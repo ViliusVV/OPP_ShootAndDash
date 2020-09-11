@@ -34,6 +34,7 @@ namespace TestOpenTk2
         Texture bgTexture;
         Sprite bgSprite;
 
+        Vector2f viewSize;
 
         public void Show()
         {
@@ -45,11 +46,15 @@ namespace TestOpenTk2
             window.SetActive(true);
             window.SetVerticalSyncEnabled(true);
             Vector2f winSize = window.GetView().Size;
+            viewSize = winSize;
 
             // Sprites
             createSprite(winSize);
 
-
+            // View
+            View view = new View(new Vector2f(winSize.X/2, winSize.Y/2), winSize);
+            window.SetView(view);
+            
             // Event hadlers
             window.Closed += (obj, e) => { window.Close(); };
             window.KeyPressed +=
@@ -63,6 +68,23 @@ namespace TestOpenTk2
                         windowEvt.Close();
                     }
                 };
+
+            float zoomView = 1.0f;
+            float previousZoom = 1.0f;
+            window.MouseWheelScrolled += (sender, e) => {
+                if (e.Wheel == Mouse.Wheel.VerticalWheel)
+                {
+                    zoomView -= -e.Delta / 10.0f;
+                    zoomView = (zoomView < 0.3f || zoomView > 2.0f) ? previousZoom : zoomView;
+                    view = window.DefaultView;
+                    view.Zoom(zoomView);
+                    previousZoom = zoomView;
+
+
+                    Console.WriteLine(e.Delta);
+                    Console.WriteLine(zoomView);
+                }
+            };
 
             // Set initial posision for text
             position.X = window.Size.X / 2f;
@@ -98,12 +120,14 @@ namespace TestOpenTk2
                 text.Position = textPos;
                 text.DisplayedString = String.Format("{0} {1}", position.X, position.Y);
 
-                Console.WriteLine(1000 * 1000 / deltaTime.AsMicroseconds());
+                //Console.WriteLine(1000 * 1000 / deltaTime.AsMicroseconds());
                 // Draw order is important
                 window.Draw(bgSprite);
                 window.Draw(text);
                 window.Draw(charSprite);
-
+                view.Center = position.toVec2f();
+                window.SetView(view);
+                
                 window.Display();
             }
         }
