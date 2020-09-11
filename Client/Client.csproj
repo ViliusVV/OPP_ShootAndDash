@@ -10,6 +10,11 @@
     <PackageReference Include="SFML.Net" Version="2.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Folder Include="Util\" />
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if not exist $(TargetDir)\Assets mkdir $(TargetDir)\Assets&#xD;&#xA;copy &quot;$(ProjectDir)Assets\&quot; &quot;$(TargetDir)Assets&quot;" />
   </Target>
