@@ -155,9 +155,10 @@ namespace TestOpenTk2
             }
             if(Keyboard.IsKeyPressed(Keyboard.Key.Space))
             {
-                bulletSprite.Origin = getCenterVector(bulletSprite);
-                bulletSprite.Position = position.toVec2f() + new Vector2f(50, 0);
-                bulletList.Add(bulletSprite);
+                Sprite myBullet = new Sprite(bulletTexture);
+                myBullet.Origin = getCenterVector(bulletSprite);
+                myBullet.Position = position.toVec2f() + new Vector2f(50, 0);
+                bulletList.Add(myBullet);
             }
         }
 
