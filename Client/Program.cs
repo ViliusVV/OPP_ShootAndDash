@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Net;
 using SFML.Graphics.Glsl;
+using System.Collections.Generic;
 
 namespace TestOpenTk2
 {
@@ -34,6 +35,10 @@ namespace TestOpenTk2
         Texture bgTexture;
         Sprite bgSprite;
 
+        Texture bulletTexture;
+        Sprite bulletSprite;
+
+        List<Sprite> bulletList = new List<Sprite>(); 
 
         public void Show()
         {
@@ -90,7 +95,7 @@ namespace TestOpenTk2
                 Time deltaTime = clock.Restart();
                 window.DispatchEvents();
                 window.Clear();
-                this.ProccesKeyboardInput(deltaTime);
+                this.ProccesKeyboardInput(deltaTime, window);
 
                 charSprite.Position = position.toVec2f();
                 Vector2f textPos = position.toVec2f();
@@ -103,6 +108,11 @@ namespace TestOpenTk2
                 window.Draw(bgSprite);
                 window.Draw(text);
                 window.Draw(charSprite);
+
+                foreach (var bullet in bulletList)
+                {
+                    window.Draw(bullet);
+                }
 
                 window.Display();
             }
@@ -121,7 +131,7 @@ namespace TestOpenTk2
             return new Vector2f(xSize / 2, ySize / 2);
         }
 
-        private void ProccesKeyboardInput(Time deltaTime)
+        private void ProccesKeyboardInput(Time deltaTime, RenderWindow window)
         {
             float movementSpeed = 500;
             float dt = deltaTime.AsSeconds();
@@ -143,6 +153,12 @@ namespace TestOpenTk2
             {
                 position.X -= movementSpeed * dt;
             }
+            if(Keyboard.IsKeyPressed(Keyboard.Key.Space))
+            {
+                bulletSprite.Origin = getCenterVector(bulletSprite);
+                bulletSprite.Position = position.toVec2f() + new Vector2f(50, 0);
+                bulletList.Add(bulletSprite);
+            }
         }
 
         private void createSprite(Vector2f winSize)
@@ -153,6 +169,9 @@ namespace TestOpenTk2
             bgTexture = new Texture("Assets/groundTexture.png") { Repeated = true };
             IntRect rect = new IntRect(0, 0, 800, 600);
             bgSprite = new Sprite(bgTexture, rect);
+            bulletTexture = new Texture("Assets/bullet.png");
+            bulletSprite = new Sprite(bulletTexture);
+
         }
 
         static float SinceEpoch()
