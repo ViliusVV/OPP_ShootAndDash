@@ -6,13 +6,14 @@ using System.Security.Cryptography.X509Certificates;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Net;
+using SFML.Graphics.Glsl;
 
 namespace TestOpenTk2
 {
     class Program
     {
         static void Main(string[] args)
-        {
+        {   
             Console.WriteLine("Creating window...");
             ShootAndDashWindow window = new ShootAndDashWindow();
 
@@ -86,10 +87,10 @@ namespace TestOpenTk2
             Clock clock = new Clock();
             while (window.IsOpen)
             {
-                Time elapsed = clock.Restart();
+                Time deltaTime = clock.Restart();
                 window.DispatchEvents();
                 window.Clear();
-                this.ProccesKeyboardInput();
+                this.ProccesKeyboardInput(deltaTime);
 
                 charSprite.Position = position.toVec2f();
                 Vector2f textPos = position.toVec2f();
@@ -97,7 +98,7 @@ namespace TestOpenTk2
                 text.Position = textPos;
                 text.DisplayedString = String.Format("{0} {1}", position.X, position.Y);
 
-                Console.WriteLine(1000 * 1000 / elapsed.AsMicroseconds());
+                Console.WriteLine(1000 * 1000 / deltaTime.AsMicroseconds());
                 // Draw order is important
                 window.Draw(bgSprite);
                 window.Draw(text);
@@ -120,25 +121,27 @@ namespace TestOpenTk2
             return new Vector2f(xSize / 2, ySize / 2);
         }
 
-        private void ProccesKeyboardInput()
+        private void ProccesKeyboardInput(Time deltaTime)
         {
+            float movementSpeed = 500;
+            float dt = deltaTime.AsSeconds();
             // Polling key presses is better than events if we
             // need to detect multiple key presses at same time
             if (Keyboard.IsKeyPressed(Keyboard.Key.Up))
             {
-                position.Y -= 5;
+                position.Y -= movementSpeed * dt;
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.Down))
             {
-                position.Y += 5;
+                position.Y += movementSpeed * dt;
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.Right))
             {
-                position.X += 5;
+                position.X += movementSpeed * dt;
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.Left))
             {
-                position.X -= 5;
+                position.X -= movementSpeed * dt;
             }
         }
 
