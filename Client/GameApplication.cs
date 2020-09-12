@@ -34,6 +34,7 @@ namespace Client
         List<Projectile> bulletList = new List<Projectile>();
         float attackCooldown;
         float attackSpeed = 200;
+        bool facingRight = true;
 
         public GameApplication() { }
 
@@ -184,10 +185,20 @@ namespace Client
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.D))
             {
+                if (!facingRight)
+                {
+                    charSprite.Scale = new Vector2f(1, 1);
+                    facingRight = true;
+                }
                 position.X += movementSpeed * dt;
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.A))
             {
+                if (facingRight)
+                {
+                    charSprite.Scale = new Vector2f(-1, 1);
+                    facingRight = false;
+                }
                 position.X -= movementSpeed * dt;
             }
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
