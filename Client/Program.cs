@@ -46,6 +46,7 @@ namespace TestOpenTk2
         List<Projectile> bulletList = new List<Projectile>();
         float attackCooldown;
         float attackSpeed = 200;
+        bool facingRight = true;
         public void Show()
         {
             // Create render window
@@ -195,10 +196,20 @@ namespace TestOpenTk2
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.Right))
             {
+                if (!facingRight)
+                {
+                    charSprite.Scale = new Vector2f(1, 1);
+                    facingRight = true;
+                }
                 position.X += movementSpeed * dt;
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.Left))
             {
+                if(facingRight)
+                {
+                    charSprite.Scale = new Vector2f(-1, 1);
+                    facingRight = false;
+                }
                 position.X -= movementSpeed * dt;
             }
             if(Keyboard.IsKeyPressed(Keyboard.Key.Space))
