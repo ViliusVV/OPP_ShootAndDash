@@ -76,7 +76,7 @@ namespace Client
             window.MouseWheelScrolled += (sender, e) => {
                 if (e.Wheel == Mouse.Wheel.VerticalWheel)
                 {
-                    zoomView -= -e.Delta / 10.0f;
+                    zoomView += -e.Delta / 10.0f;
                     zoomView = (zoomView < 0.3f || zoomView > 2.0f) ? previousZoom : zoomView;
                     view = window.DefaultView;
                     view.Zoom(zoomView);
