@@ -164,8 +164,6 @@ namespace TestOpenTk2
                     bulletList[i].Move(deltaTime.AsSeconds());
                     window.Draw(bulletList[i].ProjectileSprite);
                 }
-
-                window.Display();
             }
         }
         /// <summary>
