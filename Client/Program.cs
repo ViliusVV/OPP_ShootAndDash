@@ -134,13 +134,32 @@ namespace TestOpenTk2
                 window.Draw(charSprite);
                 view.Center = position.toVec2f();
                 window.SetView(view);
-                
 
-                foreach (var bullet in bulletList)
+                for (int i = 0; i < bulletList.Count; i++)
                 {
-                    bullet.Move(deltaTime.AsSeconds());
-                    window.Draw(bullet.ProjectileSprite);
+                    Projectile bullet = bulletList[i];
+                    bullet.TimeSinceCreation += deltaTime.AsMilliseconds();
+                    if(bullet.TimeSinceCreation > 300)
+                    {
+                        bullet.ProjectileSprite.Dispose();
+                        bulletList.RemoveAt(i);
+                    }
+                    else
+                    {
+                        bulletList[i].Move(deltaTime.AsSeconds());
+                        window.Draw(bulletList[i].ProjectileSprite);
+                    }
                 }
+                //foreach (var bullet in bulletList)
+                //{
+                //    bullet.TimeSinceCreation += deltaTime.AsMilliseconds();
+                //    if (bullet.TimeSinceCreation > 100)
+                //    {
+                //        bullet.ProjectileSprite.Dispose();
+                //    }
+                //    bullet.Move(deltaTime.AsSeconds());
+                //    window.Draw(bullet.ProjectileSprite);
+                //}
 
                 window.Display();
             }
@@ -186,6 +205,7 @@ namespace TestOpenTk2
                 Sprite myBullet = new Sprite(bulletTexture);
                 Projectile bullet = new Projectile(1000, 0, myBullet);
                 bullet.InitializeSpriteParams(getCenterVector(bulletSprite), position.toVec2f() + new Vector2f(50, 0));
+                //Task.Delay(100).ContinueWith(o => { bulletList.RemoveAt(0); });
                 bulletList.Add(bullet);
             }
         }

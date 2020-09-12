@@ -11,6 +11,7 @@ namespace Client.Objects
         public float VelocityX { get; private set; }
         public float VelocityY { get; private set; }
 
+        public int TimeSinceCreation { get; set; }
         //Texture ProjectileTexture ;
         public Sprite ProjectileSprite { get; private set; }
 
@@ -19,6 +20,7 @@ namespace Client.Objects
             this.VelocityX = velocityX;
             this.VelocityY = velocityY;
             this.ProjectileSprite = projectileSprite;
+            TimeSinceCreation = 0;
         }
         public void Move(float deltaTime)
         {
