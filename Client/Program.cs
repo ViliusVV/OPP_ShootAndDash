@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 using System.Net;
 using SFML.Graphics.Glsl;
 using System.Collections.Generic;
+using Client.Objects;
+using System.Threading.Tasks;
 
 namespace TestOpenTk2
 {
@@ -39,7 +41,7 @@ namespace TestOpenTk2
         Texture bulletTexture;
         Sprite bulletSprite;
 
-        List<Sprite> bulletList = new List<Sprite>(); 
+        List<Projectile> bulletList = new List<Projectile>(); 
 
         public void Show()
         {
@@ -136,7 +138,8 @@ namespace TestOpenTk2
 
                 foreach (var bullet in bulletList)
                 {
-                    window.Draw(bullet);
+                    bullet.Move(deltaTime.AsSeconds());
+                    window.Draw(bullet.ProjectileSprite);
                 }
 
                 window.Display();
@@ -181,9 +184,9 @@ namespace TestOpenTk2
             if(Keyboard.IsKeyPressed(Keyboard.Key.Space))
             {
                 Sprite myBullet = new Sprite(bulletTexture);
-                myBullet.Origin = getCenterVector(bulletSprite);
-                myBullet.Position = position.toVec2f() + new Vector2f(50, 0);
-                bulletList.Add(myBullet);
+                Projectile bullet = new Projectile(1000, 0, myBullet);
+                bullet.InitializeSpriteParams(getCenterVector(bulletSprite), position.toVec2f() + new Vector2f(50, 0));
+                bulletList.Add(bullet);
             }
         }
 
