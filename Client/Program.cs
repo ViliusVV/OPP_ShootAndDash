@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Net;
 using SFML.Graphics.Glsl;
+
 using System.Collections.Generic;
 using Client.Objects;
 using System.Threading.Tasks;
@@ -41,6 +42,7 @@ namespace TestOpenTk2
         Texture bulletTexture;
         Sprite bulletSprite;
 
+        Cursor cursor = new Cursor();
         List<Projectile> bulletList = new List<Projectile>();
         float attackCooldown;
         float attackSpeed = 200;
@@ -52,7 +54,8 @@ namespace TestOpenTk2
             settings.DepthBits = 32;
             RenderWindow window = new RenderWindow(mode, "ShootN'Dash v0.000001", Styles.None, settings);
             window.SetActive(true);
-            window.SetVerticalSyncEnabled(true);
+            window.SetMouseCursorVisible(false);
+            window.SetFramerateLimit(120);
             Vector2f winSize = window.GetView().Size;
             viewSize = winSize;
 
@@ -110,7 +113,6 @@ namespace TestOpenTk2
             float yOffset = text.GetLocalBounds().Top;
             text.Origin = new Vector2f(textWidth / 2f + xOffset, textHeight / 2f + yOffset);
             text.Position = new Vector2f(position.X, position.Y);
-
             // Configure sprite
             charSprite.Origin = getCenterVector(charSprite);
 
@@ -121,7 +123,9 @@ namespace TestOpenTk2
                 window.DispatchEvents();
                 window.Clear();
                 this.ProccesKeyboardInput(deltaTime);
+                var mPos = window.MapPixelToCoords(Mouse.GetPosition(window));
 
+                cursor.Update(mPos);
                 charSprite.Position = position.toVec2f();
                 Vector2f textPos = position.toVec2f();
                 textPos.Y -= charSprite.Texture.Size.Y / 2;
@@ -138,6 +142,8 @@ namespace TestOpenTk2
 
                 attackCooldown -= deltaTime.AsMilliseconds();
                 UpdateBullets(window, deltaTime);
+                window.Draw(cursor);
+                
 
                 window.Display();
             }
@@ -158,6 +164,8 @@ namespace TestOpenTk2
                     bulletList[i].Move(deltaTime.AsSeconds());
                     window.Draw(bulletList[i].ProjectileSprite);
                 }
+
+                window.Display();
             }
         }
         /// <summary>
@@ -230,6 +238,7 @@ namespace TestOpenTk2
             bgSprite = new Sprite(bgTexture, rect);
             bulletTexture = new Texture("Assets/bullet.png");
             bulletSprite = new Sprite(bulletTexture);
+            cursor.SetSprite(new Sprite(new Texture("Assets/cursor.png")));
 
         }
 
@@ -238,6 +247,48 @@ namespace TestOpenTk2
             double since = (DateTime.Now).Second;
             float fsince = (float)since;
             return fsince;
+        }
+    }
+
+    class Cursor : Drawable
+    {
+        private Sprite cursorSprite { get; set; }
+        public Vector2f position { get; set; }
+
+        public void Draw(RenderTarget target, RenderStates states)
+        {
+            target.Draw(cursorSprite);
+        }
+
+        public void Update(Vector2f pos)
+        {
+            this.position = pos;
+            cursorSprite.Position = pos;
+        }
+
+        public void SetSprite(Sprite sprite)
+        {
+            sprite.Origin = Util.GetSpriteCenter(sprite);
+            sprite.Scale = new Vector2f(2.0f, 2.0f);
+            this.cursorSprite = sprite;
+        }
+
+    }
+
+    static class Util
+    {
+        public static Vector2f GetSpriteCenter(Sprite sprite)
+        {
+            Vector2f size = GetSpriteSize(sprite);
+            return new Vector2f(size.X / 2.0f, size.Y / 2.0f);
+        }
+
+        public static Vector2f GetSpriteSize(Sprite sprite)
+        {
+            float xSize = sprite.Scale.X * sprite.Texture.Size.X;
+            float ySize = sprite.Scale.Y * sprite.Texture.Size.Y;
+
+            return new Vector2f(xSize, ySize);
         }
     }
 
