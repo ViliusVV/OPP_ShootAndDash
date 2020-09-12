@@ -42,10 +42,9 @@ namespace TestOpenTk2
         Sprite bulletSprite;
 
         Cursor cursor = new Cursor();
-        
-        List<Sprite> bulletList = new List<Sprite>(); 
-
-
+        List<Projectile> bulletList = new List<Projectile>();
+        float attackCooldown;
+        float attackSpeed = 200;
         public void Show()
         {
             // Create render window
@@ -122,7 +121,7 @@ namespace TestOpenTk2
                 Time deltaTime = clock.Restart();
                 window.DispatchEvents();
                 window.Clear();
-                this.ProccesKeyboardInput(deltaTime, window);
+                this.ProccesKeyboardInput(deltaTime);
                 var mPos = window.MapPixelToCoords(Mouse.GetPosition(window));
 
                 cursor.Update(mPos);
@@ -137,20 +136,37 @@ namespace TestOpenTk2
                 window.Draw(bgSprite);
                 window.Draw(text);
                 window.Draw(charSprite);
+                view.Center = position.toVec2f();
+                window.SetView(view);
+
+                attackCooldown -= deltaTime.AsMilliseconds();
+                UpdateBullets(window, deltaTime);
                 window.Draw(cursor);
                 
 
-                foreach (var bullet in bulletList)
+                window.Display();
+            }
+        }
+        private void UpdateBullets( RenderWindow window, Time deltaTime)
+        {
+            for (int i = 0; i < bulletList.Count; i++)
+            {
+                Projectile bullet = bulletList[i];
+                bullet.TimeSinceCreation += deltaTime.AsMilliseconds();
+                if (bullet.TimeSinceCreation > 300)
                 {
-                    window.Draw(bullet);
+                    bullet.ProjectileSprite.Dispose();
+                    bulletList.RemoveAt(i);
+                }
+                else
+                {
+                    bulletList[i].Move(deltaTime.AsSeconds());
+                    window.Draw(bulletList[i].ProjectileSprite);
                 }
 
                 window.Display();
-                view.Center = position.toVec2f();
-                window.SetView(view);
             }
         }
-
         /// <summary>
         /// Get center vector of sprite
         /// </summary>
@@ -164,7 +180,7 @@ namespace TestOpenTk2
             return new Vector2f(xSize / 2, ySize / 2);
         }
 
-        private void ProccesKeyboardInput(Time deltaTime, RenderWindow window)
+        private void ProccesKeyboardInput(Time deltaTime)
         {
             float movementSpeed = 500;
             float dt = deltaTime.AsSeconds();
@@ -188,13 +204,21 @@ namespace TestOpenTk2
             }
             if(Keyboard.IsKeyPressed(Keyboard.Key.Space))
             {
-                Sprite myBullet = new Sprite(bulletTexture);
-                myBullet.Origin = getCenterVector(bulletSprite);
-                myBullet.Position = position.toVec2f() + new Vector2f(50, 0);
-                bulletList.Add(myBullet);
+                if(attackCooldown <= 0)
+                {
+                    attackCooldown = attackSpeed;
+                    ShootBullet();
+                }
+
             }
         }
-
+        private void ShootBullet()
+        {
+            Sprite myBullet = new Sprite(bulletTexture);
+            Projectile bullet = new Projectile(1000, 0, myBullet);
+            bullet.InitializeSpriteParams(getCenterVector(bulletSprite), position.toVec2f() + new Vector2f(50, 0));
+            bulletList.Add(bullet);
+        }
         private void createSprite(Vector2f winSize)
         {
             Console.WriteLine("Loading sprites...");
