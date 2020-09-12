@@ -216,16 +216,15 @@ namespace TestOpenTk2
         private void ShootBullet()
         {
             Sprite myBullet = new Sprite(bulletTexture);
-            // put cursor position instead of mouse position
             Vector2 target = new Vector2(
-                Mouse.GetPosition().X - charSprite.Position.X,
-                Mouse.GetPosition().Y - charSprite.Position.Y
+                cursor.position.X - charSprite.Position.X,
+                cursor.position.Y - charSprite.Position.Y
             );
             target = Vector2.Normalize(target);
             Projectile bullet = new Projectile(target.X * 1000, target.Y * 1000, myBullet);
             bullet.InitializeSpriteParams(getCenterVector(bulletSprite), position.toVec2f() + new Vector2f(50, 0));
             bullet.ProjectileSprite.Rotation = MathF.Atan2(target.Y, target.X) * 180 / MathF.PI;
-
+            
             bulletList.Add(bullet);
         }
         private void createSprite(Vector2f winSize)
