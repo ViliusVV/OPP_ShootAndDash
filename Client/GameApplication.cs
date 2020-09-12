@@ -16,18 +16,15 @@ namespace Client
         public static GameApplication Instance { get; } = new GameApplication();
 
         RenderWindow window;
+        TextureHolder textures;
 
         Position position = new Position();
 
-        Texture charTexture;
         Sprite charSprite;
-        Shader charShader;
 
-        Texture bgTexture;
         Sprite bgSprite;
 
         Vector2f viewSize;
-        Texture bulletTexture;
         Sprite bulletSprite;
 
         AimCursor cursor = new AimCursor();
@@ -50,8 +47,11 @@ namespace Client
             Vector2f winSize = window.GetView().Size;
             viewSize = winSize;
 
+
             // Sprites
-            createSprite(winSize);
+            textures = new TextureHolder();
+            LoadTextures();
+            CreateSprites(winSize);
 
             // View
             View view = new View(new Vector2f(winSize.X / 2, winSize.Y / 2), winSize);
@@ -213,7 +213,7 @@ namespace Client
         }
         private void ShootBullet()
         {
-            Sprite myBullet = new Sprite(bulletTexture);
+            Sprite myBullet = new Sprite(textures.Get(TextureID.Bullet));
             Vector2 target = new Vector2(
                 cursor.position.X - charSprite.Position.X,
                 cursor.position.Y - charSprite.Position.Y
@@ -225,18 +225,24 @@ namespace Client
 
             bulletList.Add(bullet);
         }
-        private void createSprite(Vector2f winSize)
+        private void CreateSprites(Vector2f winSize)
         {
+            
             Console.WriteLine("Loading sprites...");
-            charTexture = new Texture("Assets/char.png");
-            charSprite = new Sprite(charTexture);
-            bgTexture = new Texture("Assets/groundTexture.png") { Repeated = true };
+            charSprite = new Sprite(textures.Get(TextureID.MainCharacter));
             IntRect rect = new IntRect(0, 0, 800, 600);
-            bgSprite = new Sprite(bgTexture, rect);
-            bulletTexture = new Texture("Assets/bullet.png");
-            bulletSprite = new Sprite(bulletTexture);
-            cursor.SetSprite(new Sprite(new Texture("Assets/cursor.png")));
+            bgSprite = new Sprite(textures.Get(TextureID.Background), rect);
+            bulletSprite = new Sprite(textures.Get(TextureID.Bullet));
+            cursor.SetTexture(new Texture(textures.Get(TextureID.AimCursor)));
 
+        }
+
+        public void LoadTextures()
+        {
+            textures.Load(TextureID.Background, "Assets/groundTexture.png", true);
+            textures.Load(TextureID.AimCursor, "Assets/cursor.png");
+            textures.Load(TextureID.MainCharacter, "Assets/char.png");
+            textures.Load(TextureID.Bullet, "Assets/bullet.png");
         }
 
         static float SinceEpoch()

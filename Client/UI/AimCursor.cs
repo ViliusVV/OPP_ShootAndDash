@@ -31,5 +31,10 @@ namespace Client.UI
             this.cursorSprite = sprite;
         }
 
+        public void SetTexture(Texture texture)
+        {
+            this.SetSprite(new Sprite(texture));
+        }
+
     }
 }
