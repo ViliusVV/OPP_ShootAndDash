@@ -67,10 +67,12 @@ namespace Client
             position.Y = window.Size.Y / 2f;
 
             // Configure text
-            Font font = new Font("C:/Windows/Fonts/arial.ttf");
+            Font font = new Font("Assets/pixelFontSmall.ttf");
             Text text = new Text("000 000", font)
             {
-                CharacterSize = 10
+                CharacterSize = 8,
+                Color = Color.Black
+                
             };
             float textWidth = text.GetLocalBounds().Width;
             float textHeight = text.GetLocalBounds().Height;
