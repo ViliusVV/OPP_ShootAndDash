@@ -41,8 +41,9 @@ namespace TestOpenTk2
         Texture bulletTexture;
         Sprite bulletSprite;
 
-        List<Projectile> bulletList = new List<Projectile>(); 
-
+        List<Projectile> bulletList = new List<Projectile>();
+        float attackCooldown;
+        float attackSpeed = 200;
         public void Show()
         {
             // Create render window
@@ -135,6 +136,7 @@ namespace TestOpenTk2
                 view.Center = position.toVec2f();
                 window.SetView(view);
 
+                attackCooldown -= deltaTime.AsMilliseconds();
                 for (int i = 0; i < bulletList.Count; i++)
                 {
                     Projectile bullet = bulletList[i];
@@ -202,11 +204,16 @@ namespace TestOpenTk2
             }
             if(Keyboard.IsKeyPressed(Keyboard.Key.Space))
             {
-                Sprite myBullet = new Sprite(bulletTexture);
-                Projectile bullet = new Projectile(1000, 0, myBullet);
-                bullet.InitializeSpriteParams(getCenterVector(bulletSprite), position.toVec2f() + new Vector2f(50, 0));
-                //Task.Delay(100).ContinueWith(o => { bulletList.RemoveAt(0); });
-                bulletList.Add(bullet);
+                if(attackCooldown <= 0)
+                {
+                    attackCooldown = attackSpeed;
+                    Sprite myBullet = new Sprite(bulletTexture);
+                    Projectile bullet = new Projectile(1000, 0, myBullet);
+                    bullet.InitializeSpriteParams(getCenterVector(bulletSprite), position.toVec2f() + new Vector2f(50, 0));
+                    //Task.Delay(100).ContinueWith(o => { bulletList.RemoveAt(0); });
+                    bulletList.Add(bullet);
+                }
+
             }
         }
 
