@@ -10,7 +10,7 @@ using SFML.Graphics.Glsl;
 using System.Collections.Generic;
 using Client.Objects;
 using System.Threading.Tasks;
-
+using System.Numerics;
 namespace TestOpenTk2
 {
     class Program
@@ -208,8 +208,16 @@ namespace TestOpenTk2
         private void ShootBullet()
         {
             Sprite myBullet = new Sprite(bulletTexture);
-            Projectile bullet = new Projectile(1000, 0, myBullet);
+            // put cursor position instead of mouse position
+            Vector2 target = new Vector2(
+                Mouse.GetPosition().X - charSprite.Position.X,
+                Mouse.GetPosition().Y - charSprite.Position.Y
+            );
+            target = Vector2.Normalize(target);
+            Projectile bullet = new Projectile(target.X * 1000, target.Y * 1000, myBullet);
             bullet.InitializeSpriteParams(getCenterVector(bulletSprite), position.toVec2f() + new Vector2f(50, 0));
+            bullet.ProjectileSprite.Rotation = MathF.Atan2(target.Y, target.X) * 180 / MathF.PI;
+
             bulletList.Add(bullet);
         }
         private void createSprite(Vector2f winSize)
