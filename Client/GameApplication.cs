@@ -257,7 +257,7 @@ namespace Client
             );
             target = Vector2.Normalize(target);
             Projectile bullet = new Projectile(target.X * 1000, target.Y * 1000, myBullet);
-            bullet.InitializeSpriteParams(getCenterVector(bulletSprite), position.toVec2f() + new Vector2f(50, 0));
+            bullet.InitializeSpriteParams(getCenterVector(bulletSprite), position.toVec2f());
             bullet.ProjectileSprite.Rotation = MathF.Atan2(target.Y, target.X) * 180 / MathF.PI;
 
             bulletList.Add(bullet);
