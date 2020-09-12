@@ -15,23 +15,28 @@ namespace Client
     {
         public static GameApplication Instance { get; } = new GameApplication();
 
+        private bool FullScreen { get; set; }
+        private bool PrevFullScreen { get; set; }
+        
         RenderWindow window;
         TextureHolder textures;
+        View MainView { get; set; }
 
         Position position = new Position();
 
         Sprite charSprite;
-
         Sprite bgSprite;
-
         Vector2f viewSize;
         Sprite bulletSprite;
 
         AimCursor cursor = new AimCursor();
         List<Projectile> bulletList = new List<Projectile>();
         float attackCooldown;
-        float attackSpeed = 200;
+        float attackSpeed = 250;
         bool facingRight = true;
+
+        float zoomView = 1.0f;
+        float previousZoom = 1.0f;
 
         public GameApplication() { }
 
@@ -39,11 +44,8 @@ namespace Client
         public void Run()
         {
             // Create render window
-            VideoMode mode = new VideoMode(800, 400);
-            window = new RenderWindow(mode, "ShootN'Dash v0.000001", Styles.None);
-            window.SetActive(true);
-            window.SetMouseCursorVisible(false);
-            window.SetFramerateLimit(120);
+            window = CreateRenderWindow(Styles.Close);
+
             Vector2f winSize = window.GetView().Size;
             viewSize = winSize;
 
@@ -54,39 +56,11 @@ namespace Client
             CreateSprites(winSize);
 
             // View
-            View view = new View(new Vector2f(winSize.X / 2, winSize.Y / 2), winSize);
-            window.SetView(view);
+            View MainView = window.GetView(); ;
+            window.SetView(MainView);
 
             // Event hadlers
-            window.Closed += (obj, e) => { window.Close(); };
-            window.KeyPressed +=
-                // Catch key event, event is better used for instant response
-                // but can only trigger only one key at a time
-                (sender, e) =>
-                {
-                    Window windowEvt = (Window)sender;
-                    if (e.Code == Keyboard.Key.Escape)
-                    {
-                        windowEvt.Close();
-                    }
-                };
-
-            float zoomView = 1.0f;
-            float previousZoom = 1.0f;
-            window.MouseWheelScrolled += (sender, e) => {
-                if (e.Wheel == Mouse.Wheel.VerticalWheel)
-                {
-                    zoomView += -e.Delta / 10.0f;
-                    zoomView = (zoomView < 0.3f || zoomView > 2.0f) ? previousZoom : zoomView;
-                    view = window.DefaultView;
-                    view.Zoom(zoomView);
-                    previousZoom = zoomView;
-
-
-                    Console.WriteLine(e.Delta);
-                    Console.WriteLine(zoomView);
-                }
-            };
+            BindWindowEvents(window);
 
             // Set initial posision for text
             position.X = window.Size.X / 2f;
@@ -104,17 +78,20 @@ namespace Client
             float yOffset = text.GetLocalBounds().Top;
             text.Origin = new Vector2f(textWidth / 2f + xOffset, textHeight / 2f + yOffset);
             text.Position = new Vector2f(position.X, position.Y);
+
             // Configure sprite
             charSprite.Origin = getCenterVector(charSprite);
 
             Clock clock = new Clock();
             while (window.IsOpen)
             {
+                ToogleScreen();
                 Time deltaTime = clock.Restart();
                 window.DispatchEvents();
                 window.Clear();
                 this.ProccesKeyboardInput(deltaTime);
                 var mPos = window.MapPixelToCoords(Mouse.GetPosition(window));
+                var middlePoint = (mPos + position.toVec2f())/ 2.0f;
 
                 charSprite.Position = position.toVec2f();
                 Vector2f textPos = position.toVec2f();
@@ -133,11 +110,24 @@ namespace Client
                 cursor.Update(mPos);
                 window.Draw(cursor);
 
-                view.Center = position.toVec2f();
-                window.SetView(view);
+                MainView.Center = middlePoint;
+                window.SetView(MainView);
                 window.Display();
             }
         }
+
+        private void ToogleScreen()
+        {
+            if(FullScreen != PrevFullScreen)
+            {
+                PrevFullScreen = FullScreen;
+                var windowStyle = FullScreen ? Styles.Fullscreen : Styles.Close;
+                window.Close();
+                window = CreateRenderWindow(windowStyle);
+                BindWindowEvents(window);
+            }
+        }
+
         private void UpdateBullets(RenderWindow window, Time deltaTime)
         {
             for (int i = 0; i < bulletList.Count; i++)
@@ -156,6 +146,52 @@ namespace Client
                 }
             }
         }
+
+        public RenderWindow CreateRenderWindow(Styles windowStyle)
+        {
+            VideoMode videoMode = new VideoMode(1280, 720);
+            RenderWindow window = new RenderWindow(videoMode, "ShootN'Dash v0.09", windowStyle);
+            window.SetActive(true);
+            window.SetMouseCursorVisible(false);
+            window.SetFramerateLimit(120);
+
+            return window;
+        }
+
+        public void BindWindowEvents(RenderWindow window)
+        {
+            window.Closed += (obj, e) => { window.Close(); };
+            window.KeyPressed +=
+                // Catch key event, event is better used for instant response
+                // but can only trigger only one key at a time
+                (sender, e) =>
+                {
+                    Window windowEvt = (Window)sender;
+                    if (e.Code == Keyboard.Key.Escape)
+                    {
+                        windowEvt.Close();
+                    }
+                    if (e.Code == Keyboard.Key.Numpad0)
+                    {
+                        FullScreen = !FullScreen;
+                    }
+                };
+
+            window.MouseWheelScrolled += (sender, e) => {
+                if (e.Wheel == Mouse.Wheel.VerticalWheel)
+                {
+                    zoomView += -e.Delta / 10.0f;
+                    zoomView = (zoomView < 0.3f || zoomView > 2.0f) ? previousZoom : zoomView;
+                    MainView = window.DefaultView;
+                    MainView.Zoom(zoomView);
+                    previousZoom = zoomView;
+
+
+                    Console.WriteLine(e.Delta);
+                    Console.WriteLine(zoomView);
+                }
+            };
+        }
         /// <summary>
         /// Get center vector of sprite
         /// </summary>
@@ -163,6 +199,7 @@ namespace Client
         /// <returns>Center vector</returns>
         private static Vector2f getCenterVector(Sprite charSprite)
         {
+            
             // Sprite size is native texture size multiplied by sprite's scale
             float xSize = charSprite.Texture.Size.X * charSprite.Scale.X;
             float ySize = charSprite.Texture.Size.Y * charSprite.Scale.Y;
@@ -239,10 +276,11 @@ namespace Client
 
         public void LoadTextures()
         {
-            textures.Load(TextureID.Background, "Assets/groundTexture.png", true);
+            textures.Load(TextureID.Background, "Assets/tileGrass.png", true);
             textures.Load(TextureID.AimCursor, "Assets/cursor.png");
             textures.Load(TextureID.MainCharacter, "Assets/char.png");
             textures.Load(TextureID.Bullet, "Assets/bullet.png");
+            textures.Load(TextureID.GunAk47, "Assets/gunAk47.png");
         }
 
         static float SinceEpoch()

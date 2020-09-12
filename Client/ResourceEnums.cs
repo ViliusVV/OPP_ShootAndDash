@@ -6,9 +6,16 @@ namespace Client
 {
     internal enum TextureID
     {
+        // Tiles
         Background,
+        // Characters
         MainCharacter,
-        AimCursor, 
-        Bullet
+        // UI
+        AimCursor,
+        // Projectiles
+        Bullet,
+        // Guns
+        GunAk47
+
     }
 }

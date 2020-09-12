@@ -5,7 +5,7 @@ using SFML.Graphics;
 
 namespace Client
 {
-    internal abstract class ResourceHolder<TIdentifier, TResource, TParameter>
+    abstract class ResourceHolder<TIdentifier, TResource, TParameter>
     {
         private Dictionary<TIdentifier, TResource> resourceMap = new Dictionary<TIdentifier, TResource>();
 
@@ -23,7 +23,7 @@ namespace Client
         }
     }
 
-    internal class TextureHolder : ResourceHolder<TextureID, Texture, IntRect>
+    class TextureHolder : ResourceHolder<TextureID, Texture, IntRect>
     {
         public override void Load(TextureID id, string filename)
         {
