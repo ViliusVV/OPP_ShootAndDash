@@ -138,14 +138,13 @@ namespace TestOpenTk2
                 window.Draw(bgSprite);
                 window.Draw(text);
                 window.Draw(charSprite);
-                view.Center = position.toVec2f();
-                window.SetView(view);
 
                 attackCooldown -= deltaTime.AsMilliseconds();
                 UpdateBullets(window, deltaTime);
                 window.Draw(cursor);
-                
 
+                view.Center = position.toVec2f();
+                window.SetView(view);
                 window.Display();
             }
         }
@@ -186,15 +185,15 @@ namespace TestOpenTk2
             float dt = deltaTime.AsSeconds();
             // Polling key presses is better than events if we
             // need to detect multiple key presses at same time
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Up))
+            if (Keyboard.IsKeyPressed(Keyboard.Key.W))
             {
                 position.Y -= movementSpeed * dt;
             }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Down))
+            if (Keyboard.IsKeyPressed(Keyboard.Key.S))
             {
                 position.Y += movementSpeed * dt;
             }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Right))
+            if (Keyboard.IsKeyPressed(Keyboard.Key.D))
             {
                 if (!facingRight)
                 {
@@ -203,7 +202,7 @@ namespace TestOpenTk2
                 }
                 position.X += movementSpeed * dt;
             }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Left))
+            if (Keyboard.IsKeyPressed(Keyboard.Key.A))
             {
                 if(facingRight)
                 {
@@ -212,7 +211,7 @@ namespace TestOpenTk2
                 }
                 position.X -= movementSpeed * dt;
             }
-            if(Keyboard.IsKeyPressed(Keyboard.Key.Space))
+            if(Mouse.IsButtonPressed(Mouse.Button.Left))
             {
                 if(attackCooldown <= 0)
                 {
