@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
+using Client.Collisions;
 
 namespace Client
 {
@@ -178,7 +179,12 @@ namespace Client
                 {
                     bulletList[i].Move(deltaTime.AsSeconds());
                     window.Draw(bullet);
+                    if (CollisionTester.BoundingBoxTest(bullet.ProjectileSprite, charSprite))
+                    {
+                        Console.WriteLine("Bullet and character colliding");
+                    }
                 }
+
             }
         }
 
