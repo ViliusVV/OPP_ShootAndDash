@@ -9,10 +9,17 @@ namespace Client.Config
     class ResourceAttr : Attribute
     {
         public string Path { get; private set; }
+        public bool IgnoreBatchLoad { get; set; }
+
 
         public ResourceAttr(string path)
         {
             this.Path = path;
+        }
+
+        public ResourceAttr(string path, bool ignoreBatchLoad): this(path)
+        {
+            this.IgnoreBatchLoad = ignoreBatchLoad;
         }
     }
 

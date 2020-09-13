@@ -32,6 +32,7 @@ namespace Client
         Sprite charSprite;
         Sprite bgSprite;
         Sprite bulletSprite;
+        Sprite ak47Sprite;
 
         AimCursor cursor = new AimCursor();
         List<Projectile> bulletList = new List<Projectile>();
@@ -89,6 +90,7 @@ namespace Client
 
             // Configure sprite
             charSprite.Origin = SpriteUtils.GetSpriteCenter(charSprite);
+            ak47Sprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(ak47Sprite).X, 0.0f);
 
             Clock clock = new Clock();
             while (window.IsOpen)
@@ -106,8 +108,17 @@ namespace Client
                 MainView.Zoom(zoomView);
                 zoomView = 1.0f;
                 window.SetView(MainView);
+                double dx = mPos.X - position.X;
+                double dy = mPos.Y - position.Y;
+
+                float rotation = (float)((Math.Atan2(dy, dx)) * 180 / Math.PI);
+                Console.WriteLine("Rotation: {0}", rotation);
+
 
                 charSprite.Position = position.ToVec2f();
+                ak47Sprite.Position = position.ToVec2f();
+                ak47Sprite.Rotation = rotation;
+                ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
                 Vector2f textPos = position.ToVec2f();
                 textPos.Y -= charSprite.Texture.Size.Y / 2;
                 text.Position = textPos;
@@ -117,6 +128,7 @@ namespace Client
                 window.Draw(bgSprite);
                 window.Draw(text);
                 window.Draw(charSprite);
+                window.Draw(ak47Sprite);
 
                 attackCooldown -= deltaTime.AsMilliseconds();
                 UpdateBullets(window, deltaTime);
@@ -147,7 +159,7 @@ namespace Client
             {
                 Projectile bullet = bulletList[i];
                 bullet.TimeSinceCreation += deltaTime.AsMilliseconds();
-                if (bullet.TimeSinceCreation > 300)
+                if (bullet.TimeSinceCreation > 600)
                 {
                     bullet.ProjectileSprite.Dispose();
                     bulletList.RemoveAt(i);
@@ -281,6 +293,7 @@ namespace Client
             IntRect rect = new IntRect(0, 0, 1280, 720);
             bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
             bulletSprite = new Sprite(Textures.Get(TextureIdentifier.Bullet));
+            ak47Sprite = new Sprite(Textures.Get(TextureIdentifier.GunAk47));
             cursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
 
         }
