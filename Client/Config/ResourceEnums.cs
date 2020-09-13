@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Client.Config
 {
-    public enum SoundResource
+    public enum SoundIdentifier
     {
         [ResourceAttr("Assets/soundGenericGun.ogg")] GenericGun,
         [ResourceAttr("Assets/soundSniper.ogg")] Sniper
@@ -26,8 +26,8 @@ namespace Client.Config
         [ResourceAttr("Assets/hudPlayerBar.png")] PlayerBar
     }
 
-    public enum FontResource
+    public enum FontIdentifier
     {
-        [ResourceAttr("Assets/pixelFontSmall.ogg")] PixelatedSmall,
+        [ResourceAttr("Assets/pixelFontSmall.ttf")] PixelatedSmall,
     }
 }

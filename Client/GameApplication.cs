@@ -20,14 +20,16 @@ namespace Client
         private bool PrevFullScreen { get; set; }
         
         RenderWindow window;
-        TextureHolder textures;
+
+        private TextureHolder Textures { get; } = new TextureHolder();
+        private SoundHolder Sounds { get; } = new SoundHolder();
+        private FontHolder Fonts { get; } = new FontHolder();
         View MainView { get; set; }
 
         Position position = new Position();
 
         Sprite charSprite;
         Sprite bgSprite;
-        Vector2f viewSize;
         Sprite bulletSprite;
 
         AimCursor cursor = new AimCursor();
@@ -42,23 +44,26 @@ namespace Client
         public GameApplication() { }
 
 
+
+        // ========================================================================
+        // =========================== MAIN ENTRY POINT ===========================
+        // ========================================================================
+
         public void Run()
         {
-            string path = SoundResource.GenericGun.GetResoucePath();
-            Console.WriteLine("Generic gun path: {0}", path);
             // Create render window
             window = CreateRenderWindow(Styles.Close);
             Vector2f winSize = window.GetView().Size;
-            viewSize = winSize;
 
 
-            // Sprites
-            textures = new TextureHolder();
+            // Load resources
             LoadTextures();
-            CreateSprites(winSize);
+            LoadSounds();
+            LoadFonts();
+            CreateSprites();
 
             // View
-            View MainView = window.GetView(); ;
+            View MainView = window.DefaultView; 
             window.SetView(MainView);
 
 
@@ -71,7 +76,7 @@ namespace Client
             Text text = new Text("000 000", font)
             {
                 CharacterSize = 14,
-                FillColor = Color.Black
+                OutlineThickness = 2.0f
                 
             };
             float textWidth = text.GetLocalBounds().Width;
@@ -82,22 +87,27 @@ namespace Client
             text.Position = new Vector2f(position.X, position.Y);
 
             // Configure sprite
-            charSprite.Origin = getCenterVector(charSprite);
+            charSprite.Origin = SpriteUtils.GetSpriteCenter(charSprite);
 
             Clock clock = new Clock();
             while (window.IsOpen)
             {
                 ToogleScreen();
                 Time deltaTime = clock.Restart();
+                Console.WriteLine(deltaTime.AsMicroseconds());
                 window.Clear();
                 window.DispatchEvents();
                
                 this.ProccesKeyboardInput(deltaTime);
                 var mPos = window.MapPixelToCoords(Mouse.GetPosition(window));
-                var middlePoint = (mPos + position.toVec2f())/ 2.0f;
+                var middlePoint = (mPos + position.ToVec2f())/ 2.0f;
+                MainView.Center = middlePoint;
+                MainView.Zoom(zoomView);
+                zoomView = 1.0f;
+                window.SetView(MainView);
 
-                charSprite.Position = position.toVec2f();
-                Vector2f textPos = position.toVec2f();
+                charSprite.Position = position.ToVec2f();
+                Vector2f textPos = position.ToVec2f();
                 textPos.Y -= charSprite.Texture.Size.Y / 2;
                 text.Position = textPos;
                 text.DisplayedString = String.Format("{0} {1}", position.X, position.Y);
@@ -116,10 +126,6 @@ namespace Client
 
                 window.Display();
 
-                MainView.Center = middlePoint;
-                MainView.Zoom(zoomView);
-                zoomView = 1.0f;
-                window.SetView(MainView);
             }
         }
 
@@ -200,20 +206,6 @@ namespace Client
             };
         }
 
-        /// <summary>
-        /// Get center vector of sprite
-        /// </summary>
-        /// <param name="charSprite">Sprite to get center of</param>
-        /// <returns>Center vector</returns>
-        private static Vector2f getCenterVector(Sprite charSprite)
-        {
-            
-            // Sprite size is native texture size multiplied by sprite's scale
-            float xSize = charSprite.Texture.Size.X * charSprite.Scale.X;
-            float ySize = charSprite.Texture.Size.Y * charSprite.Scale.Y;
-            return new Vector2f(xSize / 2, ySize / 2);
-        }
-
         private void ProccesKeyboardInput(Time deltaTime)
         {
             float movementSpeed = 500;
@@ -258,58 +250,79 @@ namespace Client
         }
         private void ShootBullet()
         {
-            Sprite myBullet = new Sprite(textures.Get(TextureIdentifier.Bullet));
+            Sprite myBullet = new Sprite(Textures.Get(TextureIdentifier.Bullet));
             Vector2 target = new Vector2(
-                cursor.position.X - charSprite.Position.X,
-                cursor.position.Y - charSprite.Position.Y
+                cursor.Position.X - charSprite.Position.X,
+                cursor.Position.Y - charSprite.Position.Y
             );
             target = Vector2.Normalize(target);
             Projectile bullet = new Projectile(target.X * 1000, target.Y * 1000, myBullet);
-            bullet.InitializeSpriteParams(getCenterVector(bulletSprite), position.toVec2f());
+            bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(bulletSprite), position.ToVec2f());
             bullet.ProjectileSprite.Rotation = MathF.Atan2(target.Y, target.X) * 180 / MathF.PI;
 
             bulletList.Add(bullet);
         }
-        private void CreateSprites(Vector2f winSize)
+
+
+        // ========================================================================
+        // ======================== INITIALIZATION METHODS ========================
+        // ========================================================================
+
+        // Create sprites and some game objects
+        // TODO: Make it better
+        private void CreateSprites()
         {
-            
+
             Console.WriteLine("Loading sprites...");
-            charSprite = new Sprite(textures.Get(TextureIdentifier.MainCharacter));
+            charSprite = new Sprite(Textures.Get(TextureIdentifier.MainCharacter));
             IntRect rect = new IntRect(0, 0, 1280, 720);
-            bgSprite = new Sprite(textures.Get(TextureIdentifier.Background), rect);
-            bulletSprite = new Sprite(textures.Get(TextureIdentifier.Bullet));
-            cursor.SetTexture(new Texture(textures.Get(TextureIdentifier.AimCursor)));
+            bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
+            bulletSprite = new Sprite(Textures.Get(TextureIdentifier.Bullet));
+            cursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
 
         }
 
-
-        // =============== INITIALIZATION METHODS =================
 
         // Load all game textures
         public void LoadTextures()
         {
+            Console.WriteLine("Loading textures...");
+
             // Iterate over all textures and load
             var allTextures = Enum.GetValues(typeof(TextureIdentifier));
             foreach(TextureIdentifier texture in allTextures)
             {
-                textures.Load(texture);
+                Textures.Load(texture);
             }
 
             // Set special properties for some textures
-            textures.Get(TextureIdentifier.Background).Repeated = true;
-
+            Textures.Get(TextureIdentifier.Background).Repeated = true;
         }
+
 
         // Load all music and sound efects
         public void LoadSounds()
         {
+            Console.WriteLine("Loading sounds...");
 
+            var allSounds = Enum.GetValues(typeof(SoundIdentifier));
+            foreach (SoundIdentifier sound in allSounds)
+            {
+                Sounds.Load(sound);
+            }
         }
+
 
         // Load all custom fonts
         public void LoadFonts()
         {
+            Console.WriteLine("Loading textures...");
 
+            var allFonts = Enum.GetValues(typeof(FontIdentifier));
+            foreach (FontIdentifier font in allFonts)
+            {
+                Fonts.Load(font);
+            }
         }
     }
 }
