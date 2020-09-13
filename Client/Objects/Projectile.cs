@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Client.Objects
 {
-    class Projectile
+    class Projectile : Drawable
     {
         public float VelocityX { get; private set; }
         public float VelocityY { get; private set; }
@@ -30,6 +30,11 @@ namespace Client.Objects
         {
             ProjectileSprite.Origin = origin;
             ProjectileSprite.Position = position;
+        }
+
+        public void Draw(RenderTarget target, RenderStates states)
+        {
+            target.Draw(ProjectileSprite);
         }
     }
 }

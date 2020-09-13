@@ -141,7 +141,7 @@ namespace Client
                 window.Draw(playerBarMask);
                 window.Draw(playerBar);
                 attackCooldown -= deltaTime.AsMilliseconds();
-                UpdateBullets(window, deltaTime);
+                UpdateBullets(deltaTime);
 
                 cursor.Update(mPos);
                 window.Draw(cursor);
@@ -163,7 +163,7 @@ namespace Client
             }
         }
 
-        private void UpdateBullets(RenderWindow window, Time deltaTime)
+        private void UpdateBullets(Time deltaTime)
         {
             for (int i = 0; i < bulletList.Count; i++)
             {
@@ -177,7 +177,7 @@ namespace Client
                 else
                 {
                     bulletList[i].Move(deltaTime.AsSeconds());
-                    window.Draw(bulletList[i].ProjectileSprite);
+                    window.Draw(bullet);
                 }
             }
         }
