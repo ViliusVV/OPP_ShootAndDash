@@ -186,6 +186,11 @@ namespace Client
                     {
                         Console.WriteLine("Bullet and character colliding");
                     }
+                    if(CollisionTester.BoundingBoxTest(bullet.ProjectileSprite, crate))
+                    {
+                        bullet.ProjectileSprite.Dispose();
+                        bulletList.RemoveAt(i);
+                    }
                 }
 
             }
