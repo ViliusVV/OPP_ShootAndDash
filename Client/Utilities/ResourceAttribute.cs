@@ -19,15 +19,15 @@ namespace Client.Config
     // Game resrouce class which helps to pull field data form enums with ResoureAttr atribute
     public static class GameResourceHelper
     {
-        private static ResourceAttr GetAttr<R>(R r) where R : Enum
+        private static ResourceAttr GetAttr(Object r)
         {
             return (ResourceAttr)Attribute.GetCustomAttribute(ForValue(r), typeof(ResourceAttr));
         }
 
 
-        private static MemberInfo ForValue<R>(R r) where R : Enum
+        private static MemberInfo ForValue(Object r)
         {
-            return typeof(R).GetField(Enum.GetName(typeof(R), r));
+            return r.GetType().GetField(Enum.GetName(r.GetType(), r));
         }
 
 
@@ -37,4 +37,6 @@ namespace Client.Config
             return attr.Path;
         }
     }
+
+
 }

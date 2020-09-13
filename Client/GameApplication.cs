@@ -2,6 +2,7 @@
 using Client.Objects;
 using Client.UI;
 using Client.Utilities;
+using SFML.Audio;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -35,7 +36,7 @@ namespace Client
         AimCursor cursor = new AimCursor();
         List<Projectile> bulletList = new List<Projectile>();
         float attackCooldown;
-        float attackSpeed = 250;
+        float attackSpeed = 150;
         bool facingRight = true;
 
         float zoomView = 1.0f;
@@ -72,7 +73,7 @@ namespace Client
             position.Y = window.Size.Y / 2f;
 
             // Configure text
-            Font font = new Font("Assets/pixelFontSmall.ttf");
+            Font font = Fonts.Get(FontIdentifier.PixelatedSmall);
             Text text = new Text("000 000", font)
             {
                 CharacterSize = 14,
@@ -162,8 +163,7 @@ namespace Client
         public RenderWindow CreateRenderWindow(Styles windowStyle)
         {
             VideoMode videoMode = new VideoMode(1280, 720);
-            RenderWindow window = new RenderWindow(videoMode, "ShootN'Dash v0.09", windowStyle);
-            window.SetActive(true);
+            RenderWindow window = new RenderWindow(videoMode, "ShootN'Dash v0.011", windowStyle);
             window.SetMouseCursorVisible(false);
             window.SetFramerateLimit(120);
 
@@ -176,7 +176,8 @@ namespace Client
         {
             window.Closed += (obj, e) => { window.Close(); };
             window.KeyPressed +=
-                // Catch key event, event is better used for instant response
+                // Catch key event. E
+                // Event is better used for instant response
                 // but can only trigger only one key at a time
                 (sender, e) =>
                 {
@@ -261,6 +262,8 @@ namespace Client
             bullet.ProjectileSprite.Rotation = MathF.Atan2(target.Y, target.X) * 180 / MathF.PI;
 
             bulletList.Add(bullet);
+            Sound sound = Sounds.Get(SoundIdentifier.GenericGun);
+            sound.Play();
         }
 
 
@@ -316,7 +319,7 @@ namespace Client
         // Load all custom fonts
         public void LoadFonts()
         {
-            Console.WriteLine("Loading textures...");
+            Console.WriteLine("Loading fonts...");
 
             var allFonts = Enum.GetValues(typeof(FontIdentifier));
             foreach (FontIdentifier font in allFonts)

@@ -23,6 +23,8 @@ namespace Client
 
         protected void InsertResource(TIdentifier id, TResource resource)
         {
+            Console.WriteLine("Loaded resource: {0}", GameResourceHelper.GetResoucePath<Enum>(id as Enum));
+
             resourceMap.Add(id, resource);
         }
     }
