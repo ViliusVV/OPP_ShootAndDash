@@ -33,6 +33,8 @@ namespace Client
         Sprite bgSprite;
         Sprite bulletSprite;
         Sprite ak47Sprite;
+        Sprite playerBar;
+        Sprite playerBarMask;
 
         AimCursor cursor = new AimCursor();
         List<Projectile> bulletList = new List<Projectile>();
@@ -83,15 +85,18 @@ namespace Client
             };
             float textWidth = text.GetLocalBounds().Width;
             float textHeight = text.GetLocalBounds().Height;
-            float xOffset = text.GetLocalBounds().Left;
-            float yOffset = text.GetLocalBounds().Top;
+            float xOffset = text.GetLocalBounds().Left + 30;
+            float yOffset = text.GetLocalBounds().Top + 30;
             text.Origin = new Vector2f(textWidth / 2f + xOffset, textHeight / 2f + yOffset);
             text.Position = new Vector2f(position.X, position.Y);
 
             // Configure sprite
             charSprite.Origin = SpriteUtils.GetSpriteCenter(charSprite);
+            playerBar.Origin = SpriteUtils.GetSpriteCenter(playerBar);
+            playerBarMask.Origin = SpriteUtils.GetSpriteCenter(playerBarMask);
             ak47Sprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(ak47Sprite).X, 0.0f);
-
+            playerBar.Scale = new Vector2f(1.5f, 1.5f);
+            playerBarMask.Scale = new Vector2f(1.5f, 1.5f);
             Clock clock = new Clock();
             while (window.IsOpen)
             {
@@ -114,12 +119,16 @@ namespace Client
                 float rotation = (float)((Math.Atan2(dy, dx)) * 180 / Math.PI);
                 Console.WriteLine("Rotation: {0}", rotation);
 
+                Vector2f playerBarPos = new Vector2f(position.X, position.Y - 40);
 
                 charSprite.Position = position.ToVec2f();
                 ak47Sprite.Position = position.ToVec2f();
+                playerBar.Position = playerBarPos;
+                playerBarMask.Position = playerBarPos;
                 ak47Sprite.Rotation = rotation;
                 ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
                 Vector2f textPos = position.ToVec2f();
+               
                 textPos.Y -= charSprite.Texture.Size.Y / 2;
                 text.Position = textPos;
                 text.DisplayedString = String.Format("{0} {1}", position.X, position.Y);
@@ -129,7 +138,8 @@ namespace Client
                 window.Draw(text);
                 window.Draw(charSprite);
                 window.Draw(ak47Sprite);
-
+                window.Draw(playerBarMask);
+                window.Draw(playerBar);
                 attackCooldown -= deltaTime.AsMilliseconds();
                 UpdateBullets(window, deltaTime);
 
@@ -294,6 +304,8 @@ namespace Client
             bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
             bulletSprite = new Sprite(Textures.Get(TextureIdentifier.Bullet));
             ak47Sprite = new Sprite(Textures.Get(TextureIdentifier.GunAk47));
+            playerBar = new Sprite(Textures.Get(TextureIdentifier.PlayerBar));
+            playerBarMask = new Sprite(Textures.Get(TextureIdentifier.PlayerBarMask));
             cursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
 
         }
