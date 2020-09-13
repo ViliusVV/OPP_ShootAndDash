@@ -11,12 +11,16 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using Client.Collisions;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Runtime.InteropServices.ComTypes;
+using Client.Models;
 
 namespace Client
 {
     class GameApplication
     {
-        public static GameApplication Instance { get; } = new GameApplication();
+        // Singleton instance
+        private static readonly GameApplication _instance = new GameApplication();
 
         private bool FullScreen { get; set; }
         private bool PrevFullScreen { get; set; }
@@ -26,17 +30,18 @@ namespace Client
         private TextureHolder Textures { get; } = new TextureHolder();
         private SoundHolder Sounds { get; } = new SoundHolder();
         private FontHolder Fonts { get; } = new FontHolder();
-        View MainView { get; set; }
+        private View MainView { get; set; }
+        private View ZoomedView { get; set; }
 
         Position position = new Position();
 
-        Sprite charSprite;
         Sprite bgSprite;
         Sprite bulletSprite;
         Sprite ak47Sprite;
         Sprite playerBar;
         Sprite playerBarMask;
         Sprite crate;
+        Player mainPlayer = new Player();
 
         AimCursor cursor = new AimCursor();
         List<Projectile> bulletList = new List<Projectile>();
@@ -48,6 +53,11 @@ namespace Client
         float previousZoom = 1.0f;
 
         public GameApplication() { }
+
+        public static GameApplication GetInstance()
+        {
+            return _instance;
+        }
 
 
 
@@ -69,77 +79,54 @@ namespace Client
             CreateSprites();
 
             // View
-            View MainView = window.DefaultView; 
-            window.SetView(MainView);
+            MainView = window.DefaultView;
+            ZoomedView = new View(MainView);
+            window.SetView(ZoomedView);
 
 
             // Set initial posision for text
-            position.X = window.Size.X / 2f;
-            position.Y = window.Size.Y / 2f;
-
-            // Configure text
-            Font font = Fonts.Get(FontIdentifier.PixelatedSmall);
-            Text text = new Text("000 000", font)
-            {
-                CharacterSize = 14,
-                OutlineThickness = 2.0f
-                
-            };
-            float textWidth = text.GetLocalBounds().Width;
-            float textHeight = text.GetLocalBounds().Height;
-            float xOffset = text.GetLocalBounds().Left + 30;
-            float yOffset = text.GetLocalBounds().Top + 30;
-            text.Origin = new Vector2f(textWidth / 2f + xOffset, textHeight / 2f + yOffset);
-            text.Position = new Vector2f(position.X, position.Y);
+            mainPlayer.Position = new Vector2f(window.Size.X / 2f, window.Size.Y / 2f);
 
             // Configure sprite
-            charSprite.Origin = SpriteUtils.GetSpriteCenter(charSprite);
+            mainPlayer.Origin = SpriteUtils.GetSpriteCenter(mainPlayer);
             playerBar.Origin = SpriteUtils.GetSpriteCenter(playerBar);
             playerBarMask.Origin = SpriteUtils.GetSpriteCenter(playerBarMask);
             ak47Sprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(ak47Sprite).X, 0.0f);
+
             playerBar.Scale = new Vector2f(1.5f, 1.5f);
             playerBarMask.Scale = new Vector2f(1.5f, 1.5f);
+
             Clock clock = new Clock();
             while (window.IsOpen)
             {
                 ToogleScreen();
                 Time deltaTime = clock.Restart();
-                //Console.WriteLine(deltaTime.AsMicroseconds());
                 window.Clear();
                 window.DispatchEvents();
                
                 this.ProccesKeyboardInput(deltaTime);
                 var mPos = window.MapPixelToCoords(Mouse.GetPosition(window));
-                var middlePoint = (mPos + position.ToVec2f())/ 2.0f;
-                MainView.Center = middlePoint;
-                MainView.Zoom(zoomView);
-                zoomView = 1.0f;
-                window.SetView(MainView);
+                var middlePoint = VectorUtils.GetMiddlePoint(position.ToVec2f(), mPos);
+
                 double dx = mPos.X - position.X;
                 double dy = mPos.Y - position.Y;
 
-                float rotation = (float)((Math.Atan2(dy, dx)) * 180 / Math.PI);
-                //Console.WriteLine("Rotation: {0}", rotation);
+                float rotation = VectorUtils.GetAngleBetweenVectors(position.ToVec2f(), mPos);
 
                 Vector2f playerBarPos = new Vector2f(position.X, position.Y - 40);
 
-                charSprite.Position = position.ToVec2f();
+                mainPlayer.Position = position.ToVec2f();
                 ak47Sprite.Position = position.ToVec2f();
                 playerBar.Position = playerBarPos;
                 playerBarMask.Position = playerBarPos;
                 crate.Position = new Vector2f(1000, 400);
                 ak47Sprite.Rotation = rotation;
                 ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
-                Vector2f textPos = position.ToVec2f();
                
-                textPos.Y -= charSprite.Texture.Size.Y / 2;
-                text.Position = textPos;
-                text.DisplayedString = String.Format("{0} {1}", position.X, position.Y);
 
                 //Draw order is important
                 window.Draw(bgSprite);
-                window.Draw(text);
-                window.Draw(charSprite);
+                window.Draw(mainPlayer);
                 window.Draw(ak47Sprite);
                 window.Draw(playerBarMask);
                 window.Draw(playerBar);
@@ -150,6 +137,10 @@ namespace Client
                 cursor.Update(mPos);
                 window.Draw(cursor);
 
+                ZoomedView.Center = middlePoint;
+                ZoomedView.Zoom(zoomView);
+                zoomView = 1.0f;
+                window.SetView(ZoomedView);
 
                 window.Display();
 
@@ -182,7 +173,7 @@ namespace Client
                 {
                     bulletList[i].Move(deltaTime.AsSeconds());
                     window.Draw(bullet);
-                    if (CollisionTester.BoundingBoxTest(bullet.ProjectileSprite, charSprite))
+                    if (CollisionTester.BoundingBoxTest(bullet.ProjectileSprite, mainPlayer))
                     {
                         Console.WriteLine("Bullet and character colliding");
                     }
@@ -253,10 +244,10 @@ namespace Client
             // need to detect multiple key presses at same time
             if (Keyboard.IsKeyPressed(Keyboard.Key.W))
             {
-                //Console.WriteLine(charSprite.Position);
+                //Console.WriteLine(mainPlayer.Position);
                 //Console.WriteLine(crate.Position);
-                charSprite.Position = new Vector2f(charSprite.Position.X, charSprite.Position.Y - moveDistance);
-                if (CollisionTester.BoundingBoxTest(charSprite, crate))
+                mainPlayer.Position = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y - moveDistance);
+                if (CollisionTester.BoundingBoxTest(mainPlayer, crate))
                 {
                     Console.WriteLine("Player collided with a crate");
                 }
@@ -264,13 +255,13 @@ namespace Client
                 {
                     position.Y -= moveDistance;
                 }
-                charSprite.Position = new Vector2f(charSprite.Position.X , charSprite.Position.Y + moveDistance);
+                mainPlayer.Position = new Vector2f(mainPlayer.Position.X , mainPlayer.Position.Y + moveDistance);
 
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.S))
             {
-                charSprite.Position = new Vector2f(charSprite.Position.X, charSprite.Position.Y + moveDistance);
-                if (CollisionTester.BoundingBoxTest(charSprite, crate))
+                mainPlayer.Position = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y + moveDistance);
+                if (CollisionTester.BoundingBoxTest(mainPlayer, crate))
                 {
                     Console.WriteLine("Player collided with a crate");
                 }
@@ -278,17 +269,17 @@ namespace Client
                 {
                     position.Y += moveDistance;
                 }
-                charSprite.Position = new Vector2f(charSprite.Position.X, charSprite.Position.Y - moveDistance);
+                mainPlayer.Position = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y - moveDistance);
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.D))
             {
                 if (!facingRight)
                 {
-                    charSprite.Scale = new Vector2f(1, 1);
+                    mainPlayer.Scale = new Vector2f(1, 1);
                     facingRight = true;
                 }
-                charSprite.Position = new Vector2f(charSprite.Position.X + moveDistance, charSprite.Position.Y );
-                if (CollisionTester.BoundingBoxTest(charSprite, crate))
+                mainPlayer.Position = new Vector2f(mainPlayer.Position.X + moveDistance, mainPlayer.Position.Y );
+                if (CollisionTester.BoundingBoxTest(mainPlayer, crate))
                 {
                     Console.WriteLine("Player collided with a crate");
                 }
@@ -296,19 +287,19 @@ namespace Client
                 {
                     position.X += moveDistance;
                 }
-                charSprite.Position = new Vector2f(charSprite.Position.X - moveDistance, charSprite.Position.Y);
+                mainPlayer.Position = new Vector2f(mainPlayer.Position.X - moveDistance, mainPlayer.Position.Y);
 
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.A))
             {
                 if (facingRight)
                 {
-                    charSprite.Scale = new Vector2f(-1, 1);
+                    mainPlayer.Scale = new Vector2f(-1, 1);
                     facingRight = false;
                 }
 
-                charSprite.Position = new Vector2f(charSprite.Position.X - moveDistance, charSprite.Position.Y);
-                if (CollisionTester.BoundingBoxTest(charSprite, crate))
+                mainPlayer.Position = new Vector2f(mainPlayer.Position.X - moveDistance, mainPlayer.Position.Y);
+                if (CollisionTester.BoundingBoxTest(mainPlayer, crate))
                 {
                     Console.WriteLine("Player collided with a crate");
                 }
@@ -316,7 +307,7 @@ namespace Client
                 {
                     position.X -= moveDistance;
                 }
-                charSprite.Position = new Vector2f(charSprite.Position.X + moveDistance, charSprite.Position.Y);
+                mainPlayer.Position = new Vector2f(mainPlayer.Position.X + moveDistance, mainPlayer.Position.Y);
 
             }
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
@@ -333,13 +324,13 @@ namespace Client
         {
             Sprite myBullet = new Sprite(Textures.Get(TextureIdentifier.Bullet));
             Vector2 target = new Vector2(
-                cursor.Position.X - charSprite.Position.X,
-                cursor.Position.Y - charSprite.Position.Y
+                cursor.Position.X - mainPlayer.Position.X,
+                cursor.Position.Y - mainPlayer.Position.Y
             );
             target = Vector2.Normalize(target);
             Projectile bullet = new Projectile(target.X * 1000, target.Y * 1000, myBullet);
             bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(bulletSprite), position.ToVec2f());
-            bullet.ProjectileSprite.Rotation = MathF.Atan2(target.Y, target.X) * 180 / MathF.PI;
+            bullet.ProjectileSprite.Rotation = VectorUtils.VectorToAngle(target.X, target.Y);
 
             bulletList.Add(bullet);
             Sound sound = Sounds.Get(SoundIdentifier.GenericGun);
@@ -357,7 +348,7 @@ namespace Client
         {
 
             Console.WriteLine("Loading sprites...");
-            charSprite = new Sprite(Textures.Get(TextureIdentifier.MainCharacter));
+            mainPlayer.Texture = Textures.Get(TextureIdentifier.MainCharacter);
             IntRect rect = new IntRect(0, 0, 1280, 720);
             bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
             bulletSprite = new Sprite(Textures.Get(TextureIdentifier.Bullet));

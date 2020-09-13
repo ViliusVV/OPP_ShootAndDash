@@ -16,7 +16,7 @@ namespace Client
     {
         static void Main()
         {
-            GameApplication game = GameApplication.Instance;
+            GameApplication game = GameApplication.GetInstance();
 
             Console.WriteLine("Starting game...");
 
