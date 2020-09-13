@@ -24,7 +24,9 @@ namespace Client.Config
         [ResourceAttr("Assets/gunAk47.png")] GunAk47,
         // HUD
         [ResourceAttr("Assets/hudPlayerBar.png")] PlayerBar,
-        [ResourceAttr("Assets/hudPlayerBarMask.png")] PlayerBarMask
+        [ResourceAttr("Assets/hudPlayerBarMask.png")] PlayerBarMask,
+        [ResourceAttr("Assets/crate.png")] Crate
+
     }
 
     public enum FontIdentifier

@@ -36,6 +36,7 @@ namespace Client
         Sprite ak47Sprite;
         Sprite playerBar;
         Sprite playerBarMask;
+        Sprite crate;
 
         AimCursor cursor = new AimCursor();
         List<Projectile> bulletList = new List<Projectile>();
@@ -126,6 +127,7 @@ namespace Client
                 ak47Sprite.Position = position.ToVec2f();
                 playerBar.Position = playerBarPos;
                 playerBarMask.Position = playerBarPos;
+                crate.Position = new Vector2f(1000, 400);
                 ak47Sprite.Rotation = rotation;
                 ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
                 Vector2f textPos = position.ToVec2f();
@@ -141,6 +143,7 @@ namespace Client
                 window.Draw(ak47Sprite);
                 window.Draw(playerBarMask);
                 window.Draw(playerBar);
+                window.Draw(crate);
                 attackCooldown -= deltaTime.AsMilliseconds();
                 UpdateBullets(deltaTime);
 
@@ -313,6 +316,7 @@ namespace Client
             playerBar = new Sprite(Textures.Get(TextureIdentifier.PlayerBar));
             playerBarMask = new Sprite(Textures.Get(TextureIdentifier.PlayerBarMask));
             cursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
+            crate = new Sprite(Textures.Get(TextureIdentifier.Crate));
 
         }
 
