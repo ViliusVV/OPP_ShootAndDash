@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Client.Config;
+using SFML.Audio;
 using SFML.Graphics;
 
 namespace Client
 {
+    // Helper class to hold all loadable resources
     abstract class ResourceHolder<TIdentifier, TResource, TParameter>
     {
+        // Hold all textures in map
         private Dictionary<TIdentifier, TResource> resourceMap = new Dictionary<TIdentifier, TResource>();
 
-        public abstract void Load(TIdentifier id, string filename);
-        public abstract void Load(TIdentifier id, string filename, TParameter secondParameter);
+        public abstract void Load(TIdentifier id);
+        public abstract void Load(TIdentifier id, TParameter secondParameter);
 
         public TResource Get(TIdentifier id)
         {
@@ -23,33 +27,32 @@ namespace Client
         }
     }
 
-    class TextureHolder : ResourceHolder<TextureID, Texture, IntRect>
+    // Loads and stores all game textures
+    class TextureHolder : ResourceHolder<TextureIdentifier, Texture, IntRect>
     {
-        public override void Load(TextureID id, string filename)
+        public override void Load(TextureIdentifier id)
         {
-            // Create and load resource
-            var texture = new Texture(filename);
+            var texture = new Texture(id.GetResoucePath());
 
-            // If loading successful, insert resource to map
             InsertResource(id, texture);
         }
 
-        public override void Load(TextureID id, string filename, IntRect secondParameter)
+        public override void Load(TextureIdentifier id, IntRect secondParameter)
         {
-            // Create and load resource
-            var texture = new Texture(filename, secondParameter);
+            var texture = new Texture(id.GetResoucePath(), secondParameter);
 
-            // If loading successful, insert resource to map
             InsertResource(id, texture);
         }
 
-        public void Load(TextureID id, string filename, bool repeat)
+        public void Load(TextureIdentifier id, bool repeat)
         {
-            var texture = new Texture(filename) { Repeated = repeat };
+            var texture = new Texture(id.GetResoucePath()) { Repeated = repeat };
 
             InsertResource(id, texture);
         }
     }
+
+
 
     //internal class FontHolder : ResourceHolder<Fonts.ID, Font, object>
     //{

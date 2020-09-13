@@ -1,4 +1,5 @@
-﻿using Client.Objects;
+﻿using Client.Config;
+using Client.Objects;
 using Client.UI;
 using Client.Utilities;
 using SFML.Graphics;
@@ -43,9 +44,10 @@ namespace Client
 
         public void Run()
         {
+            string path = SoundResource.GenericGun.GetResoucePath();
+            Console.WriteLine("Generic gun path: {0}", path);
             // Create render window
             window = CreateRenderWindow(Styles.Close);
-
             Vector2f winSize = window.GetView().Size;
             viewSize = winSize;
 
@@ -59,8 +61,6 @@ namespace Client
             View MainView = window.GetView(); ;
             window.SetView(MainView);
 
-            // Event hadlers
-            BindWindowEvents(window);
 
             // Set initial posision for text
             position.X = window.Size.X / 2f;
@@ -70,8 +70,8 @@ namespace Client
             Font font = new Font("Assets/pixelFontSmall.ttf");
             Text text = new Text("000 000", font)
             {
-                CharacterSize = 8,
-                Color = Color.Black
+                CharacterSize = 14,
+                FillColor = Color.Black
                 
             };
             float textWidth = text.GetLocalBounds().Width;
@@ -89,8 +89,9 @@ namespace Client
             {
                 ToogleScreen();
                 Time deltaTime = clock.Restart();
-                window.DispatchEvents();
                 window.Clear();
+                window.DispatchEvents();
+               
                 this.ProccesKeyboardInput(deltaTime);
                 var mPos = window.MapPixelToCoords(Mouse.GetPosition(window));
                 var middlePoint = (mPos + position.toVec2f())/ 2.0f;
@@ -101,7 +102,7 @@ namespace Client
                 text.Position = textPos;
                 text.DisplayedString = String.Format("{0} {1}", position.X, position.Y);
 
-                // Draw order is important
+                //Draw order is important
                 window.Draw(bgSprite);
                 window.Draw(text);
                 window.Draw(charSprite);
@@ -112,9 +113,13 @@ namespace Client
                 cursor.Update(mPos);
                 window.Draw(cursor);
 
-                MainView.Center = middlePoint;
-                window.SetView(MainView);
+
                 window.Display();
+
+                MainView.Center = middlePoint;
+                MainView.Zoom(zoomView);
+                zoomView = 1.0f;
+                window.SetView(MainView);
             }
         }
 
@@ -126,7 +131,6 @@ namespace Client
                 var windowStyle = FullScreen ? Styles.Fullscreen : Styles.Close;
                 window.Close();
                 window = CreateRenderWindow(windowStyle);
-                BindWindowEvents(window);
             }
         }
 
@@ -157,6 +161,8 @@ namespace Client
             window.SetMouseCursorVisible(false);
             window.SetFramerateLimit(120);
 
+            BindWindowEvents(window);
+
             return window;
         }
 
@@ -184,9 +190,8 @@ namespace Client
                 {
                     zoomView += -e.Delta / 10.0f;
                     zoomView = (zoomView < 0.3f || zoomView > 2.0f) ? previousZoom : zoomView;
-                    MainView = window.DefaultView;
-                    MainView.Zoom(zoomView);
                     previousZoom = zoomView;
+                    
 
 
                     Console.WriteLine(e.Delta);
@@ -194,6 +199,7 @@ namespace Client
                 }
             };
         }
+
         /// <summary>
         /// Get center vector of sprite
         /// </summary>
@@ -252,7 +258,7 @@ namespace Client
         }
         private void ShootBullet()
         {
-            Sprite myBullet = new Sprite(textures.Get(TextureID.Bullet));
+            Sprite myBullet = new Sprite(textures.Get(TextureIdentifier.Bullet));
             Vector2 target = new Vector2(
                 cursor.position.X - charSprite.Position.X,
                 cursor.position.Y - charSprite.Position.Y
@@ -268,28 +274,42 @@ namespace Client
         {
             
             Console.WriteLine("Loading sprites...");
-            charSprite = new Sprite(textures.Get(TextureID.MainCharacter));
-            IntRect rect = new IntRect(0, 0, 800, 600);
-            bgSprite = new Sprite(textures.Get(TextureID.Background), rect);
-            bulletSprite = new Sprite(textures.Get(TextureID.Bullet));
-            cursor.SetTexture(new Texture(textures.Get(TextureID.AimCursor)));
+            charSprite = new Sprite(textures.Get(TextureIdentifier.MainCharacter));
+            IntRect rect = new IntRect(0, 0, 1280, 720);
+            bgSprite = new Sprite(textures.Get(TextureIdentifier.Background), rect);
+            bulletSprite = new Sprite(textures.Get(TextureIdentifier.Bullet));
+            cursor.SetTexture(new Texture(textures.Get(TextureIdentifier.AimCursor)));
 
         }
 
+
+        // =============== INITIALIZATION METHODS =================
+
+        // Load all game textures
         public void LoadTextures()
         {
-            textures.Load(TextureID.Background, "Assets/tileGrass.png", true);
-            textures.Load(TextureID.AimCursor, "Assets/cursor.png");
-            textures.Load(TextureID.MainCharacter, "Assets/char.png");
-            textures.Load(TextureID.Bullet, "Assets/bullet.png");
-            textures.Load(TextureID.GunAk47, "Assets/gunAk47.png");
+            // Iterate over all textures and load
+            var allTextures = Enum.GetValues(typeof(TextureIdentifier));
+            foreach(TextureIdentifier texture in allTextures)
+            {
+                textures.Load(texture);
+            }
+
+            // Set special properties for some textures
+            textures.Get(TextureIdentifier.Background).Repeated = true;
+
         }
 
-        static float SinceEpoch()
+        // Load all music and sound efects
+        public void LoadSounds()
         {
-            double since = (DateTime.Now).Second;
-            float fsince = (float)since;
-            return fsince;
+
+        }
+
+        // Load all custom fonts
+        public void LoadFonts()
+        {
+
         }
     }
 }
