@@ -1,4 +1,6 @@
-﻿using SFML.Graphics;
+﻿using Client.Collisions;
+using Client.Utilities;
+using SFML.Graphics;
 using SFML.System;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,26 @@ namespace Client.Models
 
         public Vector2f Speed { get; set; } = new Vector2f(0.0f, 0.0f);
 
+        //public Position Position { get; set; } = new Position();
+
+        public void Translate(float xOffset, float yOffset)
+        {
+            this.Position = new Vector2f(this.Position.X + xOffset, this.Position.Y + yOffset);
+        }
+        public bool CheckMovementCollision(float xOffset, float yOffset, Sprite targetCollider)
+        {
+            Translate(xOffset, yOffset);
+            if (CollisionTester.BoundingBoxTest(this, targetCollider))
+            {
+                Translate(-xOffset, -yOffset);
+                return true;
+            }
+            else
+            {
+                Translate(-xOffset, -yOffset);
+                return false;
+            }
+        }
         //// Configure text
         //Font font = Fonts.Get(FontIdentifier.PixelatedSmall);
         //Text text = new Text("000 000", font)

@@ -106,17 +106,16 @@ namespace Client
                
                 this.ProccesKeyboardInput(deltaTime);
                 var mPos = window.MapPixelToCoords(Mouse.GetPosition(window));
-                var middlePoint = VectorUtils.GetMiddlePoint(position.ToVec2f(), mPos);
+                var middlePoint = VectorUtils.GetMiddlePoint(mainPlayer.Position, mPos);
 
-                double dx = mPos.X - position.X;
-                double dy = mPos.Y - position.Y;
+                double dx = mPos.X - mainPlayer.Position.X;
+                double dy = mPos.Y - mainPlayer.Position.Y;
 
-                float rotation = VectorUtils.GetAngleBetweenVectors(position.ToVec2f(), mPos);
+                float rotation = VectorUtils.GetAngleBetweenVectors(mainPlayer.Position, mPos);
 
-                Vector2f playerBarPos = new Vector2f(position.X, position.Y - 40);
+                Vector2f playerBarPos = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y - 40);
 
-                mainPlayer.Position = position.ToVec2f();
-                ak47Sprite.Position = position.ToVec2f();
+                ak47Sprite.Position = mainPlayer.Position;
                 playerBar.Position = playerBarPos;
                 playerBarMask.Position = playerBarPos;
                 crate.Position = new Vector2f(1000, 400);
@@ -240,36 +239,34 @@ namespace Client
             float movementSpeed = 500;
             float dt = deltaTime.AsSeconds();
             float moveDistance = movementSpeed * dt;
+            float movementX = 0;
+            float movementY = 0;
             // Polling key presses is better than events if we
             // need to detect multiple key presses at same time
             if (Keyboard.IsKeyPressed(Keyboard.Key.W))
             {
                 //Console.WriteLine(mainPlayer.Position);
                 //Console.WriteLine(crate.Position);
-                mainPlayer.Position = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y - moveDistance);
-                if (CollisionTester.BoundingBoxTest(mainPlayer, crate))
+                if (mainPlayer.CheckMovementCollision(0, -moveDistance, crate))
                 {
                     Console.WriteLine("Player collided with a crate");
                 }
                 else
                 {
-                    position.Y -= moveDistance;
+                    movementY -= moveDistance;
                 }
-                mainPlayer.Position = new Vector2f(mainPlayer.Position.X , mainPlayer.Position.Y + moveDistance);
 
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.S))
             {
-                mainPlayer.Position = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y + moveDistance);
-                if (CollisionTester.BoundingBoxTest(mainPlayer, crate))
+                if (mainPlayer.CheckMovementCollision(0, moveDistance, crate))
                 {
                     Console.WriteLine("Player collided with a crate");
                 }
                 else
                 {
-                    position.Y += moveDistance;
+                    movementY += moveDistance;
                 }
-                mainPlayer.Position = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y - moveDistance);
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.D))
             {
@@ -278,16 +275,14 @@ namespace Client
                     mainPlayer.Scale = new Vector2f(1, 1);
                     facingRight = true;
                 }
-                mainPlayer.Position = new Vector2f(mainPlayer.Position.X + moveDistance, mainPlayer.Position.Y );
-                if (CollisionTester.BoundingBoxTest(mainPlayer, crate))
+                if (mainPlayer.CheckMovementCollision(moveDistance, 0, crate))
                 {
                     Console.WriteLine("Player collided with a crate");
                 }
                 else
                 {
-                    position.X += moveDistance;
+                    movementX += moveDistance;
                 }
-                mainPlayer.Position = new Vector2f(mainPlayer.Position.X - moveDistance, mainPlayer.Position.Y);
 
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.A))
@@ -298,18 +293,17 @@ namespace Client
                     facingRight = false;
                 }
 
-                mainPlayer.Position = new Vector2f(mainPlayer.Position.X - moveDistance, mainPlayer.Position.Y);
-                if (CollisionTester.BoundingBoxTest(mainPlayer, crate))
+                if (mainPlayer.CheckMovementCollision(-moveDistance, 0, crate))
                 {
                     Console.WriteLine("Player collided with a crate");
                 }
                 else
                 {
-                    position.X -= moveDistance;
+                    movementX -= moveDistance;
                 }
-                mainPlayer.Position = new Vector2f(mainPlayer.Position.X + moveDistance, mainPlayer.Position.Y);
 
             }
+            mainPlayer.Translate(movementX, movementY);
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
             {
                 if (attackCooldown <= 0)
@@ -329,7 +323,7 @@ namespace Client
             );
             target = Vector2.Normalize(target);
             Projectile bullet = new Projectile(target.X * 1000, target.Y * 1000, myBullet);
-            bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(bulletSprite), position.ToVec2f());
+            bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(bulletSprite), mainPlayer.Position);
             bullet.ProjectileSprite.Rotation = VectorUtils.VectorToAngle(target.X, target.Y);
 
             bulletList.Add(bullet);
