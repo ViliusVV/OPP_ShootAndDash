@@ -21,7 +21,7 @@ namespace Client
     {
         // Singleton instance
         private static readonly GameApplication _instance = new GameApplication();
-
+        Random rnd = new Random(1000);
         private bool FullScreen { get; set; }
         private bool PrevFullScreen { get; set; }
         
@@ -353,7 +353,7 @@ namespace Client
         {
             Medkit medkit = new Medkit();
             medkit.Texture = medkitSprite.Texture;
-            medkit.Position = new Vector2f(DateTime.Now.Millisecond % 1000, DateTime.Now.Millisecond % 1000);
+            medkit.Position = new Vector2f(rnd.Next(1000), rnd.Next(1000));
             medkitList.Add(medkit);
         }
         private void ShootBullet()
