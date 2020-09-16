@@ -41,10 +41,12 @@ namespace Client
         Sprite playerBar;
         Sprite playerBarMask;
         Sprite crate;
+        Sprite medkitSprite;
         Player mainPlayer = new Player();
 
         AimCursor cursor = new AimCursor();
         List<Projectile> bulletList = new List<Projectile>();
+        List<Medkit> medkitList = new List<Medkit>();
         float attackCooldown;
         float attackSpeed = 150;
         bool facingRight = true;
@@ -119,6 +121,7 @@ namespace Client
                 playerBar.Position = playerBarPos;
                 playerBarMask.Position = playerBarPos;
                 crate.Position = new Vector2f(1000, 400);
+                //medkit.Position = new Vector2f(800, 400);
                 ak47Sprite.Rotation = rotation;
                 ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
                
@@ -130,8 +133,20 @@ namespace Client
                 window.Draw(playerBarMask);
                 window.Draw(playerBar);
                 window.Draw(crate);
+                //if(!medkit.PickedUp)
+                //{
+                //    window.Draw(medkit);
+                //}
                 attackCooldown -= deltaTime.AsMilliseconds();
+                UpdateMedkits();
                 UpdateBullets(deltaTime);
+                //if(!medkit.PickedUp)
+                //{
+                //    if (CollisionTester.BoundingBoxTest(mainPlayer, medkit))
+                //    {
+                //        medkit.Pickup(mainPlayer);
+                //    }
+                //}
 
                 cursor.Update(mPos);
                 window.Draw(cursor);
@@ -184,6 +199,22 @@ namespace Client
                     }
                 }
 
+            }
+        }
+        private void UpdateMedkits()
+        {
+            for (int i = 0; i < medkitList.Count; i++)
+            {
+                Medkit med = medkitList[i];
+                if (CollisionTester.BoundingBoxTest(mainPlayer, med))
+                {
+                    med.Pickup(mainPlayer);
+                    medkitList.RemoveAt(i);
+                }
+                else
+                {
+                    window.Draw(med);
+                }
             }
         }
 
@@ -313,6 +344,17 @@ namespace Client
                 }
 
             }
+            if(Keyboard.IsKeyPressed(Keyboard.Key.M))
+            {
+                SpawnMedkit();
+            }
+        }
+        private void SpawnMedkit()
+        {
+            Medkit medkit = new Medkit();
+            medkit.Texture = medkitSprite.Texture;
+            medkit.Position = new Vector2f(DateTime.Now.Millisecond % 1000, DateTime.Now.Millisecond % 1000);
+            medkitList.Add(medkit);
         }
         private void ShootBullet()
         {
@@ -351,7 +393,8 @@ namespace Client
             playerBarMask = new Sprite(Textures.Get(TextureIdentifier.PlayerBarMask));
             cursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
             crate = new Sprite(Textures.Get(TextureIdentifier.Crate));
-
+            //medkit.Texture = Textures.Get(TextureIdentifier.Medkit);
+            medkitSprite = new Sprite(Textures.Get(TextureIdentifier.Medkit));
         }
 
 
