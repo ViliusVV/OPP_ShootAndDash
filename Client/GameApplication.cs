@@ -14,6 +14,7 @@ using Client.Collisions;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Runtime.InteropServices.ComTypes;
 using Client.Models;
+using Client.Objects.Pickupables;
 
 namespace Client
 {
@@ -42,11 +43,15 @@ namespace Client
         Sprite playerBarMask;
         Sprite crate;
         Sprite medkitSprite;
+        Sprite movementSyringeSprite;
+        Sprite reloadSyringeSprite;
+        Sprite healingSyringeSprite;
+        Sprite deflectionSyringeSprite;
         Player mainPlayer = new Player();
 
         AimCursor cursor = new AimCursor();
         List<Projectile> bulletList = new List<Projectile>();
-        List<Medkit> medkitList = new List<Medkit>();
+        List<Pickupable> pickupableList = new List<Pickupable>();
         float attackCooldown;
         float attackSpeed = 150;
         bool facingRight = true;
@@ -138,7 +143,7 @@ namespace Client
                 //    window.Draw(medkit);
                 //}
                 attackCooldown -= deltaTime.AsMilliseconds();
-                UpdateMedkits();
+                UpdatePickupables();
                 DrawPickupables();
                 UpdateBullets(deltaTime);
                 DrawProjectiles();
@@ -202,15 +207,15 @@ namespace Client
 
             }
         }
-        private void UpdateMedkits()
+        private void UpdatePickupables()
         {
-            for (int i = 0; i < medkitList.Count; i++)
+            for (int i = 0; i < pickupableList.Count; i++)
             {
-                Medkit med = medkitList[i];
-                if (CollisionTester.BoundingBoxTest(mainPlayer, med))
+                Pickupable pickup = pickupableList[i];
+                if (CollisionTester.BoundingBoxTest(mainPlayer, pickup))
                 {
-                    med.Pickup(mainPlayer);
-                    medkitList.RemoveAt(i);
+                    pickup.Pickup(mainPlayer);
+                    pickupableList.RemoveAt(i);
                 }
             }
         }
@@ -223,9 +228,9 @@ namespace Client
         }
         private void DrawPickupables()
         {
-            for (int i = 0; i < medkitList.Count; i++)
+            for (int i = 0; i < pickupableList.Count; i++)
             {
-                window.Draw(medkitList[i]);
+                window.Draw(pickupableList[i]);
             }
         }
         public RenderWindow CreateRenderWindow(Styles windowStyle)
@@ -358,13 +363,44 @@ namespace Client
             {
                 SpawnMedkit();
             }
+            if (Keyboard.IsKeyPressed(Keyboard.Key.X))
+            {
+                SpawnRandomSyringe();
+            }
+        }
+        private void SpawnRandomSyringe()
+        {
+            int num = rnd.Next(4);
+            Pickupable syringe;
+            switch (num)
+            {
+                case 0:
+                    syringe = new MovementSyringe();
+                    syringe.Texture = movementSyringeSprite.Texture;
+                    break;
+                case 1:
+                    syringe = new ReloadSyringe();
+                    syringe.Texture = reloadSyringeSprite.Texture;
+                    break;
+                case 2:
+                    syringe = new HealingSyringe();
+                    syringe.Texture = healingSyringeSprite.Texture;
+                    break;
+                default:
+                    syringe = new DeflectionSyringe();
+                    syringe.Texture = deflectionSyringeSprite.Texture;
+                    break;
+            }
+            syringe.Position = new Vector2f(rnd.Next(1000), rnd.Next(1000));
+            pickupableList.Add(syringe);
+
         }
         private void SpawnMedkit()
         {
             Medkit medkit = new Medkit();
             medkit.Texture = medkitSprite.Texture;
             medkit.Position = new Vector2f(rnd.Next(1000), rnd.Next(1000));
-            medkitList.Add(medkit);
+            pickupableList.Add(medkit);
         }
         private void ShootBullet()
         {
@@ -405,6 +441,10 @@ namespace Client
             crate = new Sprite(Textures.Get(TextureIdentifier.Crate));
             //medkit.Texture = Textures.Get(TextureIdentifier.Medkit);
             medkitSprite = new Sprite(Textures.Get(TextureIdentifier.Medkit));
+            movementSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.MovementSyringe));
+            reloadSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.ReloadSyringe));
+            healingSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.HealingSyringe));
+            deflectionSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.DeflectionSyringe));
         }
 
 

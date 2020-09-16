@@ -26,8 +26,11 @@ namespace Client.Config
         [ResourceAttr("Assets/hudPlayerBar.png")] PlayerBar,
         [ResourceAttr("Assets/hudPlayerBarMask.png")] PlayerBarMask,
         [ResourceAttr("Assets/crate.png")] Crate,
-        [ResourceAttr("Assets/medkit48x48.png")] Medkit
-
+        [ResourceAttr("Assets/medkit48x48.png")] Medkit,
+        [ResourceAttr("Assets/syringeMovement.png")] MovementSyringe,
+        [ResourceAttr("Assets/syringeReload.png")] ReloadSyringe,
+        [ResourceAttr("Assets/syringeHealing.png")] HealingSyringe,
+        [ResourceAttr("Assets/syringeDeflection.png")] DeflectionSyringe
     }
 
     public enum FontIdentifier
