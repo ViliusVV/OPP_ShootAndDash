@@ -139,7 +139,9 @@ namespace Client
                 //}
                 attackCooldown -= deltaTime.AsMilliseconds();
                 UpdateMedkits();
+                DrawPickupables();
                 UpdateBullets(deltaTime);
+                DrawProjectiles();
                 //if(!medkit.PickedUp)
                 //{
                 //    if (CollisionTester.BoundingBoxTest(mainPlayer, medkit))
@@ -186,7 +188,6 @@ namespace Client
                 else
                 {
                     bulletList[i].Move(deltaTime.AsSeconds());
-                    window.Draw(bullet);
                     if (CollisionTester.BoundingBoxTest(bullet.ProjectileSprite, mainPlayer))
                     {
                         Console.WriteLine("Bullet and character colliding");
@@ -211,13 +212,22 @@ namespace Client
                     med.Pickup(mainPlayer);
                     medkitList.RemoveAt(i);
                 }
-                else
-                {
-                    window.Draw(med);
-                }
             }
         }
-
+        private void DrawProjectiles()
+        {
+            for (int i = 0; i < bulletList.Count; i++)
+            {
+                window.Draw(bulletList[i]);
+            }
+        }
+        private void DrawPickupables()
+        {
+            for (int i = 0; i < medkitList.Count; i++)
+            {
+                window.Draw(medkitList[i]);
+            }
+        }
         public RenderWindow CreateRenderWindow(Styles windowStyle)
         {
             VideoMode videoMode = new VideoMode(1280, 720);
