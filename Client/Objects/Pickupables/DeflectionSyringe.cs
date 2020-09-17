@@ -9,6 +9,7 @@ namespace Client.Objects.Pickupables
     {
         public override void Pickup(Player player)
         {
+            PickedUp = true;
             Console.WriteLine("Deflection syringe picked up");
         }
     }

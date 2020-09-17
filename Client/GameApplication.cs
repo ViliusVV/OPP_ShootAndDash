@@ -367,6 +367,10 @@ namespace Client
             {
                 SpawnRandomSyringe();
             }
+            if(Keyboard.IsKeyPressed(Keyboard.Key.Z))
+            {
+                mainPlayer.ApplyDamage(100);
+            }
         }
         private void SpawnRandomSyringe()
         {

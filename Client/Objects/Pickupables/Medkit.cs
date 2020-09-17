@@ -12,7 +12,7 @@ namespace Client.Objects
         {
             PickedUp = true;
             Console.WriteLine("medkit picked up");
-            player.Health += 10;
+            player.ApplyDamage(-50);
         }
     }
 }

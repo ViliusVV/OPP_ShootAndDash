@@ -9,6 +9,8 @@ namespace Client.Objects.Pickupables
     {
         public override void Pickup(Player player)
         {
+            PickedUp = true;
+            player.IncreaseMovementSpeed(2, 3000);
             Console.WriteLine("Movement syringe picked up");
         }
     }
