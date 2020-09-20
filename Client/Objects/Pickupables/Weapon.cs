@@ -70,16 +70,15 @@ namespace Client.Objects
             //    Sound sound = Sounds.Get(SoundIdentifier.GenericGun);
             return projectiles;
         }
-        public void AmmoConsume()
+        public void AmmoConsume(int i)
         {
-            this.Ammo--;
+            this.Ammo += i;
         }
         public float GetAmmo(float scale)
         {
             
             if (Ammo > 0)
             {
-                Console.WriteLine(Ammo/MagazineSize);
                 return scale * (float)Ammo / (float)MagazineSize;
             }
             else
