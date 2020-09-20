@@ -15,6 +15,8 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Runtime.InteropServices.ComTypes;
 using Client.Models;
 using Client.Objects.Pickupables;
+using Microsoft.AspNetCore.SignalR.Client;
+using System.Runtime.CompilerServices;
 
 namespace Client
 {
@@ -33,6 +35,7 @@ namespace Client
         private FontHolder Fonts { get; } = new FontHolder();
         private View MainView { get; set; }
         private View ZoomedView { get; set; }
+        private HubConnection Connection { get; set; }
 
         Position position = new Position();
 
@@ -62,6 +65,8 @@ namespace Client
 
         float zoomView = 1.0f;
         float previousZoom = 1.0f;
+        long playerId = new Random().Next(1000, 9999);
+        bool connected = false;
 
         public GameApplication() { }
 
@@ -105,62 +110,49 @@ namespace Client
             ak47Sprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(ak47Sprite).X, 0.0f);
 
             playerBar.Scale = new Vector2f(1.5f, 1.5f);
+
+            // Connect to game hub server
+             Connection = new HubConnectionBuilder()
+                .WithUrl(new Uri("https://localhost:5001/sd-server"))
+                .WithAutomaticReconnect()
+                .Build();
+            ConnectToServer(Connection);
+
             playerBarMask.Scale = new Vector2f(1.5f, 1.5f);
 
+            GameLoop();
+
+        }
+
+        public void ConnectToServer(HubConnection connection)
+        {
             Clock clock = new Clock();
-            while (window.IsOpen)
+            connection.StartAsync();
+
+            while (connection.State == HubConnectionState.Connecting) 
             {
-                ToogleScreen();
-                Time deltaTime = clock.Restart();
-                window.Clear();
-                window.DispatchEvents();
-               
-                this.ProccesKeyboardInput(deltaTime);
-                var mPos = window.MapPixelToCoords(Mouse.GetPosition(window));
-                var middlePoint = VectorUtils.GetMiddlePoint(mainPlayer.Position, mPos);
-
-                double dx = mPos.X - mainPlayer.Position.X;
-                double dy = mPos.Y - mainPlayer.Position.Y;
-
-                float rotation = VectorUtils.GetAngleBetweenVectors(mainPlayer.Position, mPos);
-
-                Vector2f playerBarPos = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y - 40);
-
-                ak47Sprite.Position = mainPlayer.Position;
-                playerBar.Position = playerBarPos;
-                playerBarMask.Position = playerBarPos;
-                crate.Position = new Vector2f(1000, 400);
-                bush.Position = new Vector2f(500, 400);
-                ak47Sprite.Rotation = rotation;
-                ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
-                playerBarMask.Scale = new Vector2f(mainPlayer.GetHealth(), 1.5f);
-
-
-                //Draw order is important
-                window.Draw(bgSprite);
-                window.Draw(mainPlayer);
-                window.Draw(ak47Sprite);
-                window.Draw(playerBarMask);
-                window.Draw(playerBar);
-                window.Draw(crate);
-                window.Draw(bush);
-                attackCooldown -= deltaTime.AsMilliseconds();
-                UpdatePickupables();
-                DrawPickupables();
-                UpdateBullets(deltaTime);
-                DrawProjectiles();
-
-                cursor.Update(mPos);
-                window.Draw(cursor);
-
-                ZoomedView.Center = middlePoint;
-                ZoomedView.Zoom(zoomView);
-                zoomView = 1.0f;
-                window.SetView(ZoomedView);
-
-                window.Display();
-
+                float dt = clock.ElapsedTime.AsSeconds();
+                if(dt >  0.5){
+                    clock.Restart();
+                    Console.WriteLine("Connecting...");
+                }
             }
+            if (connection.State != HubConnectionState.Connected)
+            {
+                Console.WriteLine("Connection failed!");
+                Environment.Exit(-1);
+            }
+            else
+            {
+                Console.WriteLine("Connection succesfull!");
+                connected = true;
+            }
+            Console.WriteLine(connection.State);
+        }
+
+        public void SendPos(HubConnection connection, Vector2f pos)
+        {
+            connection.SendAsync("ReceivePos", $"ID{playerId}", $"{pos.X} {pos.Y}");
         }
 
         private void ToogleScreen()
@@ -226,6 +218,68 @@ namespace Client
             for (int i = 0; i < pickupableList.Count; i++)
             {
                 window.Draw(pickupableList[i]);
+            }
+        }
+
+        public void GameLoop()
+        {
+            Clock clock = new Clock();
+            Clock sendClock = new Clock();
+            while (window.IsOpen)
+            {
+
+                Time deltaTime = clock.Restart();
+                if (sendClock.ElapsedTime.AsSeconds() > (1f / 30f))
+                {
+                    sendClock.Restart();
+                    SendPos(Connection, mainPlayer.Position);
+                }
+
+                window.Clear();
+                window.DispatchEvents();
+
+                this.ProccesKeyboardInput(deltaTime);
+                var mPos = window.MapPixelToCoords(Mouse.GetPosition(window));
+                var middlePoint = VectorUtils.GetMiddlePoint(mainPlayer.Position, mPos);
+
+                float rotation = VectorUtils.GetAngleBetweenVectors(mainPlayer.Position, mPos);
+
+                Vector2f playerBarPos = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y - 40);
+
+                ak47Sprite.Position = mainPlayer.Position;
+                playerBar.Position = playerBarPos;
+                playerBarMask.Position = playerBarPos;
+                crate.Position = new Vector2f(1000, 400);
+                bush.Position = new Vector2f(500, 400);
+                ak47Sprite.Rotation = rotation;
+                ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
+                playerBarMask.Scale = new Vector2f(mainPlayer.GetHealth(), 1.5f);
+
+
+                //Draw order is important
+                window.Draw(bgSprite);
+                window.Draw(mainPlayer);
+                window.Draw(ak47Sprite);
+                window.Draw(playerBarMask);
+                window.Draw(playerBar);
+                window.Draw(crate);
+                window.Draw(bush);
+                attackCooldown -= deltaTime.AsMilliseconds();
+                UpdatePickupables();
+                DrawPickupables();
+                UpdateBullets(deltaTime);
+                DrawProjectiles();
+
+                cursor.Update(mPos);
+                window.Draw(cursor);
+
+                ZoomedView.Center = middlePoint;
+                ZoomedView.Zoom(zoomView);
+                zoomView = 1.0f;
+                window.SetView(ZoomedView);
+
+                window.Display();
+
             }
         }
         public RenderWindow CreateRenderWindow(Styles windowStyle)
