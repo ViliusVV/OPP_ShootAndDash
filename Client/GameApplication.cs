@@ -48,9 +48,15 @@ namespace Client
         Sprite healingSyringeSprite;
         Sprite deflectionSyringeSprite;
         Sprite bush;
+
         static Texture bulletTexture = new Texture("Assets/bullet.png");
         static Sprite bullet = new Sprite(bulletTexture);
+
         Player mainPlayer = new Player();
+        IntRect playerAnimation = new IntRect(0, 0, 36, 64);
+
+        Clock animationSpeed = new Clock();
+
         Weapon wep = new Weapon("AK-47", 10, 20, 2000, 200, 1, 20, true, bullet);
 
         AimCursor cursor = new AimCursor();
@@ -82,7 +88,6 @@ namespace Client
             window = CreateRenderWindow(Styles.Close);
             Vector2f winSize = window.GetView().Size;
 
-
             // Load resources
             LoadTextures();
             LoadSounds();
@@ -98,6 +103,7 @@ namespace Client
             // Set initial posision for text
             mainPlayer.Position = new Vector2f(window.Size.X / 2f, window.Size.Y / 2f);
 
+            mainPlayer.TextureRect = playerAnimation;
             // Configure sprite
             mainPlayer.Origin = SpriteUtils.GetSpriteCenter(mainPlayer);
             playerBar.Origin = SpriteUtils.GetSpriteCenter(playerBar);
@@ -106,7 +112,7 @@ namespace Client
 
             playerBar.Scale = new Vector2f(1.5f, 1.5f);
             playerBarMask.Scale = new Vector2f(1.5f, 1.5f);
-
+            
             Clock clock = new Clock();
             while (window.IsOpen)
             {
@@ -135,6 +141,18 @@ namespace Client
                 ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
                 playerBarMask.Scale = new Vector2f(mainPlayer.GetHealth(), 1.5f);
 
+                // Run player animations
+                if (animationSpeed.ElapsedTime.AsSeconds() > 0.01f)
+                {
+                    if (playerAnimation.Left == 108)
+                    {
+                        playerAnimation.Left = 0;
+                    }
+                    else
+                        playerAnimation.Left += 36;
+                    mainPlayer.TextureRect = playerAnimation;
+                    animationSpeed.Restart();
+                }
 
                 //Draw order is important
                 window.Draw(bgSprite);
@@ -269,6 +287,11 @@ namespace Client
                     
                 }
             };
+        }
+
+        private void AnimateCharacter()
+        {
+
         }
 
         private void ProccesKeyboardInput(Time deltaTime)
@@ -428,7 +451,7 @@ namespace Client
         {
 
             Console.WriteLine("Loading sprites...");
-            mainPlayer.Texture = Textures.Get(TextureIdentifier.MainCharacter);
+            mainPlayer.Texture = Textures.Get(TextureIdentifier.Spritesheet);
             IntRect rect = new IntRect(0, 0, 1280, 720);
             bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
             bulletSprite = new Sprite(Textures.Get(TextureIdentifier.Bullet));

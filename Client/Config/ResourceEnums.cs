@@ -16,6 +16,7 @@ namespace Client.Config
         [ResourceAttr("Assets/tileGrass.png")] Background,
         // Characters
         [ResourceAttr("Assets/Char4.png")] MainCharacter,
+        [ResourceAttr("Assets/Char4Run_spritesheet.png")] Spritesheet,
         // UI
         [ResourceAttr("Assets/cursor.png")] AimCursor,
         // Projectiles
@@ -25,13 +26,16 @@ namespace Client.Config
         // HUD
         [ResourceAttr("Assets/hudPlayerBar.png")] PlayerBar,
         [ResourceAttr("Assets/hudPlayerBarMask.png")] PlayerBarMask,
+        // Environment
         [ResourceAttr("Assets/Box.png")] Crate,
+        [ResourceAttr("Assets/BushLong.png")] Bush,
+        // Powerups
         [ResourceAttr("Assets/Medkit.png")] Medkit,
         [ResourceAttr("Assets/syringeMovement.png")] MovementSyringe,
         [ResourceAttr("Assets/syringeReload.png")] ReloadSyringe,
         [ResourceAttr("Assets/syringeHealing.png")] HealingSyringe,
-        [ResourceAttr("Assets/syringeDeflection.png")] DeflectionSyringe,
-        [ResourceAttr("Assets/BushLong.png")] Bush
+        [ResourceAttr("Assets/syringeDeflection.png")] DeflectionSyringe
+       
     }
 
     public enum FontIdentifier
