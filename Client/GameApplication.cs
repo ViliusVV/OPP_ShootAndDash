@@ -120,7 +120,64 @@ namespace Client
 
             playerBarMask.Scale = new Vector2f(1.5f, 1.5f);
 
-            GameLoop();
+            Clock clock = new Clock();
+            Clock sendClock = new Clock();
+            while (window.IsOpen)
+            {
+
+                Time deltaTime = clock.Restart();
+                if (sendClock.ElapsedTime.AsSeconds() > (1f / 30f))
+                {
+                    sendClock.Restart();
+                    SendPos(Connection, mainPlayer.Position);
+                }
+
+                window.Clear();
+                window.DispatchEvents();
+
+                this.ProccesKeyboardInput(deltaTime);
+                var mPos = window.MapPixelToCoords(Mouse.GetPosition(window));
+                var middlePoint = VectorUtils.GetMiddlePoint(mainPlayer.Position, mPos);
+
+                float rotation = VectorUtils.GetAngleBetweenVectors(mainPlayer.Position, mPos);
+
+                Vector2f playerBarPos = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y - 40);
+
+                ak47Sprite.Position = mainPlayer.Position;
+                playerBar.Position = playerBarPos;
+                playerBarMask.Position = playerBarPos;
+                crate.Position = new Vector2f(1000, 400);
+                bush.Position = new Vector2f(500, 400);
+                ak47Sprite.Rotation = rotation;
+                ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
+                playerBarMask.Scale = new Vector2f(mainPlayer.GetHealth(), 1.5f);
+
+
+                //Draw order is important
+                window.Draw(bgSprite);
+                window.Draw(mainPlayer);
+                window.Draw(ak47Sprite);
+                window.Draw(playerBarMask);
+                window.Draw(playerBar);
+                window.Draw(crate);
+                window.Draw(bush);
+                attackCooldown -= deltaTime.AsMilliseconds();
+                UpdatePickupables();
+                DrawPickupables();
+                UpdateBullets(deltaTime);
+                DrawProjectiles();
+
+                cursor.Update(mPos);
+                window.Draw(cursor);
+
+                ZoomedView.Center = middlePoint;
+                ZoomedView.Zoom(zoomView);
+                zoomView = 1.0f;
+                window.SetView(ZoomedView);
+
+                window.Display();
+
+            }
 
         }
 
@@ -223,64 +280,6 @@ namespace Client
 
         public void GameLoop()
         {
-            Clock clock = new Clock();
-            Clock sendClock = new Clock();
-            while (window.IsOpen)
-            {
-
-                Time deltaTime = clock.Restart();
-                if (sendClock.ElapsedTime.AsSeconds() > (1f / 30f))
-                {
-                    sendClock.Restart();
-                    SendPos(Connection, mainPlayer.Position);
-                }
-
-                window.Clear();
-                window.DispatchEvents();
-
-                this.ProccesKeyboardInput(deltaTime);
-                var mPos = window.MapPixelToCoords(Mouse.GetPosition(window));
-                var middlePoint = VectorUtils.GetMiddlePoint(mainPlayer.Position, mPos);
-
-                float rotation = VectorUtils.GetAngleBetweenVectors(mainPlayer.Position, mPos);
-
-                Vector2f playerBarPos = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y - 40);
-
-                ak47Sprite.Position = mainPlayer.Position;
-                playerBar.Position = playerBarPos;
-                playerBarMask.Position = playerBarPos;
-                crate.Position = new Vector2f(1000, 400);
-                bush.Position = new Vector2f(500, 400);
-                ak47Sprite.Rotation = rotation;
-                ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
-                playerBarMask.Scale = new Vector2f(mainPlayer.GetHealth(), 1.5f);
-
-
-                //Draw order is important
-                window.Draw(bgSprite);
-                window.Draw(mainPlayer);
-                window.Draw(ak47Sprite);
-                window.Draw(playerBarMask);
-                window.Draw(playerBar);
-                window.Draw(crate);
-                window.Draw(bush);
-                attackCooldown -= deltaTime.AsMilliseconds();
-                UpdatePickupables();
-                DrawPickupables();
-                UpdateBullets(deltaTime);
-                DrawProjectiles();
-
-                cursor.Update(mPos);
-                window.Draw(cursor);
-
-                ZoomedView.Center = middlePoint;
-                ZoomedView.Zoom(zoomView);
-                zoomView = 1.0f;
-                window.SetView(ZoomedView);
-
-                window.Display();
-
-            }
         }
         public RenderWindow CreateRenderWindow(Styles windowStyle)
         {
