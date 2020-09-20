@@ -53,9 +53,10 @@ namespace Client
         static Sprite bullet = new Sprite(bulletTexture);
 
         Player mainPlayer = new Player();
-        IntRect playerAnimation = new IntRect(0, 0, 36, 64);
-
+        IntRect playerAnimation = new IntRect(36, 0, 36, 64);
+        IntRect playerIdle = new IntRect(0, 0, 36, 64);
         Clock animationSpeed = new Clock();
+        bool isPlayerRunning = false;
 
         Weapon wep = new Weapon("AK-47", 10, 20, 2000, 200, 1, 20, true, bullet);
 
@@ -141,18 +142,23 @@ namespace Client
                 ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
                 playerBarMask.Scale = new Vector2f(mainPlayer.GetHealth(), 1.5f);
 
-                // Run player animations
-                if (animationSpeed.ElapsedTime.AsSeconds() > 0.01f)
+                // Run player animation
+                if (animationSpeed.ElapsedTime.AsSeconds() > 0.05f && isPlayerRunning)
                 {
-                    if (playerAnimation.Left == 108)
+                    if (playerAnimation.Left == 144)
                     {
-                        playerAnimation.Left = 0;
+                        playerAnimation.Left = 36;
                     }
                     else
                         playerAnimation.Left += 36;
                     mainPlayer.TextureRect = playerAnimation;
                     animationSpeed.Restart();
                 }
+                else if (!isPlayerRunning)
+                {
+                    mainPlayer.TextureRect = playerIdle;
+                }
+
 
                 //Draw order is important
                 window.Draw(bgSprite);
@@ -311,10 +317,13 @@ namespace Client
                 }
                 else
                 {
+                    isPlayerRunning = true;
                     movementY -= moveDistance;
                 }
 
             }
+            else
+                isPlayerRunning = false;
             if (Keyboard.IsKeyPressed(Keyboard.Key.S))
             {
                 if (mainPlayer.CheckMovementCollision(0, moveDistance, crate))
@@ -323,6 +332,7 @@ namespace Client
                 }
                 else
                 {
+                    isPlayerRunning = true;
                     movementY += moveDistance;
                 }
             }
@@ -339,6 +349,7 @@ namespace Client
                 }
                 else
                 {
+                    isPlayerRunning = true;
                     movementX += moveDistance;
                 }
 
@@ -357,6 +368,7 @@ namespace Client
                 }
                 else
                 {
+                    isPlayerRunning = true;
                     movementX -= moveDistance;
                 }
 
@@ -451,7 +463,7 @@ namespace Client
         {
 
             Console.WriteLine("Loading sprites...");
-            mainPlayer.Texture = Textures.Get(TextureIdentifier.Spritesheet);
+            mainPlayer.Texture = Textures.Get(TextureIdentifier.MainCharacter);
             IntRect rect = new IntRect(0, 0, 1280, 720);
             bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
             bulletSprite = new Sprite(Textures.Get(TextureIdentifier.Bullet));
