@@ -133,7 +133,8 @@ namespace Client
                 bush.Position = new Vector2f(500, 400);
                 ak47Sprite.Rotation = rotation;
                 ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
-               
+                playerBarMask.Scale = new Vector2f(mainPlayer.GetHealth(), 1.5f);
+
 
                 //Draw order is important
                 window.Draw(bgSprite);
