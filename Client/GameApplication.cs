@@ -16,6 +16,8 @@ using System.Runtime.InteropServices.ComTypes;
 using Client.Models;
 using Client.Objects.Pickupables;
 using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.SignalR.Client;
+using System.Runtime.CompilerServices;
 
 namespace Client
 {
@@ -34,6 +36,7 @@ namespace Client
         private FontHolder Fonts { get; } = new FontHolder();
         private View MainView { get; set; }
         private View ZoomedView { get; set; }
+        private HubConnection Connection { get; set; }
 
         Position position = new Position();
 
@@ -73,6 +76,8 @@ namespace Client
 
         float zoomView = 1.0f;
         float previousZoom = 1.0f;
+        long playerId = new Random().Next(1000, 9999);
+        bool connected = false;
 
         public GameApplication() { }
 
@@ -117,23 +122,35 @@ namespace Client
             ak47Sprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(ak47Sprite).X, 0.0f);
 
             playerBar.Scale = new Vector2f(1.5f, 1.5f);
+
+            // Connect to game hub server
+             Connection = new HubConnectionBuilder()
+                .WithUrl(new Uri("https://localhost:5001/sd-server"))
+                .WithAutomaticReconnect()
+                .Build();
+            ConnectToServer(Connection);
+
             playerBarMask.Scale = new Vector2f(1.5f, 1.5f);
             playerBarAmmoMask.Scale = new Vector2f(1.5f, 1.5f);
             
             Clock clock = new Clock();
+            Clock sendClock = new Clock();
             while (window.IsOpen)
             {
-                ToogleScreen();
+
                 Time deltaTime = clock.Restart();
+                if (sendClock.ElapsedTime.AsSeconds() > (1f / 30f))
+                {
+                    sendClock.Restart();
+                    SendPos(Connection, mainPlayer.Position);
+                }
+
                 window.Clear();
                 window.DispatchEvents();
-               
+
                 this.ProccesKeyboardInput(deltaTime);
                 var mPos = window.MapPixelToCoords(Mouse.GetPosition(window));
                 var middlePoint = VectorUtils.GetMiddlePoint(mainPlayer.Position, mPos);
-
-                double dx = mPos.X - mainPlayer.Position.X;
-                double dy = mPos.Y - mainPlayer.Position.Y;
 
                 float rotation = VectorUtils.GetAngleBetweenVectors(mainPlayer.Position, mPos);
 
@@ -199,6 +216,38 @@ namespace Client
                 window.Display();
 
             }
+
+        }
+
+        public void ConnectToServer(HubConnection connection)
+        {
+            Clock clock = new Clock();
+            connection.StartAsync();
+
+            while (connection.State == HubConnectionState.Connecting) 
+            {
+                float dt = clock.ElapsedTime.AsSeconds();
+                if(dt >  0.5){
+                    clock.Restart();
+                    Console.WriteLine("Connecting...");
+                }
+            }
+            if (connection.State != HubConnectionState.Connected)
+            {
+                Console.WriteLine("Connection failed!");
+                Environment.Exit(-1);
+            }
+            else
+            {
+                Console.WriteLine("Connection succesfull!");
+                connected = true;
+            }
+            Console.WriteLine(connection.State);
+        }
+
+        public void SendPos(HubConnection connection, Vector2f pos)
+        {
+            connection.SendAsync("ReceivePos", $"ID{playerId}", $"{pos.X} {pos.Y}");
         }
 
         public void ReloadGun()
@@ -281,6 +330,10 @@ namespace Client
             {
                 window.Draw(pickupableList[i]);
             }
+        }
+
+        public void GameLoop()
+        {
         }
         public RenderWindow CreateRenderWindow(Styles windowStyle)
         {
