@@ -15,6 +15,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Runtime.InteropServices.ComTypes;
 using Client.Models;
 using Client.Objects.Pickupables;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Runtime.CompilerServices;
 
@@ -60,6 +61,7 @@ namespace Client
         IntRect playerAnimation = new IntRect(36, 0, 36, 64);
         IntRect playerIdle = new IntRect(0, 0, 36, 64);
         Clock animationSpeed = new Clock();
+        Clock reloadClock = new Clock();
         bool isPlayerRunning = false;
 
         Weapon wep = new Weapon("AK-47", 30, 29, 20, 2000, 200, 1, 20, true, bullet);
@@ -70,6 +72,7 @@ namespace Client
         float attackCooldown;
         float attackSpeed = 150;
         bool facingRight = true;
+        bool isReloading = false;
 
         float zoomView = 1.0f;
         float previousZoom = 1.0f;
@@ -194,7 +197,6 @@ namespace Client
                     mainPlayer.TextureRect = playerIdle;
                 }
 
-
                 //Draw order is important
                 window.Draw(bgSprite);
                 window.Draw(mainPlayer);
@@ -210,8 +212,10 @@ namespace Client
                 DrawPickupables();
                 UpdateBullets(deltaTime);
                 DrawProjectiles();
-
-
+                if (isReloading == true)
+                {
+                    ReloadGun();
+                }
                 cursor.Update(mPos);
                 window.Draw(cursor);
 
@@ -264,6 +268,23 @@ namespace Client
         {
             connection.SendAsync("ReceivePos", $"ID{playerId}", $"{pos.X} {pos.Y}");
         }
+
+        public void ReloadGun()
+        {
+            if (wep.Ammo < wep.MagazineSize)
+            {
+                if (reloadClock.ElapsedTime.AsMilliseconds() > wep.ReloadTime)
+                {
+                    reloadClock.Restart();
+                    wep.AmmoConsume(1);
+                }
+            }
+            else
+            {
+                isReloading = false;
+            }
+        }
+
         public void CreatePlayer()
         {
             Connection.SendAsync("SpawnPlayer", playerDTO);
@@ -470,7 +491,11 @@ namespace Client
             }
             if(Keyboard.IsKeyPressed(Keyboard.Key.Z))
             {
-                mainPlayer.ApplyDamage(1);
+                mainPlayer.ApplyDamage(-1);
+            }
+            if (Keyboard.IsKeyPressed(Keyboard.Key.R))
+            {
+                isReloading = true;
             }
 
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
@@ -522,7 +547,7 @@ namespace Client
         }
         private void ShootBullet()
         {
-            if (wep.Ammo != 0)
+            if (wep.Ammo != 0 && isReloading != true)
             {
                 Sprite myBullet = new Sprite(Textures.Get(TextureIdentifier.Bullet));
                 Vector2 target = new Vector2(
@@ -537,7 +562,7 @@ namespace Client
                 bulletList.Add(bullet);
                 Sound sound = Sounds.Get(SoundIdentifier.GenericGun);
                 sound.Play();
-                wep.AmmoConsume();
+                wep.AmmoConsume(-1);
             }
         }
 

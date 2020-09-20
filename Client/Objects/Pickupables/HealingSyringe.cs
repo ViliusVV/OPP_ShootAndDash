@@ -11,7 +11,7 @@ namespace Client.Objects.Pickupables
         {
             PickedUp = true;
             Console.WriteLine("healing syringe picked up");
-            player.ApplyDamage(-10);
+            player.ApplyDamage(10);
         }
     }
 }

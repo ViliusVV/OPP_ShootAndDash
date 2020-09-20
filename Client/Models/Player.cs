@@ -5,6 +5,7 @@ using SFML.Graphics;
 using SFML.System;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,10 +34,19 @@ namespace Client.Models
         }
         public void ApplyDamage(float amount)
         {
-            Health -= amount;
-            if (Health <= 0)
+            float newHealth = Health + amount;
+            if (newHealth <= 100)
             {
-                IsDead = true;
+                Health += amount;
+                if (Health <= 0)
+                {
+                    IsDead = true;
+                    Health = 0;
+                }
+            }
+            else
+            {
+                Health = 100;
             }
         }
         public void Translate(float xOffset, float yOffset)
