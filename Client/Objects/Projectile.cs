@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Client.Objects
 {
-    class Projectile : Drawable
+    public class Projectile : Drawable
     {
         public float VelocityX { get; private set; }
         public float VelocityY { get; private set; }

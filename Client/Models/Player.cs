@@ -1,4 +1,5 @@
 ﻿using Client.Collisions;
+using Client.Objects;
 using Client.Utilities;
 using SFML.Graphics;
 using SFML.System;
@@ -18,6 +19,11 @@ namespace Client.Models
         public bool IsDead { get; private set; } = false;
         public float SpeedMultiplier { get; private set; } = 1;
 
+        public Weapon Weapon { get; private set; }
+        public void SetWeapon(Weapon wep)
+        {
+            this.Weapon = wep;
+        }
         public void ApplyDamage(float amount)
         {
             Health -= amount;

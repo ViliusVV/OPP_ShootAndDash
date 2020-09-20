@@ -22,7 +22,7 @@ namespace Client
     {
         // Singleton instance
         private static readonly GameApplication _instance = new GameApplication();
-        Random rnd = new Random(1000);
+        public static Random rnd = new Random(1000);
         private bool FullScreen { get; set; }
         private bool PrevFullScreen { get; set; }
         
@@ -47,7 +47,10 @@ namespace Client
         Sprite reloadSyringeSprite;
         Sprite healingSyringeSprite;
         Sprite deflectionSyringeSprite;
+        static Texture bulletTexture = new Texture("Assets/bullet.png");
+        static Sprite bullet = new Sprite(bulletTexture);
         Player mainPlayer = new Player();
+        Weapon wep = new Weapon("AK-47", 10, 20, 2000, 200, 1, 20, true, bullet);
 
         AimCursor cursor = new AimCursor();
         List<Projectile> bulletList = new List<Projectile>();
@@ -84,7 +87,7 @@ namespace Client
             LoadSounds();
             LoadFonts();
             CreateSprites();
-
+            wep.SetProjectileSprite(bulletSprite);
             // View
             MainView = window.DefaultView;
             ZoomedView = new View(MainView);
@@ -332,15 +335,7 @@ namespace Client
 
             }
             mainPlayer.Translate(movementX, movementY);
-            if (Mouse.IsButtonPressed(Mouse.Button.Left))
-            {
-                if (attackCooldown <= 0)
-                {
-                    attackCooldown = attackSpeed;
-                    ShootBullet();
-                }
 
-            }
             if(Keyboard.IsKeyPressed(Keyboard.Key.M))
             {
                 SpawnMedkit();
@@ -352,6 +347,19 @@ namespace Client
             if(Keyboard.IsKeyPressed(Keyboard.Key.Z))
             {
                 mainPlayer.ApplyDamage(100);
+            }
+
+            if (Mouse.IsButtonPressed(Mouse.Button.Left))
+            {
+                if (attackCooldown <= 0)
+                {
+                    attackCooldown = attackSpeed;
+                    ShootBullet();
+                    //bulletList.AddRange(wep.Shoot(10, new Vector2(cursor.Position.X,
+                    //    cursor.Position.Y), mainPlayer.Position));
+
+                }
+
             }
         }
         private void SpawnRandomSyringe()
