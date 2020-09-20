@@ -26,6 +26,7 @@ namespace Client.Config
         // HUD
         [ResourceAttr("Assets/hudPlayerBar.png")] PlayerBar,
         [ResourceAttr("Assets/hudPlayerBarMask.png")] PlayerBarMask,
+        [ResourceAttr("Assets/hudPlayerBarAmmoMask.png")] PlayerBarAmmoMask,
         // Environment
         [ResourceAttr("Assets/Box.png")] Crate,
         [ResourceAttr("Assets/BushLong.png")] Bush,
