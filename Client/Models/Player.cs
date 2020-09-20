@@ -17,7 +17,6 @@ namespace Client.Models
 
         public bool IsDead { get; private set; } = false;
         public float SpeedMultiplier { get; private set; } = 1;
-        //public Position Position { get; set; } = new Position();
 
         public void ApplyDamage(float amount)
         {
@@ -25,7 +24,6 @@ namespace Client.Models
             if (Health <= 0)
             {
                 IsDead = true;
-                this.Scale = new Vector2f(0.1f, 0.1f);
             }
         }
         public void Translate(float xOffset, float yOffset)
@@ -51,19 +49,5 @@ namespace Client.Models
             SpeedMultiplier = 2;
             Task.Delay((int)durationInMilis).ContinueWith(o => SpeedMultiplier = 1);
         }
-        //// Configure text
-        //Font font = Fonts.Get(FontIdentifier.PixelatedSmall);
-        //Text text = new Text("000 000", font)
-        //{
-        //    CharacterSize = 14,
-        //    OutlineThickness = 2.0f
-
-        //};
-        //float textWidth = text.GetLocalBounds().Width;
-        //float textHeight = text.GetLocalBounds().Height;
-        //float xOffset = text.GetLocalBounds().Left + 30;
-        //float yOffset = text.GetLocalBounds().Top + 30;
-        //text.Origin = new Vector2f(textWidth / 2f + xOffset, textHeight / 2f + yOffset);
-        //text.Position = new Vector2f(position.X, position.Y);
     }
 }

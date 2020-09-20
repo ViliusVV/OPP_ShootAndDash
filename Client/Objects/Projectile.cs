@@ -12,7 +12,6 @@ namespace Client.Objects
         public float VelocityY { get; private set; }
 
         public int TimeSinceCreation { get; set; }
-        //Texture ProjectileTexture ;
         public Sprite ProjectileSprite { get; private set; }
 
         public Projectile(float velocityX, float velocityY, Sprite projectileSprite)

@@ -126,7 +126,6 @@ namespace Client
                 playerBar.Position = playerBarPos;
                 playerBarMask.Position = playerBarPos;
                 crate.Position = new Vector2f(1000, 400);
-                //medkit.Position = new Vector2f(800, 400);
                 ak47Sprite.Rotation = rotation;
                 ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
                
@@ -138,22 +137,11 @@ namespace Client
                 window.Draw(playerBarMask);
                 window.Draw(playerBar);
                 window.Draw(crate);
-                //if(!medkit.PickedUp)
-                //{
-                //    window.Draw(medkit);
-                //}
                 attackCooldown -= deltaTime.AsMilliseconds();
                 UpdatePickupables();
                 DrawPickupables();
                 UpdateBullets(deltaTime);
                 DrawProjectiles();
-                //if(!medkit.PickedUp)
-                //{
-                //    if (CollisionTester.BoundingBoxTest(mainPlayer, medkit))
-                //    {
-                //        medkit.Pickup(mainPlayer);
-                //    }
-                //}
 
                 cursor.Update(mPos);
                 window.Draw(cursor);
@@ -272,10 +260,6 @@ namespace Client
                     zoomView = (zoomView < 0.3f || zoomView > 2.0f) ? previousZoom : zoomView;
                     previousZoom = zoomView;
                     
-
-
-                    //Console.WriteLine(e.Delta);
-                    //Console.WriteLine(zoomView);
                 }
             };
         }
@@ -291,8 +275,6 @@ namespace Client
             // need to detect multiple key presses at same time
             if (Keyboard.IsKeyPressed(Keyboard.Key.W))
             {
-                //Console.WriteLine(mainPlayer.Position);
-                //Console.WriteLine(crate.Position);
                 if (mainPlayer.CheckMovementCollision(0, -moveDistance, crate))
                 {
                     Console.WriteLine("Player collided with a crate");
@@ -443,7 +425,6 @@ namespace Client
             playerBarMask = new Sprite(Textures.Get(TextureIdentifier.PlayerBarMask));
             cursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
             crate = new Sprite(Textures.Get(TextureIdentifier.Crate));
-            //medkit.Texture = Textures.Get(TextureIdentifier.Medkit);
             medkitSprite = new Sprite(Textures.Get(TextureIdentifier.Medkit));
             movementSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.MovementSyringe));
             reloadSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.ReloadSyringe));
