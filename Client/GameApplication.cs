@@ -47,6 +47,7 @@ namespace Client
         Sprite reloadSyringeSprite;
         Sprite healingSyringeSprite;
         Sprite deflectionSyringeSprite;
+        Sprite bush;
         static Texture bulletTexture = new Texture("Assets/bullet.png");
         static Sprite bullet = new Sprite(bulletTexture);
         Player mainPlayer = new Player();
@@ -129,6 +130,7 @@ namespace Client
                 playerBar.Position = playerBarPos;
                 playerBarMask.Position = playerBarPos;
                 crate.Position = new Vector2f(1000, 400);
+                bush.Position = new Vector2f(500, 400);
                 ak47Sprite.Rotation = rotation;
                 ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
                
@@ -140,6 +142,7 @@ namespace Client
                 window.Draw(playerBarMask);
                 window.Draw(playerBar);
                 window.Draw(crate);
+                window.Draw(bush);
                 attackCooldown -= deltaTime.AsMilliseconds();
                 UpdatePickupables();
                 DrawPickupables();
@@ -438,6 +441,7 @@ namespace Client
             reloadSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.ReloadSyringe));
             healingSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.HealingSyringe));
             deflectionSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.DeflectionSyringe));
+            bush = new Sprite(Textures.Get(TextureIdentifier.Bush));
         }
 
 
