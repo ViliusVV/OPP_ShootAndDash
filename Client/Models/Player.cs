@@ -55,16 +55,29 @@ namespace Client.Models
             SpeedMultiplier = 2;
             Task.Delay((int)durationInMilis).ContinueWith(o => SpeedMultiplier = 1);
         }
-        public float GetHealth()
+        public float GetHealth(float scale)
         {
             if (Health > 0)
             {
-                return 1.5f * Health / 100;
+                return scale * Health / 100;
             }
             else
             {
                 return 0;
             }
         }
+
+        public float HealthOffSet(float scale)
+        {
+            if (Health > 0)
+            { 
+            return (float)15.5*((100 - Health) * scale / 100) ;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
     }
 }

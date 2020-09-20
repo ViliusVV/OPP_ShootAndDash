@@ -26,8 +26,8 @@ namespace Client.Utilities
         /// <returns>Size vector</returns>
         public static Vector2f GetSpriteSize(Sprite sprite)
         {
-            float xSize = sprite.Scale.X * sprite.Texture.Size.X;
-            float ySize = sprite.Scale.Y * sprite.Texture.Size.Y;
+            float xSize = sprite.Scale.X * sprite.TextureRect.Width;
+            float ySize = sprite.Scale.Y * sprite.TextureRect.Height;
             
 
             return new Vector2f(xSize, ySize);

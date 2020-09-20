@@ -44,6 +44,7 @@ namespace Client
         Sprite ak47Sprite;
         Sprite playerBar;
         Sprite playerBarMask;
+        Sprite playerBarAmmoMask;
         Sprite crate;
         Sprite medkitSprite;
         Sprite movementSyringeSprite;
@@ -51,10 +52,17 @@ namespace Client
         Sprite healingSyringeSprite;
         Sprite deflectionSyringeSprite;
         Sprite bush;
+
         static Texture bulletTexture = new Texture("Assets/bullet.png");
         static Sprite bullet = new Sprite(bulletTexture);
+
         Player mainPlayer = new Player();
-        Weapon wep = new Weapon("AK-47", 10, 20, 2000, 200, 1, 20, true, bullet);
+        IntRect playerAnimation = new IntRect(36, 0, 36, 64);
+        IntRect playerIdle = new IntRect(0, 0, 36, 64);
+        Clock animationSpeed = new Clock();
+        bool isPlayerRunning = false;
+
+        Weapon wep = new Weapon("AK-47", 30, 29, 20, 2000, 200, 1, 20, true, bullet);
 
         AimCursor cursor = new AimCursor();
         List<Projectile> bulletList = new List<Projectile>();
@@ -87,7 +95,6 @@ namespace Client
             window = CreateRenderWindow(Styles.Close);
             Vector2f winSize = window.GetView().Size;
 
-
             // Load resources
             LoadTextures();
             LoadSounds();
@@ -103,10 +110,12 @@ namespace Client
             // Set initial posision for text
             mainPlayer.Position = new Vector2f(window.Size.X / 2f, window.Size.Y / 2f);
 
+            mainPlayer.TextureRect = playerAnimation;
             // Configure sprite
             mainPlayer.Origin = SpriteUtils.GetSpriteCenter(mainPlayer);
             playerBar.Origin = SpriteUtils.GetSpriteCenter(playerBar);
             playerBarMask.Origin = SpriteUtils.GetSpriteCenter(playerBarMask);
+            playerBarAmmoMask.Origin = SpriteUtils.GetSpriteCenter(playerBarAmmoMask);
             ak47Sprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(ak47Sprite).X, 0.0f);
 
             playerBar.Scale = new Vector2f(1.5f, 1.5f);
@@ -119,7 +128,8 @@ namespace Client
             ConnectToServer(Connection);
 
             playerBarMask.Scale = new Vector2f(1.5f, 1.5f);
-
+            playerBarAmmoMask.Scale = new Vector2f(1.5f, 1.5f);
+            
             Clock clock = new Clock();
             Clock sendClock = new Clock();
             while (window.IsOpen)
@@ -146,11 +156,33 @@ namespace Client
                 ak47Sprite.Position = mainPlayer.Position;
                 playerBar.Position = playerBarPos;
                 playerBarMask.Position = playerBarPos;
+                playerBarAmmoMask.Position = playerBarPos;
                 crate.Position = new Vector2f(1000, 400);
                 bush.Position = new Vector2f(500, 400);
                 ak47Sprite.Rotation = rotation;
                 ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
-                playerBarMask.Scale = new Vector2f(mainPlayer.GetHealth(), 1.5f);
+                playerBarMask.Scale = new Vector2f(mainPlayer.GetHealth(1.5f), 1.5f);
+                playerBarMask.Position = new Vector2f(mainPlayer.Position.X - mainPlayer.HealthOffSet(1.5f), mainPlayer.Position.Y - 40);
+                playerBarAmmoMask.Scale = new Vector2f(wep.GetAmmo(1.5f), 1.5f);
+                playerBarAmmoMask.Position = new Vector2f(mainPlayer.Position.X - wep.AmmoOffSet(1.5f), mainPlayer.Position.Y - 40);
+
+
+                // Run player animation
+                if (animationSpeed.ElapsedTime.AsSeconds() > 0.05f && isPlayerRunning)
+                {
+                    if (playerAnimation.Left == 144)
+                    {
+                        playerAnimation.Left = 36;
+                    }
+                    else
+                        playerAnimation.Left += 36;
+                    mainPlayer.TextureRect = playerAnimation;
+                    animationSpeed.Restart();
+                }
+                else if (!isPlayerRunning)
+                {
+                    mainPlayer.TextureRect = playerIdle;
+                }
 
 
                 //Draw order is important
@@ -158,6 +190,7 @@ namespace Client
                 window.Draw(mainPlayer);
                 window.Draw(ak47Sprite);
                 window.Draw(playerBarMask);
+                window.Draw(playerBarAmmoMask);
                 window.Draw(playerBar);
                 window.Draw(crate);
                 window.Draw(bush);
@@ -324,6 +357,11 @@ namespace Client
             };
         }
 
+        private void AnimateCharacter()
+        {
+
+        }
+
         private void ProccesKeyboardInput(Time deltaTime)
         {
             float movementSpeed = 500;
@@ -341,10 +379,13 @@ namespace Client
                 }
                 else
                 {
+                    isPlayerRunning = true;
                     movementY -= moveDistance;
                 }
 
             }
+            else
+                isPlayerRunning = false;
             if (Keyboard.IsKeyPressed(Keyboard.Key.S))
             {
                 if (mainPlayer.CheckMovementCollision(0, moveDistance, crate))
@@ -353,6 +394,7 @@ namespace Client
                 }
                 else
                 {
+                    isPlayerRunning = true;
                     movementY += moveDistance;
                 }
             }
@@ -369,6 +411,7 @@ namespace Client
                 }
                 else
                 {
+                    isPlayerRunning = true;
                     movementX += moveDistance;
                 }
 
@@ -387,6 +430,7 @@ namespace Client
                 }
                 else
                 {
+                    isPlayerRunning = true;
                     movementX -= moveDistance;
                 }
 
@@ -403,7 +447,7 @@ namespace Client
             }
             if(Keyboard.IsKeyPressed(Keyboard.Key.Z))
             {
-                mainPlayer.ApplyDamage(100);
+                mainPlayer.ApplyDamage(1);
             }
 
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
@@ -455,19 +499,23 @@ namespace Client
         }
         private void ShootBullet()
         {
-            Sprite myBullet = new Sprite(Textures.Get(TextureIdentifier.Bullet));
-            Vector2 target = new Vector2(
-                cursor.Position.X - mainPlayer.Position.X,
-                cursor.Position.Y - mainPlayer.Position.Y
-            );
-            target = Vector2.Normalize(target);
-            Projectile bullet = new Projectile(target.X * 1000, target.Y * 1000, myBullet);
-            bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(bulletSprite), mainPlayer.Position);
-            bullet.ProjectileSprite.Rotation = VectorUtils.VectorToAngle(target.X, target.Y);
+            if (wep.Ammo != 0)
+            {
+                Sprite myBullet = new Sprite(Textures.Get(TextureIdentifier.Bullet));
+                Vector2 target = new Vector2(
+                    cursor.Position.X - mainPlayer.Position.X,
+                    cursor.Position.Y - mainPlayer.Position.Y
+                );
+                target = Vector2.Normalize(target);
+                Projectile bullet = new Projectile(target.X * 1000, target.Y * 1000, myBullet);
+                bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(bulletSprite), mainPlayer.Position);
+                bullet.ProjectileSprite.Rotation = VectorUtils.VectorToAngle(target.X, target.Y);
 
-            bulletList.Add(bullet);
-            Sound sound = Sounds.Get(SoundIdentifier.GenericGun);
-            sound.Play();
+                bulletList.Add(bullet);
+                Sound sound = Sounds.Get(SoundIdentifier.GenericGun);
+                sound.Play();
+                wep.AmmoConsume();
+            }
         }
 
 
@@ -488,6 +536,7 @@ namespace Client
             ak47Sprite = new Sprite(Textures.Get(TextureIdentifier.GunAk47));
             playerBar = new Sprite(Textures.Get(TextureIdentifier.PlayerBar));
             playerBarMask = new Sprite(Textures.Get(TextureIdentifier.PlayerBarMask));
+            playerBarAmmoMask = new Sprite(Textures.Get(TextureIdentifier.PlayerBarAmmoMask));
             cursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
             crate = new Sprite(Textures.Get(TextureIdentifier.Crate));
             medkitSprite = new Sprite(Textures.Get(TextureIdentifier.Medkit));
