@@ -76,6 +76,8 @@ namespace Client
         long playerId = new Random().Next(1000, 9999);
         bool connected = false;
 
+        List<Player> players = new List<Player>();
+        PlayerDTO playerDTO = new PlayerDTO();
         public GameApplication() { }
 
         public static GameApplication GetInstance()
@@ -121,12 +123,20 @@ namespace Client
             playerBar.Scale = new Vector2f(1.5f, 1.5f);
 
             // Connect to game hub server
-             Connection = new HubConnectionBuilder()
-                .WithUrl(new Uri("https://localhost:5001/sd-server"))
-                .WithAutomaticReconnect()
-                .Build();
+            Connection = new HubConnectionBuilder()
+               .WithUrl(new Uri("https://localhost:5001/sd-server"))
+               .WithAutomaticReconnect()
+               .Build();
             ConnectToServer(Connection);
-
+            CreatePlayer();
+            Connection.On<PlayerDTO>("CreatePlayer",
+                (playerInfo) =>
+                {
+                    Player newPlayer = new Player(playerInfo);
+                    newPlayer.Texture = Textures.Get(TextureIdentifier.MainCharacter);
+                    players.Add(newPlayer);
+                    Console.WriteLine(playerInfo);
+                });
             playerBarMask.Scale = new Vector2f(1.5f, 1.5f);
             playerBarAmmoMask.Scale = new Vector2f(1.5f, 1.5f);
             
@@ -188,6 +198,7 @@ namespace Client
                 //Draw order is important
                 window.Draw(bgSprite);
                 window.Draw(mainPlayer);
+                RenderPlayers();
                 window.Draw(ak47Sprite);
                 window.Draw(playerBarMask);
                 window.Draw(playerBarAmmoMask);
@@ -199,6 +210,7 @@ namespace Client
                 DrawPickupables();
                 UpdateBullets(deltaTime);
                 DrawProjectiles();
+
 
                 cursor.Update(mPos);
                 window.Draw(cursor);
@@ -212,6 +224,14 @@ namespace Client
 
             }
 
+        }
+
+        private void RenderPlayers()
+        {
+            foreach (var player in players)
+            {
+                window.Draw(player);
+            }
         }
 
         public void ConnectToServer(HubConnection connection)
@@ -244,7 +264,10 @@ namespace Client
         {
             connection.SendAsync("ReceivePos", $"ID{playerId}", $"{pos.X} {pos.Y}");
         }
-
+        public void CreatePlayer()
+        {
+            Connection.SendAsync("SpawnPlayer", playerDTO);
+        }
         private void ToogleScreen()
         {
             if(FullScreen != PrevFullScreen)

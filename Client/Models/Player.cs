@@ -20,6 +20,13 @@ namespace Client.Models
         public float SpeedMultiplier { get; private set; } = 1;
 
         public Weapon Weapon { get; private set; }
+        public Player() { }
+        public Player(PlayerDTO playerDTO)
+        {
+            Health = playerDTO.Health;
+            Speed = playerDTO.Speed;
+            Position = playerDTO.Position;
+        }
         public void SetWeapon(Weapon wep)
         {
             this.Weapon = wep;

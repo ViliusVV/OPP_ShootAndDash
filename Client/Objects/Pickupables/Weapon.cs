@@ -52,8 +52,8 @@ namespace Client.Objects
                 for (int i = 0; i < bulletCount; i++)
                 {
                     Vector2 target = new Vector2(
-                    cursorPos.X - playerPos.X,
-                    cursorPos.Y - playerPos.Y
+                        cursorPos.X - playerPos.X,
+                        cursorPos.Y - playerPos.Y
                     );
                     target.X += GameApplication.rnd.Next(SpreadAmount);
                     target.Y += GameApplication.rnd.Next(SpreadAmount);
@@ -79,7 +79,7 @@ namespace Client.Objects
             
             if (Ammo > 0)
             {
-                Console.WriteLine(Ammo/MagazineSize);
+                //Console.WriteLine(Ammo/MagazineSize);
                 return scale * (float)Ammo / (float)MagazineSize;
             }
             else
