@@ -10,7 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DTO\PlayerDTO.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DTO\Vector2fSer.cs" />
+    <Compile Include="..\Common\DTO\Vector2fSerializable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\VectorUtils.cs" />
   </ItemGroup>

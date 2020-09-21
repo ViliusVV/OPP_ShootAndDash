@@ -105,6 +105,12 @@ namespace Client
             GameWindow = CreateRenderWindow(Styles.Close);
             Vector2f winSize = GameWindow.GetView().Size;
 
+            Vector2fSerializable vectorSer = new Vector2fSerializable();
+            Vector2f vec0 = new Vector2f(15.0f, 14.4f);
+            Vector2f vec2 = new Vector2f(1.0f, 4.5f);
+            vec0 = vectorSer;
+            vectorSer = vec2;
+
             // Load resources
             LoadTextures();
             LoadSounds();
@@ -247,7 +253,7 @@ namespace Client
             foreach(var dto in playerDTOs)
             {
                 Player player = players.Find(p => p.Name.Equals(dto.Name));
-                if(player != null)
+                if(player != null && !mainPlayer.Equals(player))
                 {
                     player.Position = dto.Position;
                 }
@@ -266,7 +272,7 @@ namespace Client
         public void SendPos(HubConnection connection)
         {
             var tmpPlayer = mainPlayer.ToDTO();
-            connection.SendAsync("ReceivePos", mainPlayer.Position.X, mainPlayer.Position.Y);
+            connection.SendAsync("ReceivePos", tmpPlayer);
         }
 
         public void ReloadGun()

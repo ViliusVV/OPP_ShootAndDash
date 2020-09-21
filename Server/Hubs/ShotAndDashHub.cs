@@ -14,9 +14,9 @@ namespace Server.Hubs
     {
         public readonly GameManager _gameManager = GameManager.GetInstance();
 
-        public async Task ReceivePos(float x, float y)
+        public async Task ReceivePos(PlayerDTO dto)
         {
-            _gameManager.Players[Context.ConnectionId].Position = new Vector2f(x, y);
+            _gameManager.Players[Context.ConnectionId].Position = dto.Position;
             await Clients.All.SendAsync("UpdateState", _gameManager.Players.Values.ToList());
         }
 

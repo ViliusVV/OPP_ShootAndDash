@@ -11,8 +11,8 @@ namespace Common.DTO
         public string Name { get; set; }
         public float Health { get; set; } = 100;
 
-        public Vector2f Speed { get; set; }
-        public Vector2f Position { get; set; }
+        public Vector2fSerializable Speed { get; set; }
+        public Vector2fSerializable Position { get; set; }
 
         public bool IsDead { get; private set; } = false;
         public float SpeedMultiplier { get; set; } = 1;
