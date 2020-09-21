@@ -18,6 +18,9 @@ using Client.Objects.Pickupables;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Runtime.CompilerServices;
+using Common.DTO;
+using Common.Utilities;
+using System.Reflection.Metadata;
 
 namespace Client
 {
@@ -25,20 +28,24 @@ namespace Client
     {
         // Singleton instance
         private static readonly GameApplication _instance = new GameApplication();
-        public static Random rnd = new Random(1000);
+
+        // Screen 
+        RenderWindow GameWindow { get; set; }
+        private View MainView { get; set; }
+        private View ZoomedView { get; set; }
         private bool FullScreen { get; set; }
         private bool PrevFullScreen { get; set; }
-        
-        RenderWindow window;
+        float zoomView = 1.0f;
+        float previousZoom = 1.0f;
 
+
+        // Resources
         private TextureHolder Textures { get; } = new TextureHolder();
         private SoundHolder Sounds { get; } = new SoundHolder();
         private FontHolder Fonts { get; } = new FontHolder();
-        private View MainView { get; set; }
-        private View ZoomedView { get; set; }
-        private HubConnection Connection { get; set; }
-
-        Position position = new Position();
+        private ConnectionManager ConnectionManager { get; set; }
+        static Texture bulletTexture = new Texture("Assets/bullet.png");
+        static Sprite bullet = new Sprite(bulletTexture);
 
         Sprite bgSprite;
         Sprite bulletSprite;
@@ -54,8 +61,6 @@ namespace Client
         Sprite deflectionSyringeSprite;
         Sprite bush;
 
-        static Texture bulletTexture = new Texture("Assets/bullet.png");
-        static Sprite bullet = new Sprite(bulletTexture);
 
         Player mainPlayer = new Player();
         IntRect playerAnimation = new IntRect(36, 0, 36, 64);
@@ -74,13 +79,13 @@ namespace Client
         bool facingRight = true;
         bool isReloading = false;
 
-        float zoomView = 1.0f;
-        float previousZoom = 1.0f;
         long playerId = new Random().Next(1000, 9999);
         bool connected = false;
 
         List<Player> players = new List<Player>();
         PlayerDTO playerDTO = new PlayerDTO();
+
+        public static Random rnd = new Random(1000);
         public GameApplication() { }
 
         public static GameApplication GetInstance()
@@ -97,8 +102,8 @@ namespace Client
         public void Run()
         {
             // Create render window
-            window = CreateRenderWindow(Styles.Close);
-            Vector2f winSize = window.GetView().Size;
+            GameWindow = CreateRenderWindow(Styles.Close);
+            Vector2f winSize = GameWindow.GetView().Size;
 
             // Load resources
             LoadTextures();
@@ -107,13 +112,13 @@ namespace Client
             CreateSprites();
             wep.SetProjectileSprite(bulletSprite);
             // View
-            MainView = window.DefaultView;
+            MainView = GameWindow.DefaultView;
             ZoomedView = new View(MainView);
-            window.SetView(ZoomedView);
+            GameWindow.SetView(ZoomedView);
 
 
             // Set initial posision for text
-            mainPlayer.Position = new Vector2f(window.Size.X / 2f, window.Size.Y / 2f);
+            mainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
 
             mainPlayer.TextureRect = playerAnimation;
             // Configure sprite
@@ -126,40 +131,34 @@ namespace Client
             playerBar.Scale = new Vector2f(1.5f, 1.5f);
 
             // Connect to game hub server
-            Connection = new HubConnectionBuilder()
-               .WithUrl(new Uri("https://localhost:5001/sd-server"))
-               .WithAutomaticReconnect()
-               .Build();
-            ConnectToServer(Connection);
+            ConnectionManager = new ConnectionManager("http://localhost:5000/sd-server");
+            BindEvents();
+
             CreatePlayer();
-            Connection.On<PlayerDTO>("CreatePlayer",
-                (playerInfo) =>
-                {
-                    Player newPlayer = new Player(playerInfo);
-                    newPlayer.Texture = Textures.Get(TextureIdentifier.MainCharacter);
-                    players.Add(newPlayer);
-                    Console.WriteLine(playerInfo);
-                });
+
             playerBarMask.Scale = new Vector2f(1.5f, 1.5f);
             playerBarAmmoMask.Scale = new Vector2f(1.5f, 1.5f);
+
+            players.Add(mainPlayer);
             
             Clock clock = new Clock();
             Clock sendClock = new Clock();
-            while (window.IsOpen)
+            while (GameWindow.IsOpen)
             {
+                if (true) { 
 
                 Time deltaTime = clock.Restart();
-                if (sendClock.ElapsedTime.AsSeconds() > (1f / 30f))
-                {
-                    sendClock.Restart();
-                    SendPos(Connection, mainPlayer.Position);
-                }
+                    if (sendClock.ElapsedTime.AsSeconds() > (1f / 30f))
+                    {
+                        sendClock.Restart();
+                        SendPos(ConnectionManager.Connection);
+                    }
 
-                window.Clear();
-                window.DispatchEvents();
+                    GameWindow.Clear();
+                GameWindow.DispatchEvents();
 
                 this.ProccesKeyboardInput(deltaTime);
-                var mPos = window.MapPixelToCoords(Mouse.GetPosition(window));
+                var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
                 var middlePoint = VectorUtils.GetMiddlePoint(mainPlayer.Position, mPos);
 
                 float rotation = VectorUtils.GetAngleBetweenVectors(mainPlayer.Position, mPos);
@@ -198,15 +197,14 @@ namespace Client
                 }
 
                 //Draw order is important
-                window.Draw(bgSprite);
-                window.Draw(mainPlayer);
+                GameWindow.Draw(bgSprite);
                 RenderPlayers();
-                window.Draw(ak47Sprite);
-                window.Draw(playerBarMask);
-                window.Draw(playerBarAmmoMask);
-                window.Draw(playerBar);
-                window.Draw(crate);
-                window.Draw(bush);
+                GameWindow.Draw(ak47Sprite);
+                GameWindow.Draw(playerBarMask);
+                GameWindow.Draw(playerBarAmmoMask);
+                GameWindow.Draw(playerBar);
+                GameWindow.Draw(crate);
+                GameWindow.Draw(bush);
                 attackCooldown -= deltaTime.AsMilliseconds();
                 UpdatePickupables();
                 DrawPickupables();
@@ -217,56 +215,58 @@ namespace Client
                     ReloadGun();
                 }
                 cursor.Update(mPos);
-                window.Draw(cursor);
+                GameWindow.Draw(cursor);
 
                 ZoomedView.Center = middlePoint;
                 ZoomedView.Zoom(zoomView);
                 zoomView = 1.0f;
-                window.SetView(ZoomedView);
+                GameWindow.SetView(ZoomedView);
 
-                window.Display();
+                GameWindow.Display();
+                }
 
             }
 
+        }
+
+        private void CreatePlayers(List<PlayerDTO> playerDTOs)
+        {
+            foreach(var playerDto in playerDTOs)
+            {
+                if(players.FindIndex(player => player.Name.Equals(playerDto.Name)) < 0)
+                {
+                    Player tmpPlayer = new Player(playerDto);
+                    tmpPlayer.Texture = Textures.Get(TextureIdentifier.MainCharacter);
+                    players.Add(tmpPlayer);
+                }
+            }
+        }
+
+        private void UpdatePlayers(List<PlayerDTO> playerDTOs)
+        {
+            foreach(var dto in playerDTOs)
+            {
+                Player player = players.Find(p => p.Name.Equals(dto.Name));
+                if(player != null)
+                {
+                    player.Position = dto.Position;
+                }
+            }
         }
 
         private void RenderPlayers()
         {
             foreach (var player in players)
             {
-                window.Draw(player);
+                GameWindow.Draw(player);
             }
         }
 
-        public void ConnectToServer(HubConnection connection)
-        {
-            Clock clock = new Clock();
-            connection.StartAsync();
 
-            while (connection.State == HubConnectionState.Connecting) 
-            {
-                float dt = clock.ElapsedTime.AsSeconds();
-                if(dt >  0.5){
-                    clock.Restart();
-                    Console.WriteLine("Connecting...");
-                }
-            }
-            if (connection.State != HubConnectionState.Connected)
-            {
-                Console.WriteLine("Connection failed!");
-                Environment.Exit(-1);
-            }
-            else
-            {
-                Console.WriteLine("Connection succesfull!");
-                connected = true;
-            }
-            Console.WriteLine(connection.State);
-        }
-
-        public void SendPos(HubConnection connection, Vector2f pos)
+        public void SendPos(HubConnection connection)
         {
-            connection.SendAsync("ReceivePos", $"ID{playerId}", $"{pos.X} {pos.Y}");
+            var tmpPlayer = mainPlayer.ToDTO();
+            connection.SendAsync("ReceivePos", mainPlayer.Position.X, mainPlayer.Position.Y);
         }
 
         public void ReloadGun()
@@ -277,6 +277,8 @@ namespace Client
                 {
                     reloadClock.Restart();
                     wep.AmmoConsume(1);
+                    Sound sound = Sounds.Get(SoundIdentifier.Reload);
+                    sound.Play();
                 }
             }
             else
@@ -287,16 +289,18 @@ namespace Client
 
         public void CreatePlayer()
         {
-            Connection.SendAsync("SpawnPlayer", playerDTO);
+
+            ConnectionManager.Connection.SendAsync("SpawnPlayer", mainPlayer.ToDTO()).Wait();
         }
+
         private void ToogleScreen()
         {
             if(FullScreen != PrevFullScreen)
             {
                 PrevFullScreen = FullScreen;
                 var windowStyle = FullScreen ? Styles.Fullscreen : Styles.Close;
-                window.Close();
-                window = CreateRenderWindow(windowStyle);
+                GameWindow.Close();
+                GameWindow = CreateRenderWindow(windowStyle);
             }
         }
 
@@ -344,14 +348,14 @@ namespace Client
         {
             for (int i = 0; i < bulletList.Count; i++)
             {
-                window.Draw(bulletList[i]);
+                GameWindow.Draw(bulletList[i]);
             }
         }
         private void DrawPickupables()
         {
             for (int i = 0; i < pickupableList.Count; i++)
             {
-                window.Draw(pickupableList[i]);
+                GameWindow.Draw(pickupableList[i]);
             }
         }
 
@@ -372,7 +376,10 @@ namespace Client
 
         public void BindWindowEvents(RenderWindow window)
         {
-            window.Closed += (obj, e) => { window.Close(); };
+            window.Closed += (obj, e) => {
+                ConnectionManager.Connection.StopAsync().Wait();
+                window.Close(); 
+            };
             window.KeyPressed +=
                 // Catch key event. E
                 // Event is better used for instant response
@@ -538,6 +545,8 @@ namespace Client
             pickupableList.Add(syringe);
 
         }
+
+
         private void SpawnMedkit()
         {
             Medkit medkit = new Medkit();
@@ -545,6 +554,8 @@ namespace Client
             medkit.Position = new Vector2f(rnd.Next(1000), rnd.Next(1000));
             pickupableList.Add(medkit);
         }
+
+
         private void ShootBullet()
         {
             if (wep.Ammo != 0 && isReloading != true)
@@ -564,6 +575,19 @@ namespace Client
                 sound.Play();
                 wep.AmmoConsume(-1);
             }
+        }
+
+        public void BindEvents()
+        {
+            ConnectionManager.Connection.On<List<PlayerDTO>>("CreatePlayer", (list) =>
+            {
+                CreatePlayers(list);
+            });
+
+            ConnectionManager.Connection.On<List<PlayerDTO>>("UpdateState", (list) =>
+            {
+                UpdatePlayers(list);
+            });
         }
 
 

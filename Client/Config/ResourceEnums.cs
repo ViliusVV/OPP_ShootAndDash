@@ -7,7 +7,8 @@ namespace Client.Config
     public enum SoundIdentifier
     {
         [ResourceAttr("Assets/soundGenericGun.ogg")] GenericGun,
-        [ResourceAttr("Assets/soundSniper.ogg")] Sniper
+        [ResourceAttr("Assets/soundSniper.ogg")] Sniper,
+        [ResourceAttr("Assets/soundReload.ogg")] Reload
     }
 
     public enum TextureIdentifier

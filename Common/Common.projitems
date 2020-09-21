@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>382069e3-6add-4847-a418-156b37bf08a8</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Common</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)DTO\PlayerDTO.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DTO\Vector2fSer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\VectorUtils.cs" />
+  </ItemGroup>
+</Project>

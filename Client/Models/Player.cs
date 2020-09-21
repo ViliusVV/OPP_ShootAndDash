@@ -1,6 +1,7 @@
 ﻿using Client.Collisions;
 using Client.Objects;
 using Client.Utilities;
+using Common.DTO;
 using SFML.Graphics;
 using SFML.System;
 using System;
@@ -13,6 +14,7 @@ namespace Client.Models
 {
     class Player: Sprite
     {
+        public string Name { get; set; } = new Random().Next(1, 888).ToString();
         public float Health { get; private set; } = 100;
 
         public Vector2f Speed { get; set; } = new Vector2f(0.0f, 0.0f);
@@ -24,9 +26,11 @@ namespace Client.Models
         public Player() { }
         public Player(PlayerDTO playerDTO)
         {
+            Name = playerDTO.Name;
             Health = playerDTO.Health;
             Speed = playerDTO.Speed;
             Position = playerDTO.Position;
+            TextureRect = new IntRect(0, 0, 36, 64);
         }
         public void SetWeapon(Weapon wep)
         {
@@ -49,10 +53,13 @@ namespace Client.Models
                 Health = 100;
             }
         }
+
+
         public void Translate(float xOffset, float yOffset)
         {
             this.Position = new Vector2f(this.Position.X + xOffset * SpeedMultiplier, this.Position.Y + yOffset * SpeedMultiplier);
         }
+
         public bool CheckMovementCollision(float xOffset, float yOffset, Sprite targetCollider)
         {
             Translate(xOffset, yOffset);
@@ -94,6 +101,26 @@ namespace Client.Models
             {
                 return 0;
             }
+        }
+
+        public PlayerDTO ToDTO()
+        {
+            var tmpDto = new PlayerDTO();
+
+            tmpDto.Name = Name;
+            tmpDto.Health = Health;
+            tmpDto.Position = Position;
+            tmpDto.Speed = Speed;
+
+            return tmpDto;
+        }
+
+
+        public void RefreshData(PlayerDTO playerDto)
+        {
+            Health = playerDto.Health;
+            Position = playerDto.Position;
+            Speed = playerDto.Speed;
         }
 
     }

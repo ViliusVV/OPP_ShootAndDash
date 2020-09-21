@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Client.Utilities
+namespace Common.Utilities
 {
     static class VectorUtils
     {

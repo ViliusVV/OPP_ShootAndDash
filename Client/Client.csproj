@@ -14,4 +14,6 @@
     <Exec Command="if not exist $(TargetDir)\Assets mkdir $(TargetDir)\Assets&#xD;&#xA;copy &quot;$(ProjectDir)Assets\&quot; &quot;$(TargetDir)Assets&quot;" />
   </Target>
 
+  <Import Project="..\Common\Common.projitems" Label="Shared" />
+
 </Project>
