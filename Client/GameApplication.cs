@@ -67,6 +67,7 @@ namespace Client
         IntRect playerIdle = new IntRect(0, 0, 36, 64);
         Clock animationSpeed = new Clock();
         Clock reloadClock = new Clock();
+        Clock reloadTimer = new Clock();
         bool isPlayerRunning = false;
 
         Weapon wep = new Weapon("AK-47", 30, 29, 20, 2000, 200, 1, 20, true, bullet);
@@ -86,6 +87,8 @@ namespace Client
         PlayerDTO playerDTO = new PlayerDTO();
 
         public static Random rnd = new Random(1000);
+
+        public MapGeneration map = new MapGeneration();
         public GameApplication() { }
 
         public static GameApplication GetInstance()
@@ -116,6 +119,7 @@ namespace Client
             LoadSounds();
             LoadFonts();
             CreateSprites();
+            map.CreateMap();
             wep.SetProjectileSprite(bulletSprite);
             // View
             MainView = GameWindow.DefaultView;
@@ -202,8 +206,9 @@ namespace Client
                     mainPlayer.TextureRect = playerIdle;
                 }
 
-                //Draw order is important
-                GameWindow.Draw(bgSprite);
+                    //Draw order is important
+                    //GameWindow.Draw(bgSprite);
+                GameWindow.Draw(map.map);
                 RenderPlayers();
                 GameWindow.Draw(ak47Sprite);
                 GameWindow.Draw(playerBarMask);
@@ -287,9 +292,10 @@ namespace Client
                     sound.Play();
                 }
             }
-            else
+            if (reloadTimer.ElapsedTime.AsMilliseconds() > wep.ReloadTime*600)
             {
                 isReloading = false;
+                reloadTimer.Restart();
             }
         }
 
