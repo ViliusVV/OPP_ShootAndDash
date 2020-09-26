@@ -141,7 +141,7 @@ namespace Client
             playerBar.Scale = new Vector2f(1.5f, 1.5f);
 
             // Connect to game hub server
-            ConnectionManager = new ConnectionManager("http://localhost:5000/sd-server");
+            ConnectionManager = new ConnectionManager("https://shoot-and-dash.azurewebsites.net/sd-server");
             BindEvents();
 
             CreatePlayer();
@@ -170,7 +170,6 @@ namespace Client
                 this.ProccesKeyboardInput(deltaTime);
                 var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
                 var middlePoint = VectorUtils.GetMiddlePoint(mainPlayer.Position, mPos);
-
                 float rotation = VectorUtils.GetAngleBetweenVectors(mainPlayer.Position, mPos);
 
                 Vector2f playerBarPos = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y - 40);
