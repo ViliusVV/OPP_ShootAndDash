@@ -33,6 +33,7 @@ namespace Client
         RenderWindow GameWindow { get; set; }
         private View MainView { get; set; }
         private View ZoomedView { get; set; }
+        private View HUDView { get; set; }
         private bool FullScreen { get; set; }
         private bool PrevFullScreen { get; set; }
         float zoomView = 1.0f;
@@ -59,8 +60,8 @@ namespace Client
         Sprite reloadSyringeSprite;
         Sprite healingSyringeSprite;
         Sprite deflectionSyringeSprite;
-        Sprite bush;
-
+        Sprite bushSprite;
+        Sprite scoreboardSprite;
 
         Player mainPlayer = new Player();
         IntRect playerAnimation = new IntRect(36, 0, 36, 64);
@@ -69,6 +70,9 @@ namespace Client
         Clock reloadClock = new Clock();
         Clock reloadTimer = new Clock();
         bool isPlayerRunning = false;
+
+        CustomText scoreboardText;
+        Text txt = new Text();
 
         Weapon wep = new Weapon("AK-47", 30, 29, 20, 2000, 200, 1, 20, true, bullet);
 
@@ -141,7 +145,7 @@ namespace Client
             playerBar.Scale = new Vector2f(1.5f, 1.5f);
 
             // Connect to game hub server
-            ConnectionManager = new ConnectionManager("http://localhost:5000/sd-server");
+            ConnectionManager = new ConnectionManager("https://shoot-and-dash.azurewebsites.net/sd-server");
             BindEvents();
 
             CreatePlayer();
@@ -150,7 +154,11 @@ namespace Client
             playerBarAmmoMask.Scale = new Vector2f(1.5f, 1.5f);
 
             players.Add(mainPlayer);
-            
+
+
+            scoreboardText = new CustomText(Fonts.Get(FontIdentifier.PixelatedSmall), 21);
+            scoreboardText.DisplayedString = "Testing";
+
             Clock clock = new Clock();
             Clock sendClock = new Clock();
             while (GameWindow.IsOpen)
@@ -158,82 +166,91 @@ namespace Client
                 if (true) { 
 
                 Time deltaTime = clock.Restart();
-                    if (sendClock.ElapsedTime.AsSeconds() > (1f / 30f))
+                    if (sendClock.ElapsedTime.AsSeconds() > (1f / 60f))
                     {
                         sendClock.Restart();
                         SendPos(ConnectionManager.Connection);
                     }
 
                     GameWindow.Clear();
-                GameWindow.DispatchEvents();
+                    GameWindow.DispatchEvents();
 
-                this.ProccesKeyboardInput(deltaTime);
-                var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
-                var middlePoint = VectorUtils.GetMiddlePoint(mainPlayer.Position, mPos);
+                    this.ProccesKeyboardInput(deltaTime);
+                    var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
+                    var middlePoint = VectorUtils.GetMiddlePoint(mainPlayer.Position, mPos);
 
-                float rotation = VectorUtils.GetAngleBetweenVectors(mainPlayer.Position, mPos);
+                    float rotation = VectorUtils.GetAngleBetweenVectors(mainPlayer.Position, mPos);
 
-                Vector2f playerBarPos = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y - 40);
+                    Vector2f playerBarPos = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y - 40);
+                    Vector2f scoreboardPos = new Vector2f(0, 0);
+                    Vector2f scoreboardTextPos = new Vector2f(0, 0);
 
-                ak47Sprite.Position = mainPlayer.Position;
-                playerBar.Position = playerBarPos;
-                playerBarMask.Position = playerBarPos;
-                playerBarAmmoMask.Position = playerBarPos;
-                crate.Position = new Vector2f(1000, 400);
-                bush.Position = new Vector2f(500, 400);
-                ak47Sprite.Rotation = rotation;
-                ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
-                playerBarMask.Scale = new Vector2f(mainPlayer.GetHealth(1.5f), 1.5f);
-                playerBarMask.Position = new Vector2f(mainPlayer.Position.X - mainPlayer.HealthOffSet(1.5f), mainPlayer.Position.Y - 40);
-                playerBarAmmoMask.Scale = new Vector2f(wep.GetAmmo(1.5f), 1.5f);
-                playerBarAmmoMask.Position = new Vector2f(mainPlayer.Position.X - wep.AmmoOffSet(1.5f), mainPlayer.Position.Y - 40);
+                    ak47Sprite.Position = mainPlayer.Position;
+                    playerBar.Position = playerBarPos;
+                    scoreboardSprite.Position = scoreboardPos;
+                    scoreboardText.Position = scoreboardTextPos;
+                    playerBarMask.Position = playerBarPos;
+                    playerBarAmmoMask.Position = playerBarPos;
+                    crate.Position = new Vector2f(1000, 400);
+                    bushSprite.Position = new Vector2f(500, 400);
+                    ak47Sprite.Rotation = rotation;
+                    ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
+                    playerBarMask.Scale = new Vector2f(mainPlayer.GetHealth(1.5f), 1.5f);
+                    playerBarMask.Position = new Vector2f(mainPlayer.Position.X - mainPlayer.HealthOffSet(1.5f), mainPlayer.Position.Y - 40);
+                    playerBarAmmoMask.Scale = new Vector2f(wep.GetAmmo(1.5f), 1.5f);
+                    playerBarAmmoMask.Position = new Vector2f(mainPlayer.Position.X - wep.AmmoOffSet(1.5f), mainPlayer.Position.Y - 40);
 
 
-                // Run player animation
-                if (animationSpeed.ElapsedTime.AsSeconds() > 0.05f && isPlayerRunning)
-                {
-                    if (playerAnimation.Left == 144)
+                    // Run player animation
+                    if (animationSpeed.ElapsedTime.AsSeconds() > 0.05f && isPlayerRunning)
                     {
-                        playerAnimation.Left = 36;
+                        if (playerAnimation.Left == 144)
+                        {
+                            playerAnimation.Left = 36;
+                        }
+                        else
+                            playerAnimation.Left += 36;
+                        mainPlayer.TextureRect = playerAnimation;
+                        animationSpeed.Restart();
                     }
-                    else
-                        playerAnimation.Left += 36;
-                    mainPlayer.TextureRect = playerAnimation;
-                    animationSpeed.Restart();
-                }
-                else if (!isPlayerRunning)
-                {
-                    mainPlayer.TextureRect = playerIdle;
-                }
+                    else if (!isPlayerRunning)
+                    {
+                        mainPlayer.TextureRect = playerIdle;
+                    }
 
-                    //Draw order is important
-                    //GameWindow.Draw(bgSprite);
-                GameWindow.Draw(map.map);
-                RenderPlayers();
-                GameWindow.Draw(ak47Sprite);
-                GameWindow.Draw(playerBarMask);
-                GameWindow.Draw(playerBarAmmoMask);
-                GameWindow.Draw(playerBar);
-                GameWindow.Draw(crate);
-                GameWindow.Draw(bush);
-                attackCooldown -= deltaTime.AsMilliseconds();
-                UpdatePickupables();
-                DrawPickupables();
-                UpdateBullets(deltaTime);
-                DrawProjectiles();
-                if (isReloading == true)
-                {
-                    ReloadGun();
-                }
-                cursor.Update(mPos);
-                GameWindow.Draw(cursor);
+                        //Draw order is important
+                        //GameWindow.Draw(bgSprite);
+                    GameWindow.Draw(map.map);
+                    RenderPlayers();
+                    GameWindow.Draw(ak47Sprite);
+                    GameWindow.Draw(playerBarMask);
+                    GameWindow.Draw(playerBarAmmoMask);
+                    GameWindow.Draw(playerBar);
+                    GameWindow.Draw(crate);
+                    GameWindow.Draw(bushSprite);
+                    attackCooldown -= deltaTime.AsMilliseconds();
+                    UpdatePickupables();
+                    DrawPickupables();
+                    UpdateBullets(deltaTime);
+                    DrawProjectiles();
+                    if (isReloading == true)
+                    {
+                        ReloadGun();
+                    }
+                    cursor.Update(mPos);
+                    GameWindow.Draw(cursor);
 
-                ZoomedView.Center = middlePoint;
-                ZoomedView.Zoom(zoomView);
-                zoomView = 1.0f;
-                GameWindow.SetView(ZoomedView);
+                    GameWindow.SetView(MainView);
+                    GameWindow.Draw(scoreboardSprite);
+                    GameWindow.Draw(scoreboardText);
 
-                GameWindow.Display();
+                    ZoomedView.Center = middlePoint;
+                    ZoomedView.Zoom(zoomView);
+                    zoomView = 1.0f;
+                    GameWindow.SetView(ZoomedView);
+
+                    GameWindow.Display();
+
                 }
 
             }
@@ -628,7 +645,9 @@ namespace Client
             reloadSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.ReloadSyringe));
             healingSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.HealingSyringe));
             deflectionSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.DeflectionSyringe));
-            bush = new Sprite(Textures.Get(TextureIdentifier.Bush));
+            bushSprite = new Sprite(Textures.Get(TextureIdentifier.Bush));
+            scoreboardSprite = new Sprite(Textures.Get(TextureIdentifier.ScoreboardBox));
+            //scoreboard.SetTexture(new Texture(Textures.Get(TextureIdentifier.ScoreboardBox)));
         }
 
 
