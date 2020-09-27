@@ -9,6 +9,7 @@ namespace Client.Utilities
 {
     class ConnectionManager
     {
+        public string ServerUrl { get; set; }
         public HubConnection Connection { get; set; }
         public bool Connected { get => Connection.State == HubConnectionState.Connected; }
 
@@ -18,8 +19,6 @@ namespace Client.Utilities
                .WithUrl(new Uri(url))
                .WithAutomaticReconnect()
                .Build();
-
-            ConnectToHub();
         }
 
         public void ConnectToHub()

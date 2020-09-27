@@ -25,6 +25,7 @@ namespace Client
         private static readonly GameApplication _instance = new GameApplication();
         public static Random Rnd { get; set; } = new Random();
 
+
         // Screen 
         RenderWindow GameWindow { get; set; }
         private View MainView { get; set; }
@@ -41,7 +42,7 @@ namespace Client
         private FontHolder Fonts { get; set; } = FontHolder.GetInstance();
 
         GameState GameState { get; set; } = new GameState();
-        private ConnectionManager ConnectionManager { get; set; }
+        private ConnectionManager ConnectionManager { get; set; } = new ConnectionManager("http://localhost:5000/sd-server"); // https://shoot-and-dash.azurewebsites.net/sd-server
 
 
         Player MainPlayer { get; set; }
@@ -49,7 +50,6 @@ namespace Client
         Sprite bgSprite;
         Sprite crate;
         Sprite bushSprite;
-        Sprite scoreboardSprite;
 
         IntRect playerAnimation = new IntRect(36, 0, 36, 64);
         IntRect playerIdle = new IntRect(0, 0, 36, 64);
@@ -113,13 +113,6 @@ namespace Client
 
             MainPlayer.Origin = SpriteUtils.GetSpriteCenter(MainPlayer);
 
-            // Connect to game hub server
-            //ConnectionManager = new ConnectionManager("https://shoot-and-dash.azurewebsites.net/sd-server");
-            ConnectionManager = new ConnectionManager("http://localhost:5000/sd-server");
-
-            BindEvents();
-
-            CreatePlayer();
             GameState.Players.Add(MainPlayer);
 
 
@@ -149,10 +142,8 @@ namespace Client
 
                     float rotation = VectorUtils.GetAngleBetweenVectors(MainPlayer.Position, mPos);
 
-                    Vector2f scoreboardPos = new Vector2f(0, 0);
                     Vector2f scoreboardTextPos = new Vector2f(0, 0);
 
-                    scoreboardSprite.Position = scoreboardPos;
                     scoreboardText.Position = scoreboardTextPos;
                     crate.Position = new Vector2f(1000, 400);
                     bushSprite.Position = new Vector2f(500, 400);
@@ -197,7 +188,6 @@ namespace Client
                     GameWindow.Draw(AimCursor);
 
                     GameWindow.SetView(MainView);
-                    GameWindow.Draw(scoreboardSprite);
                     GameWindow.Draw(scoreboardText);
 
                     ZoomedView.Center = middlePoint;
@@ -370,22 +360,25 @@ namespace Client
                 ConnectionManager.Connection.StopAsync().Wait();
                 window.Close(); 
             };
-            window.KeyPressed +=
-                // Catch key event. E
-                // Event is better used for instant response
-                // but can only trigger only one key at a time
-                (sender, e) =>
+
+            // Catch key event. E
+            // Event is better used for instant response
+            // but can only trigger only one key at a time
+            window.KeyPressed += (sender, e) => {
+                Window windowEvt = (Window)sender;
+                if (e.Code == Keyboard.Key.Escape)
                 {
-                    Window windowEvt = (Window)sender;
-                    if (e.Code == Keyboard.Key.Escape)
-                    {
-                        windowEvt.Close();
-                    }
-                    if (e.Code == Keyboard.Key.Numpad0)
-                    {
-                        FullScreen = !FullScreen;
-                    }
-                };
+                    windowEvt.Close();
+                }
+                if (e.Code == Keyboard.Key.Numpad0)
+                {
+                    FullScreen = !FullScreen;
+                }
+                if (e.Code == Keyboard.Key.F1)
+                {
+                    ConntectToServer();
+                }
+            };
 
             window.MouseWheelScrolled += (sender, e) => {
                 if (e.Wheel == Mouse.Wheel.VerticalWheel)
@@ -566,7 +559,10 @@ namespace Client
 
         public void ConntectToServer()
         {
+            ConnectionManager.ConnectToHub();
 
+            BindEvents();
+            CreatePlayer();
         }
 
         public void BindEvents()
@@ -598,7 +594,6 @@ namespace Client
             AimCursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
             crate = new Sprite(Textures.Get(TextureIdentifier.Crate));
             bushSprite = new Sprite(Textures.Get(TextureIdentifier.Bush));
-            scoreboardSprite = new Sprite(Textures.Get(TextureIdentifier.ScoreboardBox));
         }
 
 

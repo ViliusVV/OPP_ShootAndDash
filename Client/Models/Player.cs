@@ -99,30 +99,6 @@ namespace Client.Models
             Task.Delay((int)durationInMilis).ContinueWith(o => SpeedMultiplier = 1);
         }
 
-        public float GetHealth(float scale)
-        {
-            if (Health > 0)
-            {
-                return scale * Health / 100;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
-        public float HealthOffSet(float scale)
-        {
-            if (Health > 0)
-            { 
-            return (float)15.5*((100 - Health) * scale / 100) ;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
         public PlayerDTO ToDTO()
         {
             var tmpDto = new PlayerDTO();
