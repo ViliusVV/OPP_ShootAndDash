@@ -480,10 +480,10 @@ namespace Client
                 CreatePlayers(list);
             });
 
-            ConnectionManager.Connection.On<List<PlayerDTO>>("UpdateState", (list) =>
-            {
-                UpdatePlayers(list);
-            });
+            //connectionmanager.connection.on<list<playerdto>>("updatestate", (list) =>
+            //{
+            //    updateplayers(list);
+            //});
         }
 
 
