@@ -42,7 +42,7 @@ namespace Client
         private FontHolder Fonts { get; set; } = FontHolder.GetInstance();
 
         GameState GameState { get; set; } = new GameState();
-        private ConnectionManager ConnectionManager { get; set; } = new ConnectionManager("http://localhost:5000/sd-server"); // https://shoot-and-dash.azurewebsites.net/sd-server
+        private ConnectionManager ConnectionManager { get; set; } = new ConnectionManager("https://shoot-and-dash.azurewebsites.net/sd-server");
 
 
         Player MainPlayer { get; set; }
@@ -184,13 +184,13 @@ namespace Client
                     DrawPickupables();
                     UpdateBullets(deltaTime);
                     DrawProjectiles();
-                    AimCursor.Update(mPos);
-                    GameWindow.Draw(AimCursor);
 
                     GameWindow.SetView(MainView);
                     GameWindow.Draw(scoreboardText);
-
                     ZoomedView.Center = middlePoint;
+                    mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
+                    AimCursor.Update(mPos);
+                    GameWindow.Draw(AimCursor);
                     ZoomedView.Zoom(zoomView);
                     zoomView = 1.0f;
                     GameWindow.SetView(ZoomedView);
@@ -228,8 +228,9 @@ namespace Client
 
         private void RenderPlayers()
         {
-            foreach (var player in GameState.Players)
+            for (int i = 0; i < GameState.Players.Count; i++)
             {
+                var player = GameState.Players[i];
                 GameWindow.Draw(player);
                 Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
                 player.PlayerBar.Position = playerBarPos;

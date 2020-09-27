@@ -72,7 +72,6 @@ namespace Client.Models
             }
         }
 
-
         public void Translate(float xOffset, float yOffset)
         {
             this.Position = new Vector2f(this.Position.X + xOffset * SpeedMultiplier, this.Position.Y + yOffset * SpeedMultiplier);
