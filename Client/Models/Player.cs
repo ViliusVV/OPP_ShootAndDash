@@ -5,6 +5,7 @@ using Client.Objects;
 using Client.UI;
 using Client.Utilities;
 using Common.DTO;
+using Common.Utilities;
 using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
@@ -12,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +30,7 @@ namespace Client.Models
 
         public bool IsDead { get; private set; } = false;
         public float SpeedMultiplier { get; private set; } = 1;
-
+        public bool Running { get => Math.Abs(Speed.X) > 0.1 || Math.Abs(Speed.Y) > 0.1; }
         public Weapon Weapon { get; set; }
 
         public PlayerBar PlayerBar { get; set; }
@@ -75,10 +77,6 @@ namespace Client.Models
             }
         }
 
-        public void Translate(float xOffset, float yOffset)
-        {
-            this.Position = new Vector2f(this.Position.X + xOffset * SpeedMultiplier, this.Position.Y + yOffset * SpeedMultiplier);
-        }
         public void TranslateFromSpeed()
         {
             var oldPos = this.Position;
@@ -86,6 +84,22 @@ namespace Client.Models
             if (CheckCollisions())
             {
                 this.Position = oldPos;
+            }
+            UpdatePlayerFacingPosition();
+        }
+        public void UpdatePlayerFacingPosition ()
+        {
+            if (Math.Abs(Speed.X) < 0.01)
+            {
+                // leave this here, it fixes facing right/left
+            }
+            else if (Speed.X > 0)
+            {
+                this.Scale = new Vector2f(1, 1);
+            }
+            else if (Speed.X < 0)
+            {
+                this.Scale = new Vector2f(-1, 1);
             }
         }
         public void UpdateSpeed()
@@ -140,23 +154,6 @@ namespace Client.Models
                 _speed.X = 0;
             if (Math.Abs(Speed.Y) < 0.3f)
                 _speed.Y = 0;
-        }
-
-
-        public bool CheckMovementCollision(float xOffset, float yOffset, Sprite targetCollider)
-        {
-            Translate(xOffset, yOffset);
-            if (CollisionTester.BoundingBoxTest(this, targetCollider))
-            {
-                Translate(-xOffset, -yOffset);
-                Speed = new Vector2f(0, 0);
-                return true;
-            }
-            else
-            {
-                Translate(-xOffset, -yOffset);
-                return false;
-            }
         }
 
         public bool CheckCollisions()

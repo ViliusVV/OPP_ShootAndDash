@@ -56,7 +56,6 @@ namespace Client
         Clock animationSpeed = new Clock();
         Clock reloadClock = new Clock();
         Clock reloadTimer = new Clock();
-        bool isPlayerRunning = false;
 
         CustomText scoreboardText;
 
@@ -64,7 +63,6 @@ namespace Client
         List<Projectile> bulletList = new List<Projectile>();
         float attackCooldown;
         float attackSpeed = 150;
-        bool facingRight = true;
         bool isReloading = false;
 
 
@@ -136,7 +134,7 @@ namespace Client
                     GameWindow.Clear();
                     GameWindow.DispatchEvents();
 
-                    this.ProccesKeyboardInput(deltaTime);
+                    this.ProccesKeyboardInput();
                     var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
                     var middlePoint = VectorUtils.GetMiddlePoint(MainPlayer.Position, mPos);
 
@@ -153,7 +151,7 @@ namespace Client
 
 
                     // Run player animation
-                    if (animationSpeed.ElapsedTime.AsSeconds() > 0.05f && isPlayerRunning)
+                    if (animationSpeed.ElapsedTime.AsSeconds() > 0.05f && MainPlayer.Running)
                     {
                         if (playerAnimation.Left == 144)
                         {
@@ -164,7 +162,7 @@ namespace Client
                         MainPlayer.TextureRect = playerAnimation;
                         animationSpeed.Restart();
                     }
-                    else if (!isPlayerRunning)
+                    else if (!MainPlayer.Running)
                     {
                         MainPlayer.TextureRect = playerIdle;
                     }
@@ -408,81 +406,11 @@ namespace Client
 
         }
 
-        private void ProccesKeyboardInput(Time deltaTime)
+        private void ProccesKeyboardInput()
         {
-            float movementSpeed = 500;
-            float dt = deltaTime.AsSeconds();
-            float moveDistance = movementSpeed * dt;
-            float movementX = 0;
-            float movementY = 0;
-
             // Polling key presses is better than events if we
             // need to detect multiple key presses at same time
-            if (Keyboard.IsKeyPressed(Keyboard.Key.W))
-            {
-                if (MainPlayer.CheckMovementCollision(0, -moveDistance, crate))
-                {
-                    Console.WriteLine("Player collided with a crate");
-                }
-                else
-                {
-                    isPlayerRunning = true;
-                    movementY -= moveDistance;
-                }
-
-            }
-            else
-                isPlayerRunning = false;
-            if (Keyboard.IsKeyPressed(Keyboard.Key.S))
-            {
-                if (MainPlayer.CheckMovementCollision(0, moveDistance, crate))
-                {
-                    Console.WriteLine("Player collided with a crate");
-                }
-                else
-                {
-                    isPlayerRunning = true;
-                    movementY += moveDistance;
-                }
-            }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.D))
-            {
-                if (!facingRight)
-                {
-                    MainPlayer.Scale = new Vector2f(1, 1);
-                    facingRight = true;
-                }
-                if (MainPlayer.CheckMovementCollision(moveDistance, 0, crate))
-                {
-                    Console.WriteLine("Player collided with a crate");
-                }
-                else
-                {
-                    isPlayerRunning = true;
-                    movementX += moveDistance;
-                }
-
-            }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.A))
-            {
-                if (facingRight)
-                {
-                    MainPlayer.Scale = new Vector2f(-1, 1);
-                    facingRight = false;
-                }
-
-                if (MainPlayer.CheckMovementCollision(-moveDistance, 0, crate))
-                {
-                    Console.WriteLine("Player collided with a crate");
-                }
-                else
-                {
-                    isPlayerRunning = true;
-                    movementX -= moveDistance;
-                }
-
-            }
-            //MainPlayer.Translate(movementX, movementY);
+            
             if(Keyboard.IsKeyPressed(Keyboard.Key.M))
             {
                 SpawnMedkit();
