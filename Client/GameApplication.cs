@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Common.DTO;
 using Common.Utilities;
 using Client.Managers;
+using Common;
 
 namespace Client
 {
@@ -42,7 +43,7 @@ namespace Client
         private FontHolder Fonts { get; set; } = FontHolder.GetInstance();
 
         GameState GameState { get; set; } = GameState.GetInstance();
-        private ConnectionManager ConnectionManager { get; set; } = new ConnectionManager("https://shoot-and-dash.azurewebsites.net/sd-server");
+        private ConnectionManager ConnectionManager { get; set; } = new ConnectionManager("http://localhost:5000/sd-server");
 
 
         Player MainPlayer { get; set; }
@@ -210,9 +211,9 @@ namespace Client
             }
         }
 
-        private void CreatePlayers(List<PlayerDTO> playerDTOs)
+        private void CreatePlayers(GameStateDTO stateDto)
         {
-            foreach(var playerDto in playerDTOs)
+            foreach(var playerDto in stateDto.Players)
             {
                 if(GameState.Players.FindIndex(player => player.Name.Equals(playerDto.Name)) < 0)
                 {
@@ -222,9 +223,9 @@ namespace Client
             }
         }
 
-        private void UpdatePlayers(List<PlayerDTO> playerDTOs)
+        private void UpdatePlayers(GameStateDTO stateDTO)
         {
-            foreach(var dto in playerDTOs)
+            foreach(var dto in stateDTO.Players)
             {
                 Player player = GameState.Players.Find(p => p.Name.Equals(dto.Name));
                 if(player != null && !MainPlayer.Equals(player))
@@ -475,14 +476,14 @@ namespace Client
 
         public void BindEvents()
         {
-            ConnectionManager.Connection.On<List<PlayerDTO>>("CreatePlayer", (list) =>
+            ConnectionManager.Connection.On<GameStateDTO>("CreatePlayer", (stateDto) =>
             {
-                CreatePlayers(list);
+                CreatePlayers(stateDto);
             });
 
-            ConnectionManager.Connection.On<List<PlayerDTO>>("UpdateState", (list) =>
+            ConnectionManager.Connection.On<GameStateDTO>("UpdateState", (stateDto) =>
             {
-                UpdatePlayers(list);
+                UpdatePlayers(stateDto);
             });
         }
 

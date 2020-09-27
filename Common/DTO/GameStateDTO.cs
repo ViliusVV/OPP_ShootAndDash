@@ -5,14 +5,14 @@ using System.Text;
 
 namespace Common
 {
-    public class GameState
+    public class GameStateDTO
     {
         public List<PlayerDTO> Players { get; set; }
         //public List<Pickupable> Pickupables { get; set; }
 
         //public MapGeneration Map {get;set;}
 
-        public GameState() {
+        public GameStateDTO() {
             this.Players = new List<PlayerDTO>();
         }
 

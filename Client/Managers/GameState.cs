@@ -1,5 +1,7 @@
 ﻿using Client.Models;
 using Client.Objects;
+using Common;
+using Common.DTO;
 using SFML.Graphics;
 using System;
 using System.Collections.Generic;
@@ -22,6 +24,28 @@ namespace Client.Managers
         public static GameState GetInstance()
         {
             return _instance;
+        }
+
+        public void ToDTO()
+        {
+            GameStateDTO dto = new GameStateDTO();
+            foreach(Player player in Players)
+            {
+                dto.Players.Add(player.ToDTO());
+            }
+        }
+        
+        public void FromDTO(GameStateDTO dto)
+        {
+            foreach(PlayerDTO playerDto in dto.Players)
+            {
+                Player player = Players.Find(p => p.Name.Equals(playerDto.Name));
+
+                if (player != null && !player.IsMainPlayer)
+                {
+                    player.RefreshData(playerDto);
+                }
+            }
         }
     }
 }

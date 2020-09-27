@@ -1,4 +1,5 @@
-﻿using Common.DTO;
+﻿using Common;
+using Common.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,17 @@ namespace Server
         public static GameManager GetInstance()
         {
             return _instance;
+        }
+
+        public GameStateDTO GetGameStateDTO()
+        {
+            GameStateDTO dto = new GameStateDTO();
+            for (int i = 0; i < Players.Values.Count; i++)
+            {
+                dto.Players.Add(Players.Values.ToList()[i]);
+            }
+
+            return dto;
         }
     }
 }

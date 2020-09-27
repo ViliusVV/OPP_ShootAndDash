@@ -1,4 +1,5 @@
-﻿using Common.DTO;
+﻿using Common;
+using Common.DTO;
 using Microsoft.AspNetCore.SignalR;
 using SFML.System;
 using System;
@@ -15,9 +16,9 @@ namespace Server.Hubs
         public readonly GameManager _gameManager = GameManager.GetInstance();
 
         public async Task ReceivePos(PlayerDTO dto)
-        {
-            _gameManager.Players[Context.ConnectionId].Position = dto.Position;
-            await Clients.All.SendAsync("UpdateState", _gameManager.Players.Values.ToList());
+        {wadas
+            _gameManager.Players[Context.ConnectionId] = dto;
+            await Clients.All.SendAsync("UpdateState", _gameManager.GetGameStateDTO());
         }
 
         public async Task SpawnPlayer(PlayerDTO playerDTO)
@@ -25,7 +26,7 @@ namespace Server.Hubs
             Console.WriteLine("Player {0} connected", playerDTO);
             _gameManager.Players.Add(Context.ConnectionId, playerDTO);
             //await Clients.AllExcept(Context.ConnectionId).SendAsync("CreatePlayer", playerDTO);
-            await Clients.All.SendAsync("CreatePlayer", _gameManager.Players.Values.ToList());
+            await Clients.All.SendAsync("CreatePlayer", _gameManager.GetGameStateDTO());
         }
 
         public async override Task OnConnectedAsync()

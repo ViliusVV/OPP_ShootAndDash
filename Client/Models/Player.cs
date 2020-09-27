@@ -23,7 +23,7 @@ namespace Client.Models
     class Player: Sprite
     {
         public string Name { get; set; } = new Random().Next(1, 888).ToString();
-        public float Health { get; private set; } = 100;
+        public float Health { get; set; } = 100;
 
         private Vector2f _speed = new Vector2f(0.0f, 0.0f);
         public Vector2f Speed { get => _speed; set => _speed = value; }
