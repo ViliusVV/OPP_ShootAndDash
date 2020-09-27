@@ -4,6 +4,7 @@ using System.Text;
 using Client.Config;
 using Client.Models;
 using SFML.Graphics;
+using Client.Utilities;
 
 namespace Client.Objects
 {
