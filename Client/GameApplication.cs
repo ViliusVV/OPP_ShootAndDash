@@ -21,6 +21,7 @@ using System.Runtime.CompilerServices;
 using Common.DTO;
 using Common.Utilities;
 using System.Reflection.Metadata;
+using Client.Managers;
 
 namespace Client
 {
@@ -44,9 +45,10 @@ namespace Client
         private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
         private FontHolder Fonts { get; set; } = FontHolder.GetInstance();
         private ConnectionManager ConnectionManager { get; set; }
+        public static Random Rnd { get; set; } = new Random();
 
-        static Texture bulletTexture = new Texture("Assets/bullet.png");
-        static Sprite bullet = new Sprite(bulletTexture);
+
+        Player MainPlayer { get; set; }
 
         Sprite bgSprite;
         Sprite bulletSprite;
@@ -60,7 +62,6 @@ namespace Client
         Sprite bushSprite;
         Sprite scoreboardSprite;
 
-        Player mainPlayer;
         IntRect playerAnimation = new IntRect(36, 0, 36, 64);
         IntRect playerIdle = new IntRect(0, 0, 36, 64);
         Clock animationSpeed = new Clock();
@@ -71,23 +72,17 @@ namespace Client
         CustomText scoreboardText;
         Text txt = new Text();
 
-        Weapon wep = new Weapon("AK-47", 30, 29, 20, 2000, 200, 1, 20, true, bullet);
+        Weapon wep;
 
-        AimCursor cursor = new AimCursor();
+        AimCursor AimCursor = new AimCursor();
         List<Projectile> bulletList = new List<Projectile>();
-        List<Pickupable> pickupableList = new List<Pickupable>();
         float attackCooldown;
         float attackSpeed = 150;
         bool facingRight = true;
         bool isReloading = false;
 
-        long playerId = new Random().Next(1000, 9999);
-        bool connected = false;
+        GameState GameState = new GameState();
 
-        List<Player> players = new List<Player>();
-        PlayerDTO playerDTO = new PlayerDTO();
-
-        public static Random rnd = new Random(1000);
 
         public MapGeneration map = new MapGeneration();
         public GameApplication() { }
@@ -109,43 +104,42 @@ namespace Client
             GameWindow = CreateRenderWindow(Styles.Close);
             Vector2f winSize = GameWindow.GetView().Size;
 
-            Vector2fS vectorSer = new Vector2fS();
-            Vector2f vec0 = new Vector2f(15.0f, 14.4f);
-            Vector2f vec2 = new Vector2f(1.0f, 4.5f);
-            vec0 = vectorSer;
-            vectorSer = vec2;
-
             // Load resources
             LoadTextures();
             LoadSounds();
             LoadFonts();
             CreateSprites();
+
+
             map.CreateMap();
+
+            wep = new Weapon("AK-47", 30, 29, 20, 2000, 200, 1, 20, true);
             wep.SetProjectileSprite(bulletSprite);
+
             // View
             MainView = GameWindow.DefaultView;
             ZoomedView = new View(MainView);
             GameWindow.SetView(ZoomedView);
 
 
-            // Set initial posision for text
-            mainPlayer = new Player();
-            mainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
+            MainPlayer = new Player();
+            MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
 
-            mainPlayer.TextureRect = playerAnimation;
+            MainPlayer.TextureRect = playerAnimation;
             // Configure sprite
-            mainPlayer.Origin = SpriteUtils.GetSpriteCenter(mainPlayer);
+            MainPlayer.Origin = SpriteUtils.GetSpriteCenter(MainPlayer);
             ak47Sprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(ak47Sprite).X, 0.0f);
 
 
             // Connect to game hub server
-            ConnectionManager = new ConnectionManager("https://shoot-and-dash.azurewebsites.net/sd-server");
+            //ConnectionManager = new ConnectionManager("https://shoot-and-dash.azurewebsites.net/sd-server");
+            ConnectionManager = new ConnectionManager("http://localhost:5000/sd-server");
             BindEvents();
 
             CreatePlayer();
 
-            mainPlayer.Weapon = wep;
-            players.Add(mainPlayer);
+            MainPlayer.Weapon = wep;
+            GameState.Players.Add(MainPlayer);
 
 
             scoreboardText = new CustomText(Fonts.Get(FontIdentifier.PixelatedSmall), 21);
@@ -170,14 +164,14 @@ namespace Client
 
                     this.ProccesKeyboardInput(deltaTime);
                     var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
-                    var middlePoint = VectorUtils.GetMiddlePoint(mainPlayer.Position, mPos);
+                    var middlePoint = VectorUtils.GetMiddlePoint(MainPlayer.Position, mPos);
 
-                    float rotation = VectorUtils.GetAngleBetweenVectors(mainPlayer.Position, mPos);
+                    float rotation = VectorUtils.GetAngleBetweenVectors(MainPlayer.Position, mPos);
 
                     Vector2f scoreboardPos = new Vector2f(0, 0);
                     Vector2f scoreboardTextPos = new Vector2f(0, 0);
 
-                    ak47Sprite.Position = mainPlayer.Position;
+                    ak47Sprite.Position = MainPlayer.Position;
                     scoreboardSprite.Position = scoreboardPos;
                     scoreboardText.Position = scoreboardTextPos;
                     crate.Position = new Vector2f(1000, 400);
@@ -195,12 +189,12 @@ namespace Client
                         }
                         else
                             playerAnimation.Left += 36;
-                        mainPlayer.TextureRect = playerAnimation;
+                        MainPlayer.TextureRect = playerAnimation;
                         animationSpeed.Restart();
                     }
                     else if (!isPlayerRunning)
                     {
-                        mainPlayer.TextureRect = playerIdle;
+                        MainPlayer.TextureRect = playerIdle;
                     }
 
                     //Draw order is important
@@ -220,8 +214,8 @@ namespace Client
                     DrawPickupables();
                     UpdateBullets(deltaTime);
                     DrawProjectiles();
-                    cursor.Update(mPos);
-                    GameWindow.Draw(cursor);
+                    AimCursor.Update(mPos);
+                    GameWindow.Draw(AimCursor);
 
                     GameWindow.SetView(MainView);
                     GameWindow.Draw(scoreboardSprite);
@@ -243,10 +237,10 @@ namespace Client
         {
             foreach(var playerDto in playerDTOs)
             {
-                if(players.FindIndex(player => player.Name.Equals(playerDto.Name)) < 0)
+                if(GameState.Players.FindIndex(player => player.Name.Equals(playerDto.Name)) < 0)
                 {
                     Player tmpPlayer = new Player(playerDto);
-                    players.Add(tmpPlayer);
+                    GameState.Players.Add(tmpPlayer);
                 }
             }
         }
@@ -255,8 +249,8 @@ namespace Client
         {
             foreach(var dto in playerDTOs)
             {
-                Player player = players.Find(p => p.Name.Equals(dto.Name));
-                if(player != null && !mainPlayer.Equals(player))
+                Player player = GameState.Players.Find(p => p.Name.Equals(dto.Name));
+                if(player != null && !MainPlayer.Equals(player))
                 {
                     player.Position = dto.Position;
                 }
@@ -265,7 +259,7 @@ namespace Client
 
         private void RenderPlayers()
         {
-            foreach (var player in players)
+            foreach (var player in GameState.Players)
             {
                 GameWindow.Draw(player);
                 Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
@@ -278,7 +272,7 @@ namespace Client
 
         public void SendPos(HubConnection connection)
         {
-            var tmpPlayer = mainPlayer.ToDTO();
+            var tmpPlayer = MainPlayer.ToDTO();
             connection.SendAsync("ReceivePos", tmpPlayer);
         }
 
@@ -304,7 +298,7 @@ namespace Client
         public void CreatePlayer()
         {
 
-            ConnectionManager.Connection.SendAsync("SpawnPlayer", mainPlayer.ToDTO()).Wait();
+            ConnectionManager.Connection.SendAsync("SpawnPlayer", MainPlayer.ToDTO()).Wait();
         }
 
         private void ToogleScreen()
@@ -332,7 +326,7 @@ namespace Client
                 else
                 {
                     bulletList[i].Move(deltaTime.AsSeconds());
-                    if (CollisionTester.BoundingBoxTest(bullet.ProjectileSprite, mainPlayer))
+                    if (CollisionTester.BoundingBoxTest(bullet.ProjectileSprite, MainPlayer))
                     {
                         Console.WriteLine("Bullet and character colliding");
                     }
@@ -346,15 +340,16 @@ namespace Client
 
             }
         }
+
         private void UpdatePickupables()
         {
-            for (int i = 0; i < pickupableList.Count; i++)
+            for (int i = 0; i < GameState.Pickupables.Count; i++)
             {
-                Pickupable pickup = pickupableList[i];
-                if (CollisionTester.BoundingBoxTest(mainPlayer, pickup))
+                Pickupable pickup = GameState.Pickupables[i];
+                if (CollisionTester.BoundingBoxTest(MainPlayer, pickup))
                 {
-                    pickup.Pickup(mainPlayer);
-                    pickupableList.RemoveAt(i);
+                    pickup.Pickup(MainPlayer);
+                    GameState.Pickupables.RemoveAt(i);
                 }
             }
         }
@@ -367,9 +362,9 @@ namespace Client
         }
         private void DrawPickupables()
         {
-            for (int i = 0; i < pickupableList.Count; i++)
+            for (int i = 0; i < GameState.Pickupables.Count; i++)
             {
-                GameWindow.Draw(pickupableList[i]);
+                GameWindow.Draw(GameState.Pickupables[i]);
             }
         }
 
@@ -438,7 +433,7 @@ namespace Client
             // need to detect multiple key presses at same time
             if (Keyboard.IsKeyPressed(Keyboard.Key.W))
             {
-                if (mainPlayer.CheckMovementCollision(0, -moveDistance, crate))
+                if (MainPlayer.CheckMovementCollision(0, -moveDistance, crate))
                 {
                     Console.WriteLine("Player collided with a crate");
                 }
@@ -453,7 +448,7 @@ namespace Client
                 isPlayerRunning = false;
             if (Keyboard.IsKeyPressed(Keyboard.Key.S))
             {
-                if (mainPlayer.CheckMovementCollision(0, moveDistance, crate))
+                if (MainPlayer.CheckMovementCollision(0, moveDistance, crate))
                 {
                     Console.WriteLine("Player collided with a crate");
                 }
@@ -467,10 +462,10 @@ namespace Client
             {
                 if (!facingRight)
                 {
-                    mainPlayer.Scale = new Vector2f(1, 1);
+                    MainPlayer.Scale = new Vector2f(1, 1);
                     facingRight = true;
                 }
-                if (mainPlayer.CheckMovementCollision(moveDistance, 0, crate))
+                if (MainPlayer.CheckMovementCollision(moveDistance, 0, crate))
                 {
                     Console.WriteLine("Player collided with a crate");
                 }
@@ -485,11 +480,11 @@ namespace Client
             {
                 if (facingRight)
                 {
-                    mainPlayer.Scale = new Vector2f(-1, 1);
+                    MainPlayer.Scale = new Vector2f(-1, 1);
                     facingRight = false;
                 }
 
-                if (mainPlayer.CheckMovementCollision(-moveDistance, 0, crate))
+                if (MainPlayer.CheckMovementCollision(-moveDistance, 0, crate))
                 {
                     Console.WriteLine("Player collided with a crate");
                 }
@@ -500,7 +495,7 @@ namespace Client
                 }
 
             }
-            mainPlayer.Translate(movementX, movementY);
+            MainPlayer.Translate(movementX, movementY);
 
             if(Keyboard.IsKeyPressed(Keyboard.Key.M))
             {
@@ -512,7 +507,7 @@ namespace Client
             }
             if(Keyboard.IsKeyPressed(Keyboard.Key.Z))
             {
-                mainPlayer.ApplyDamage(-1);
+                MainPlayer.ApplyDamage(-1);
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.R))
             {
@@ -525,8 +520,8 @@ namespace Client
                 {
                     attackCooldown = attackSpeed;
                     ShootBullet();
-                    //bulletList.AddRange(wep.Shoot(10, new Vector2(cursor.Position.X,
-                    //    cursor.Position.Y), mainPlayer.Position));
+                    //bulletList.AddRange(wep.Shoot(10, new Vector2(AimCursor.Position.X,
+                    //    AimCursor.Position.Y), MainPlayer.Position));
 
                 }
 
@@ -534,7 +529,7 @@ namespace Client
         }
         private void SpawnRandomSyringe()
         {
-            int num = rnd.Next(4);
+            int num = Rnd.Next(4);
             Pickupable syringe;
             switch (num)
             {
@@ -555,8 +550,8 @@ namespace Client
                     syringe.Texture = deflectionSyringeSprite.Texture;
                     break;
             }
-            syringe.Position = new Vector2f(rnd.Next(1000), rnd.Next(1000));
-            pickupableList.Add(syringe);
+            syringe.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
+            GameState.Pickupables.Add(syringe);
 
         }
 
@@ -565,8 +560,8 @@ namespace Client
         {
             Medkit medkit = new Medkit();
             medkit.Texture = medkitSprite.Texture;
-            medkit.Position = new Vector2f(rnd.Next(1000), rnd.Next(1000));
-            pickupableList.Add(medkit);
+            medkit.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
+            GameState.Pickupables.Add(medkit);
         }
 
 
@@ -576,12 +571,12 @@ namespace Client
             {
                 Sprite myBullet = new Sprite(Textures.Get(TextureIdentifier.Bullet));
                 Vector2 target = new Vector2(
-                    cursor.Position.X - mainPlayer.Position.X,
-                    cursor.Position.Y - mainPlayer.Position.Y
+                    AimCursor.Position.X - MainPlayer.Position.X,
+                    AimCursor.Position.Y - MainPlayer.Position.Y
                 );
                 target = Vector2.Normalize(target);
                 Projectile bullet = new Projectile(target.X * 1000, target.Y * 1000, myBullet);
-                bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(bulletSprite), mainPlayer.Position);
+                bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(bulletSprite), MainPlayer.Position);
                 bullet.ProjectileSprite.Rotation = VectorUtils.VectorToAngle(target.X, target.Y);
 
                 bulletList.Add(bullet);
@@ -619,7 +614,7 @@ namespace Client
             bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
             bulletSprite = new Sprite(Textures.Get(TextureIdentifier.Bullet));
             ak47Sprite = new Sprite(Textures.Get(TextureIdentifier.GunAk47));
-            cursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
+            AimCursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
             crate = new Sprite(Textures.Get(TextureIdentifier.Crate));
             medkitSprite = new Sprite(Textures.Get(TextureIdentifier.Medkit));
             movementSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.MovementSyringe));

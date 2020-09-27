@@ -1,6 +1,4 @@
-﻿using Client.Models;
-using Client.Objects;
-using SFML.System;
+﻿using SFML.System;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -24,7 +22,6 @@ namespace Common.DTO
         public string Appearance { get; set; }
 
         // List of all projectiles that player has shot and currently is in world
-        public List<Projectile> Projectiles { get; set; }
 
         public PlayerDTO() { }
 

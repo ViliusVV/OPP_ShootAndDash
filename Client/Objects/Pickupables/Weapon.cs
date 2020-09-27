@@ -26,7 +26,7 @@ namespace Client.Objects
         public Sprite Projectile { get; private set; }
 
         public Weapon(string name, int magazineSize, int ammo, float dmg, float projectileSpd,
-            float attackSpd, float reloadTime, int spreadAmount, bool canShoot, Sprite projectile)
+            float attackSpd, float reloadTime, int spreadAmount, bool canShoot)
         {
             this.Name = name;
             this.MagazineSize = magazineSize;
@@ -37,7 +37,7 @@ namespace Client.Objects
             this.ReloadTime = reloadTime;
             this.SpreadAmount = spreadAmount;
             this.CanShoot = canShoot;
-            this.Projectile = projectile;
+            this.Projectile = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Bullet));
         }
         public override void Pickup(Player player)
         {
@@ -56,8 +56,8 @@ namespace Client.Objects
                         cursorPos.X - playerPos.X,
                         cursorPos.Y - playerPos.Y
                     );
-                    target.X += GameApplication.rnd.Next(SpreadAmount);
-                    target.Y += GameApplication.rnd.Next(SpreadAmount);
+                    target.X += GameApplication.Rnd.Next(SpreadAmount);
+                    target.Y += GameApplication.Rnd.Next(SpreadAmount);
                     target = Vector2.Normalize(target);
                     Projectile bullet = new Projectile(target.X * ProjectileSpeed,
                         target.Y * ProjectileSpeed, Projectile);
