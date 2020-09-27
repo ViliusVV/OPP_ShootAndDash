@@ -11,7 +11,9 @@ namespace Client.Utilities
     {
         public string ServerUrl { get; set; }
         public HubConnection Connection { get; set; }
+        public Clock ActivityClock { get; set; } = new Clock();
         public bool Connected { get => Connection.State == HubConnectionState.Connected; }
+
 
         public ConnectionManager(string url)
         {

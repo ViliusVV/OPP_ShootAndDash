@@ -47,6 +47,8 @@ namespace Client
 
         Player MainPlayer { get; set; }
 
+        Clock FrameClock { get; set; } = new Clock();
+
         Sprite bgSprite;
         Sprite crate;
         Sprite bushSprite;
@@ -61,9 +63,7 @@ namespace Client
 
         AimCursor AimCursor = new AimCursor();
         List<Projectile> bulletList = new List<Projectile>();
-        float attackCooldown;
-        float attackSpeed = 150;
-        bool isReloading = false;
+        bool facingRight = true;
 
 
         public MapGeneration map = new MapGeneration();
@@ -117,17 +117,15 @@ namespace Client
             scoreboardText = new CustomText(Fonts.Get(FontIdentifier.PixelatedSmall), 21);
             scoreboardText.DisplayedString = "Player01 - 15/2";
 
-            Clock clock = new Clock();
-            Clock sendClock = new Clock();
 
             while (GameWindow.IsOpen)
             {
-                if (true) { 
+                if (true) {
 
-                Time deltaTime = clock.Restart();
-                    if (sendClock.ElapsedTime.AsSeconds() > (1f / 60f) && ConnectionManager.Connected)
+                    Time deltaTime = FrameClock.Restart();
+                    if (ConnectionManager.ActivityClock.ElapsedTime.AsSeconds() > (1f / 60f) && ConnectionManager.Connected)
                     {
-                        sendClock.Restart();
+                        ConnectionManager.ActivityClock.Restart();
                         SendPos(ConnectionManager.Connection);
                     }
 
@@ -137,6 +135,7 @@ namespace Client
                     this.ProccesKeyboardInput();
                     var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
                     var middlePoint = VectorUtils.GetMiddlePoint(MainPlayer.Position, mPos);
+                    middlePoint.X += 0.375f;
 
                     float rotation = VectorUtils.GetAngleBetweenVectors(MainPlayer.Position, mPos);
 
@@ -169,7 +168,7 @@ namespace Client
 
                     //Draw order is important
                     //GameWindow.Draw(bgSprite);
-                    if (isReloading == true)
+                    if (MainPlayer.Weapon.Reloading == true)
                     {
                         ReloadGun();
                     }
@@ -178,11 +177,12 @@ namespace Client
                     RenderPlayers();
                     DrawCollidables();
                     GameWindow.Draw(bushSprite);
-                    attackCooldown -= deltaTime.AsMilliseconds();
                     UpdatePickupables();
                     DrawPickupables();
                     UpdateBullets(deltaTime);
                     DrawProjectiles();
+                    AimCursor.Update(mPos);
+                    GameWindow.Draw(AimCursor);
 
                     AimCursor.Update(mPos);
                     GameWindow.Draw(AimCursor);
@@ -191,6 +191,7 @@ namespace Client
                     GameWindow.Draw(scoreboardText);
 
                     ZoomedView.Center = middlePoint;
+
                     ZoomedView.Zoom(zoomView);
                     zoomView = 1.0f;
                     GameWindow.SetView(ZoomedView);
@@ -266,14 +267,14 @@ namespace Client
                 {
                     reloadClock.Restart();
                     MainPlayer.Weapon.AmmoConsume(1);
-                    Sound sound = Sounds.Get(SoundIdentifier.Reload);
-                    sound.Play();
                 }
             }
             if (reloadTimer.ElapsedTime.AsMilliseconds() > MainPlayer.Weapon.ReloadTime*600)
             {
-                isReloading = false;
+                MainPlayer.Weapon.Reloading = false;
                 reloadTimer.Restart();
+                Sound sound = Sounds.Get(SoundIdentifier.Reload);
+                sound.Play();
             }
         }
 
@@ -426,20 +427,12 @@ namespace Client
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.R))
             {
-                isReloading = true;
+                MainPlayer.Weapon.Reloading = true;
             }
 
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
             {
-                if (attackCooldown <= 0)
-                {
-                    attackCooldown = attackSpeed;
-                    ShootBullet();
-                    //bulletList.AddRange(wep.Shoot(10, new Vector2(AimCursor.Position.X,
-                    //    AimCursor.Position.Y), MainPlayer.Position));
-
-                }
-
+                MainPlayer.Weapon.Shoot();
             }
         }
 
@@ -476,27 +469,6 @@ namespace Client
             GameState.Pickupables.Add(medkit);
         }
 
-
-        private void ShootBullet()
-        {
-            if (MainPlayer.Weapon.Ammo != 0 && isReloading != true)
-            {
-                Sprite myBullet = new Sprite(Textures.Get(TextureIdentifier.Bullet));
-                Vector2 target = new Vector2(
-                    AimCursor.Position.X - MainPlayer.Position.X,
-                    AimCursor.Position.Y - MainPlayer.Position.Y
-                );
-                target = Vector2.Normalize(target);
-                Projectile bullet = new Projectile(target.X * 1000, target.Y * 1000, myBullet);
-                bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(MainPlayer.Weapon.ProjectileSprite), MainPlayer.Position);
-                bullet.ProjectileSprite.Rotation = VectorUtils.VectorToAngle(target.X, target.Y);
-
-                bulletList.Add(bullet);
-                Sound sound = Sounds.Get(SoundIdentifier.GenericGun);
-                sound.Play();
-                MainPlayer.Weapon.AmmoConsume(-1);
-            }
-        }
 
         public void ConntectToServer()
         {
