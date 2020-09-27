@@ -174,19 +174,16 @@ namespace Client
 
                     float rotation = VectorUtils.GetAngleBetweenVectors(mainPlayer.Position, mPos);
 
-                    Vector2f playerBarPos = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y - 40);
                     Vector2f scoreboardPos = new Vector2f(0, 0);
                     Vector2f scoreboardTextPos = new Vector2f(0, 0);
 
                     ak47Sprite.Position = mainPlayer.Position;
-                    mainPlayer.PlayerBar.Position = playerBarPos;
                     scoreboardSprite.Position = scoreboardPos;
                     scoreboardText.Position = scoreboardTextPos;
                     crate.Position = new Vector2f(1000, 400);
                     bushSprite.Position = new Vector2f(500, 400);
                     ak47Sprite.Rotation = rotation;
                     ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
-                    mainPlayer.UpdatePlayerBar();
 
 
                     // Run player animation
@@ -208,9 +205,13 @@ namespace Client
 
                     //Draw order is important
                     //GameWindow.Draw(bgSprite);
+                    if (isReloading == true)
+                    {
+                        ReloadGun();
+                    }
+
                     GameWindow.Draw(map.map);
                     RenderPlayers();
-                    GameWindow.Draw(mainPlayer.PlayerBar);
                     GameWindow.Draw(ak47Sprite);
                     GameWindow.Draw(crate);
                     GameWindow.Draw(bushSprite);
@@ -219,10 +220,6 @@ namespace Client
                     DrawPickupables();
                     UpdateBullets(deltaTime);
                     DrawProjectiles();
-                    if (isReloading == true)
-                    {
-                        ReloadGun();
-                    }
                     cursor.Update(mPos);
                     GameWindow.Draw(cursor);
 
@@ -249,7 +246,6 @@ namespace Client
                 if(players.FindIndex(player => player.Name.Equals(playerDto.Name)) < 0)
                 {
                     Player tmpPlayer = new Player(playerDto);
-                    tmpPlayer.Texture = Textures.Get(TextureIdentifier.MainCharacter);
                     players.Add(tmpPlayer);
                 }
             }
@@ -272,6 +268,10 @@ namespace Client
             foreach (var player in players)
             {
                 GameWindow.Draw(player);
+                Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
+                player.PlayerBar.Position = playerBarPos;
+                player.UpdatePlayerBar();
+                GameWindow.Draw(player.PlayerBar);
             }
         }
 

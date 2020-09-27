@@ -51,13 +51,13 @@ namespace Client.UI
 
         public void Update(float healtPercent, float ammoPercent)
         {
-            
-            //PlayerBar.PlayerHealtMaskSprite.Position = new Vector2f(mainPlayer.Position.X - mainPlayer.HealthOffSet(1.5f), mainPlayer.Position.Y - 40);
-            //PlayerBar.PlayerAmmoMaskSprite.Position = new Vector2f(mainPlayer.Position.X - wep.AmmoOffSet(1.5f), mainPlayer.Position.Y - 40);
+            float coef = 15.5f * BarScale;
 
             PlayerHealtMaskSprite.Scale = new Vector2f(healtPercent / 100f * BarScale, BarScale);
-            //PlayerHealtMaskSprite.Position = new Vector2f(PlayerHealtMaskSprite.Position.X - mainPlayer.HealthOffSet(1.5f), PlayerHealtMaskSprite.Position.Y - 40);
+            PlayerHealtMaskSprite.Position = new Vector2f(PlayerHealtMaskSprite.Position.X - (100 - healtPercent) * coef / 100f, PlayerHealtMaskSprite.Position.Y);
+
             PlayerAmmoMaskSprite.Scale = new Vector2f(ammoPercent / 100f * BarScale, BarScale);
+            PlayerAmmoMaskSprite.Position = new Vector2f(PlayerAmmoMaskSprite.Position.X - (100 - ammoPercent) * coef / 100f, PlayerAmmoMaskSprite.Position.Y);
         }
 
 

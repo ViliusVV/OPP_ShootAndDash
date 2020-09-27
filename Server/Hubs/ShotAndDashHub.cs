@@ -17,7 +17,7 @@ namespace Server.Hubs
         public async Task ReceivePos(PlayerDTO dto)
         {
             _gameManager.Players[Context.ConnectionId].Position = dto.Position;
-            await Clients.All.("UpdateState", _gameManager.Players.Values.ToList());
+            await Clients.All.SendAsync("UpdateState", _gameManager.Players.Values.ToList());
         }
 
         public async Task SpawnPlayer(PlayerDTO playerDTO)

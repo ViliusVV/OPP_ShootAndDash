@@ -38,11 +38,14 @@ namespace Client.Models
 
         public Player(PlayerDTO playerDTO)
         {
-            Name = playerDTO.Name;
-            Health = playerDTO.Health;
-            Speed = playerDTO.Speed;
-            Position = playerDTO.Position;
-            TextureRect = new IntRect(0, 0, 36, 64);
+            this.PlayerBar = new PlayerBar();
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.MainCharacter);
+            this.TextureRect = new IntRect(0, 0, 36, 64);
+            this.Origin = SpriteUtils.GetSpriteCenter(this);
+            this.Name = playerDTO.Name;
+            this.Health = playerDTO.Health;
+            this.Speed = playerDTO.Speed;
+            this.Position = playerDTO.Position;
         }
 
         public void SetWeapon(Weapon wep)
@@ -134,7 +137,13 @@ namespace Client.Models
 
         public void UpdatePlayerBar()
         {
-            PlayerBar.Update(15.0f, 20.0f);
+            float ammo = 0.0f;
+            if(Weapon != null)
+            {
+                ammo = (float)Weapon.Ammo / Weapon.MagazineSize * 100;
+            }
+
+            PlayerBar.Update(Health , ammo);
         }
 
 
