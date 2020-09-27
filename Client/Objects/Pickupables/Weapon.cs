@@ -26,7 +26,8 @@ namespace Client.Objects
         public bool Reloading { get; set; }
         public List<Projectile> Projectiles {get;set;}
 
-        public Clock WeaponClock { get; set; } = new Clock();
+        public Clock ShootTimer { get; set; } = new Clock();
+        public Clock ReloadTimer { get; set; } = new Clock();
         public Sprite ProjectileSprite { get; private set; }
 
 
@@ -54,8 +55,9 @@ namespace Client.Objects
 
         public void Shoot()
         {
-            if (Ammo != 0 && Reloading != true)
+            if (Ammo != 0 && Reloading != true && ShootTimer.ElapsedTime.AsMilliseconds() > AttackSpeed )
             {
+                ShootTimer.Restart();
                 //Vector2f v = VectorUtils.AngleDegToUnitVector(this.Rotation);
 
                 //Sprite bulletSprite = new Sprite(ProjectileSprite);
@@ -68,8 +70,8 @@ namespace Client.Objects
                 //Projectiles.Add(bullet);
                 //AmmoConsume(-1);
 
-                //Sound sound = SoundHolder.GetInstance().Get(SoundIdentifier.GenericGun);
-                //sound.Play();
+                Sound sound = SoundHolder.GetInstance().Get(SoundIdentifier.GenericGun);
+                sound.Play();
             }
 
             //List<Projectile> projectiles = new List<Projectile>();

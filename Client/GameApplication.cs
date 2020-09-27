@@ -63,10 +63,8 @@ namespace Client
 
         AimCursor AimCursor = new AimCursor();
         List<Projectile> bulletList = new List<Projectile>();
-        bool facingRight = true;
 
-
-        public MapGeneration map = new MapGeneration();
+        public MapGeneration map;
         public GameApplication() { }
 
         public static GameApplication GetInstance()
@@ -93,6 +91,7 @@ namespace Client
             CreateSprites();
 
 
+            map = new MapGeneration();
             map.CreateMap();
 
 
@@ -103,6 +102,7 @@ namespace Client
 
 
             MainPlayer = new Player();
+            MainPlayer.IsMainPlayer = true;
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
             MainPlayer.TextureRect = playerAnimation;
             MainPlayer.Weapon = new Weapon("AK-47", 30, 29, 20, 2000, 200, 1, 20, true);
@@ -116,14 +116,14 @@ namespace Client
 
             scoreboardText = new CustomText(Fonts.Get(FontIdentifier.PixelatedSmall), 21);
             scoreboardText.DisplayedString = "Player01 - 15/2";
-
+            GameState.Collidables.Add(crate);
 
             while (GameWindow.IsOpen)
             {
                 if (true) {
 
                     Time deltaTime = FrameClock.Restart();
-                    if (ConnectionManager.ActivityClock.ElapsedTime.AsSeconds() > (1f / 60f) && ConnectionManager.Connected)
+                    if (ConnectionManager.ActivityClock.ElapsedTime.AsSeconds() > (1f / 30f) && ConnectionManager.Connected)
                     {
                         ConnectionManager.ActivityClock.Restart();
                         SendPos(ConnectionManager.Connection);
@@ -143,7 +143,6 @@ namespace Client
 
                     scoreboardText.Position = scoreboardTextPos;
                     crate.Position = new Vector2f(1000, 400);
-                    GameState.Collidables.Add(crate);
                     bushSprite.Position = new Vector2f(500, 400);
                     MainPlayer.Weapon.Rotation = rotation;
                     MainPlayer.Weapon.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
@@ -403,10 +402,6 @@ namespace Client
             };
         }
 
-        private void AnimateCharacter()
-        {
-
-        }
 
         private void ProccesKeyboardInput()
         {

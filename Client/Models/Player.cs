@@ -31,7 +31,11 @@ namespace Client.Models
         public bool IsDead { get; private set; } = false;
         public float SpeedMultiplier { get; private set; } = 1;
         public bool Running { get => Math.Abs(Speed.X) > 0.1 || Math.Abs(Speed.Y) > 0.1; }
+        public bool IsMainPlayer { get; set; }
         public Weapon Weapon { get; set; }
+
+        public static UInt64 counter { get; set; }
+
 
         public PlayerBar PlayerBar { get; set; }
         public Player()
@@ -87,6 +91,8 @@ namespace Client.Models
             }
             UpdatePlayerFacingPosition();
         }
+
+
         public void UpdatePlayerFacingPosition ()
         {
             if (Math.Abs(Speed.X) < 0.01)
@@ -102,67 +108,78 @@ namespace Client.Models
                 this.Scale = new Vector2f(-1, 1);
             }
         }
+
+
         public void UpdateSpeed()
         {
-            bool left = Keyboard.IsKeyPressed(Keyboard.Key.A);
-            bool right = Keyboard.IsKeyPressed(Keyboard.Key.D); 
-            bool up = Keyboard.IsKeyPressed(Keyboard.Key.W); 
-            bool down = Keyboard.IsKeyPressed(Keyboard.Key.S);
-            const float increment = 0.4f;
-            const float maxSpd = 4;
-            float xIncrement = 0;
-            float yIncrement = 0;
-
-            // process movement
-            xIncrement -= left ? increment : -increment;
-            xIncrement += right ? increment : -increment;
-            yIncrement -= up ? increment : -increment;
-            yIncrement += down ? increment : -increment;
-
-            // normalize movement distance when moving diagonally 
-            if (xIncrement != 0 && yIncrement != 0)
+            if (IsMainPlayer)
             {
-                xIncrement /= 1.41f;
-                yIncrement /= 1.41f;
+                bool left = Keyboard.IsKeyPressed(Keyboard.Key.A);
+                bool right = Keyboard.IsKeyPressed(Keyboard.Key.D);
+                bool up = Keyboard.IsKeyPressed(Keyboard.Key.W);
+                bool down = Keyboard.IsKeyPressed(Keyboard.Key.S);
+                const float increment = 0.4f;
+                const float maxSpd = 4;
+                float xIncrement = 0;
+                float yIncrement = 0;
+
+                // process movement
+                xIncrement -= left ? increment : -increment;
+                xIncrement += right ? increment : -increment;
+                yIncrement -= up ? increment : -increment;
+                yIncrement += down ? increment : -increment;
+
+                // normalize movement distance when moving diagonally 
+                if (xIncrement != 0 && yIncrement != 0)
+                {
+                    xIncrement /= 1.41f;
+                    yIncrement /= 1.41f;
+                }
+
+                // slow down if player isnt moving
+                if ((Math.Abs(xIncrement) < 0.1f) && Speed.X > 0)
+                    xIncrement -= increment;
+                if ((Math.Abs(xIncrement) < 0.1f) && Speed.X < 0)
+                    xIncrement += increment;
+                if ((Math.Abs(yIncrement) < 0.1f) && Speed.Y > 0)
+                    yIncrement -= increment;
+                if ((Math.Abs(yIncrement) < 0.1f) && Speed.Y < 0)
+                    yIncrement += increment;
+
+                _speed.X += xIncrement;
+                _speed.Y += yIncrement;
+
+                // limit speed
+                if (Speed.X > maxSpd)
+                    _speed.X = maxSpd;
+                if (Speed.X < -maxSpd)
+                    _speed.X = -maxSpd;
+                if (Speed.Y > maxSpd)
+                    _speed.Y = maxSpd;
+                if (Speed.Y < -maxSpd)
+                    _speed.Y = -maxSpd;
+
+                // if speed is close to 0, set it to 0
+                if (Math.Abs(Speed.X) < 0.3f)
+                    _speed.X = 0;
+                if (Math.Abs(Speed.Y) < 0.3f)
+                    _speed.Y = 0;
             }
-
-            // slow down if player isnt moving
-            if ((Math.Abs(xIncrement) < 0.1f) && Speed.X > 0)
-                xIncrement -= increment;
-            if ((Math.Abs(xIncrement) < 0.1f) && Speed.X < 0)
-                xIncrement += increment;
-            if ((Math.Abs(yIncrement) < 0.1f) && Speed.Y > 0)
-                yIncrement -= increment;
-            if ((Math.Abs(yIncrement) < 0.1f) && Speed.Y < 0)
-                yIncrement += increment;
-
-            _speed.X += xIncrement;
-            _speed.Y += yIncrement;
-
-            // limit speed
-            if (Speed.X > maxSpd)
-                _speed.X = maxSpd;
-            if (Speed.X < -maxSpd)
-                _speed.X = -maxSpd;
-            if (Speed.Y > maxSpd)
-                _speed.Y = maxSpd;
-            if (Speed.Y < -maxSpd)
-                _speed.Y = -maxSpd;
-
-            // if speed is close to 0, set it to 0
-            if (Math.Abs(Speed.X) < 0.3f)
-                _speed.X = 0;
-            if (Math.Abs(Speed.Y) < 0.3f)
-                _speed.Y = 0;
         }
 
         public bool CheckCollisions()
         {
             foreach (var item in GameState.GetInstance().Collidables)
             {
-                if(CollisionTester.BoundingBoxTest(this, item))
+                counter++;
+                if(this.GetGlobalBounds().Intersects(item.GetGlobalBounds()))
                 {
                     return true;
+                }
+
+                if(counter % 100 == 0)
+                {
+                    Console.WriteLine(counter);
                 }
             }
             return false;

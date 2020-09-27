@@ -1,4 +1,5 @@
-﻿using SFML.Graphics;
+﻿using Client.Config;
+using SFML.Graphics;
 using SFML.Graphics.Glsl;
 using SFML.System;
 using System;
@@ -55,7 +56,7 @@ namespace Client.Utilities
             target.Draw(m_vertices, states);
         }
 
-        public Texture m_tileset = new Texture("Assets/tilemap.png");
+        public Texture m_tileset = TextureHolder.GetInstance().Get(TextureIdentifier.TileMap);
         
         private VertexArray m_vertices = new VertexArray();
         
