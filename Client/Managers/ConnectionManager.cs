@@ -10,6 +10,7 @@ namespace Client.Utilities
     class ConnectionManager
     {
         public HubConnection Connection { get; set; }
+        public bool Connected { get => Connection.State == HubConnectionState.Connected; }
 
         public ConnectionManager(string url)
         {

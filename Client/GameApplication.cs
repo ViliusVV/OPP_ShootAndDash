@@ -9,18 +9,12 @@ using SFML.Window;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 using Client.Collisions;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Runtime.InteropServices.ComTypes;
 using Client.Models;
 using Client.Objects.Pickupables;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.SignalR.Client;
-using System.Runtime.CompilerServices;
 using Common.DTO;
 using Common.Utilities;
-using System.Reflection.Metadata;
 using Client.Managers;
 
 namespace Client
@@ -29,6 +23,7 @@ namespace Client
     {
         // Singleton instance
         private static readonly GameApplication _instance = new GameApplication();
+        public static Random Rnd { get; set; } = new Random();
 
         // Screen 
         RenderWindow GameWindow { get; set; }
@@ -44,21 +39,15 @@ namespace Client
         private TextureHolder Textures { get; set; } = TextureHolder.GetInstance();
         private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
         private FontHolder Fonts { get; set; } = FontHolder.GetInstance();
+
+        GameState GameState { get; set; } = new GameState();
         private ConnectionManager ConnectionManager { get; set; }
-        public static Random Rnd { get; set; } = new Random();
 
 
         Player MainPlayer { get; set; }
 
         Sprite bgSprite;
-        Sprite bulletSprite;
-        Sprite ak47Sprite;
         Sprite crate;
-        Sprite medkitSprite;
-        Sprite movementSyringeSprite;
-        Sprite reloadSyringeSprite;
-        Sprite healingSyringeSprite;
-        Sprite deflectionSyringeSprite;
         Sprite bushSprite;
         Sprite scoreboardSprite;
 
@@ -70,9 +59,6 @@ namespace Client
         bool isPlayerRunning = false;
 
         CustomText scoreboardText;
-        Text txt = new Text();
-
-        Weapon wep;
 
         AimCursor AimCursor = new AimCursor();
         List<Projectile> bulletList = new List<Projectile>();
@@ -80,8 +66,6 @@ namespace Client
         float attackSpeed = 150;
         bool facingRight = true;
         bool isReloading = false;
-
-        GameState GameState = new GameState();
 
 
         public MapGeneration map = new MapGeneration();
@@ -113,8 +97,6 @@ namespace Client
 
             map.CreateMap();
 
-            wep = new Weapon("AK-47", 30, 29, 20, 2000, 200, 1, 20, true);
-            wep.SetProjectileSprite(bulletSprite);
 
             // View
             MainView = GameWindow.DefaultView;
@@ -124,26 +106,25 @@ namespace Client
 
             MainPlayer = new Player();
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
-
             MainPlayer.TextureRect = playerAnimation;
+            MainPlayer.Weapon = new Weapon("AK-47", 30, 29, 20, 2000, 200, 1, 20, true);
             // Configure sprite
-            MainPlayer.Origin = SpriteUtils.GetSpriteCenter(MainPlayer);
-            ak47Sprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(ak47Sprite).X, 0.0f);
 
+
+            MainPlayer.Origin = SpriteUtils.GetSpriteCenter(MainPlayer);
 
             // Connect to game hub server
             //ConnectionManager = new ConnectionManager("https://shoot-and-dash.azurewebsites.net/sd-server");
             ConnectionManager = new ConnectionManager("http://localhost:5000/sd-server");
+
             BindEvents();
 
             CreatePlayer();
-
-            MainPlayer.Weapon = wep;
             GameState.Players.Add(MainPlayer);
 
 
             scoreboardText = new CustomText(Fonts.Get(FontIdentifier.PixelatedSmall), 21);
-            scoreboardText.DisplayedString = "Testing";
+            scoreboardText.DisplayedString = "Player01 - 15/2";
 
             Clock clock = new Clock();
             Clock sendClock = new Clock();
@@ -153,7 +134,7 @@ namespace Client
                 if (true) { 
 
                 Time deltaTime = clock.Restart();
-                    if (sendClock.ElapsedTime.AsSeconds() > (1f / 60f))
+                    if (sendClock.ElapsedTime.AsSeconds() > (1f / 60f) && ConnectionManager.Connected)
                     {
                         sendClock.Restart();
                         SendPos(ConnectionManager.Connection);
@@ -171,13 +152,12 @@ namespace Client
                     Vector2f scoreboardPos = new Vector2f(0, 0);
                     Vector2f scoreboardTextPos = new Vector2f(0, 0);
 
-                    ak47Sprite.Position = MainPlayer.Position;
                     scoreboardSprite.Position = scoreboardPos;
                     scoreboardText.Position = scoreboardTextPos;
                     crate.Position = new Vector2f(1000, 400);
                     bushSprite.Position = new Vector2f(500, 400);
-                    ak47Sprite.Rotation = rotation;
-                    ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
+                    MainPlayer.Weapon.Rotation = rotation;
+                    MainPlayer.Weapon.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
 
 
                     // Run player animation
@@ -206,7 +186,6 @@ namespace Client
 
                     GameWindow.Draw(map.map);
                     RenderPlayers();
-                    GameWindow.Draw(ak47Sprite);
                     GameWindow.Draw(crate);
                     GameWindow.Draw(bushSprite);
                     attackCooldown -= deltaTime.AsMilliseconds();
@@ -264,8 +243,10 @@ namespace Client
                 GameWindow.Draw(player);
                 Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
                 player.PlayerBar.Position = playerBarPos;
-                player.UpdatePlayerBar();
+                player.Update();
                 GameWindow.Draw(player.PlayerBar);
+                
+                if(player.Weapon != null) GameWindow.Draw(player.Weapon);
             }
         }
 
@@ -278,17 +259,17 @@ namespace Client
 
         public void ReloadGun()
         {
-            if (wep.Ammo < wep.MagazineSize)
+            if (MainPlayer.Weapon.Ammo < MainPlayer.Weapon.MagazineSize)
             {
-                if (reloadClock.ElapsedTime.AsMilliseconds() > wep.ReloadTime)
+                if (reloadClock.ElapsedTime.AsMilliseconds() > MainPlayer.Weapon.ReloadTime)
                 {
                     reloadClock.Restart();
-                    wep.AmmoConsume(1);
+                    MainPlayer.Weapon.AmmoConsume(1);
                     Sound sound = Sounds.Get(SoundIdentifier.Reload);
                     sound.Play();
                 }
             }
-            if (reloadTimer.ElapsedTime.AsMilliseconds() > wep.ReloadTime*600)
+            if (reloadTimer.ElapsedTime.AsMilliseconds() > MainPlayer.Weapon.ReloadTime*600)
             {
                 isReloading = false;
                 reloadTimer.Restart();
@@ -527,6 +508,8 @@ namespace Client
 
             }
         }
+
+
         private void SpawnRandomSyringe()
         {
             int num = Rnd.Next(4);
@@ -535,19 +518,15 @@ namespace Client
             {
                 case 0:
                     syringe = new MovementSyringe();
-                    syringe.Texture = movementSyringeSprite.Texture;
                     break;
                 case 1:
                     syringe = new ReloadSyringe();
-                    syringe.Texture = reloadSyringeSprite.Texture;
                     break;
                 case 2:
                     syringe = new HealingSyringe();
-                    syringe.Texture = healingSyringeSprite.Texture;
                     break;
                 default:
                     syringe = new DeflectionSyringe();
-                    syringe.Texture = deflectionSyringeSprite.Texture;
                     break;
             }
             syringe.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
@@ -559,7 +538,6 @@ namespace Client
         private void SpawnMedkit()
         {
             Medkit medkit = new Medkit();
-            medkit.Texture = medkitSprite.Texture;
             medkit.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
             GameState.Pickupables.Add(medkit);
         }
@@ -567,7 +545,7 @@ namespace Client
 
         private void ShootBullet()
         {
-            if (wep.Ammo != 0 && isReloading != true)
+            if (MainPlayer.Weapon.Ammo != 0 && isReloading != true)
             {
                 Sprite myBullet = new Sprite(Textures.Get(TextureIdentifier.Bullet));
                 Vector2 target = new Vector2(
@@ -576,14 +554,19 @@ namespace Client
                 );
                 target = Vector2.Normalize(target);
                 Projectile bullet = new Projectile(target.X * 1000, target.Y * 1000, myBullet);
-                bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(bulletSprite), MainPlayer.Position);
+                bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(MainPlayer.Weapon.ProjectileSprite), MainPlayer.Position);
                 bullet.ProjectileSprite.Rotation = VectorUtils.VectorToAngle(target.X, target.Y);
 
                 bulletList.Add(bullet);
                 Sound sound = Sounds.Get(SoundIdentifier.GenericGun);
                 sound.Play();
-                wep.AmmoConsume(-1);
+                MainPlayer.Weapon.AmmoConsume(-1);
             }
+        }
+
+        public void ConntectToServer()
+        {
+
         }
 
         public void BindEvents()
@@ -612,18 +595,10 @@ namespace Client
             Console.WriteLine("Loading sprites...");
             IntRect rect = new IntRect(0, 0, 1280, 720);
             bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
-            bulletSprite = new Sprite(Textures.Get(TextureIdentifier.Bullet));
-            ak47Sprite = new Sprite(Textures.Get(TextureIdentifier.GunAk47));
             AimCursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
             crate = new Sprite(Textures.Get(TextureIdentifier.Crate));
-            medkitSprite = new Sprite(Textures.Get(TextureIdentifier.Medkit));
-            movementSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.MovementSyringe));
-            reloadSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.ReloadSyringe));
-            healingSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.HealingSyringe));
-            deflectionSyringeSprite = new Sprite(Textures.Get(TextureIdentifier.DeflectionSyringe));
             bushSprite = new Sprite(Textures.Get(TextureIdentifier.Bush));
             scoreboardSprite = new Sprite(Textures.Get(TextureIdentifier.ScoreboardBox));
-            //scoreboard.SetTexture(new Texture(Textures.Get(TextureIdentifier.ScoreboardBox)));
         }
 
 

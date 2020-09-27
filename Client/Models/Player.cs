@@ -135,6 +135,21 @@ namespace Client.Models
             return tmpDto;
         }
 
+        public void Update()
+        {
+            UpdatePlayerBar();
+            UpdateWeapon();
+
+        }
+
+        public void UpdateWeapon()
+        {
+            if(Weapon != null)
+            {
+                Weapon.Position = this.Position;
+            }
+        }
+
         public void UpdatePlayerBar()
         {
             float ammo = 0.0f;

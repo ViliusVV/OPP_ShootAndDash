@@ -23,7 +23,7 @@ namespace Client.Objects
         public float ReloadTime { get; private set; }
         public int SpreadAmount { get; private set; }
         public bool CanShoot { get; private set; }
-        public Sprite Projectile { get; private set; }
+        public Sprite ProjectileSprite { get; private set; }
 
         public Weapon(string name, int magazineSize, int ammo, float dmg, float projectileSpd,
             float attackSpd, float reloadTime, int spreadAmount, bool canShoot)
@@ -37,16 +37,15 @@ namespace Client.Objects
             this.ReloadTime = reloadTime;
             this.SpreadAmount = spreadAmount;
             this.CanShoot = canShoot;
-            this.Projectile = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Bullet));
+            this.ProjectileSprite = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Bullet));
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GunAk47);
+            this.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
         }
         public override void Pickup(Player player)
         {
             player.SetWeapon(this);
         }
-        public void SetProjectileSprite(Sprite projectileSprite)
-        {
-            this.Projectile = projectileSprite;
-        }
+
         public List<Projectile> Shoot(int bulletCount, Vector2 cursorPos, Vector2f playerPos)
         {
             List<Projectile> projectiles = new List<Projectile>();
@@ -60,8 +59,8 @@ namespace Client.Objects
                     target.Y += GameApplication.Rnd.Next(SpreadAmount);
                     target = Vector2.Normalize(target);
                     Projectile bullet = new Projectile(target.X * ProjectileSpeed,
-                        target.Y * ProjectileSpeed, Projectile);
-                    bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(Projectile), playerPos);
+                        target.Y * ProjectileSpeed, ProjectileSprite);
+                    bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(ProjectileSprite), playerPos);
                     bullet.ProjectileSprite.Rotation = VectorUtils.VectorToAngle(target.X, target.Y);
                     Ammo--;
                     projectiles.Add(bullet);
@@ -71,32 +70,10 @@ namespace Client.Objects
             //    Sound sound = Sounds.Get(SoundIdentifier.GenericGun);
             return projectiles;
         }
+
         public void AmmoConsume(int i)
         {
             this.Ammo += i;
-        }
-        public float GetAmmo(float scale)
-        {
-            
-            if (Ammo > 0)
-            {
-                return scale * (float)Ammo / (float)MagazineSize;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-        public float AmmoOffSet(float scale)
-        {
-            if (Ammo > 0)
-            {
-                return (float)15.5 * ((MagazineSize - Ammo) * scale / MagazineSize);
-            }
-            else
-            {
-                return 0;
-            }
         }
     }
 }
