@@ -184,12 +184,13 @@ namespace Client
                     UpdateBullets(deltaTime);
                     DrawProjectiles();
 
-                    GameWindow.SetView(MainView);
-                    GameWindow.Draw(scoreboardText);
-                    ZoomedView.Center = middlePoint;
-                    mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
                     AimCursor.Update(mPos);
                     GameWindow.Draw(AimCursor);
+
+                    GameWindow.SetView(MainView);
+                    GameWindow.Draw(scoreboardText);
+
+                    ZoomedView.Center = middlePoint;
                     ZoomedView.Zoom(zoomView);
                     zoomView = 1.0f;
                     GameWindow.SetView(ZoomedView);
