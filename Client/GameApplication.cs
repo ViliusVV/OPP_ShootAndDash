@@ -41,7 +41,7 @@ namespace Client
         private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
         private FontHolder Fonts { get; set; } = FontHolder.GetInstance();
 
-        GameState GameState { get; set; } = new GameState();
+        GameState GameState { get; set; } = GameState.GetInstance();
         private ConnectionManager ConnectionManager { get; set; } = new ConnectionManager("https://shoot-and-dash.azurewebsites.net/sd-server");
 
 
@@ -146,6 +146,7 @@ namespace Client
 
                     scoreboardText.Position = scoreboardTextPos;
                     crate.Position = new Vector2f(1000, 400);
+                    GameState.Collidables.Add(crate);
                     bushSprite.Position = new Vector2f(500, 400);
                     MainPlayer.Weapon.Rotation = rotation;
                     MainPlayer.Weapon.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
@@ -177,7 +178,7 @@ namespace Client
 
                     GameWindow.Draw(map.map);
                     RenderPlayers();
-                    GameWindow.Draw(crate);
+                    DrawCollidables();
                     GameWindow.Draw(bushSprite);
                     attackCooldown -= deltaTime.AsMilliseconds();
                     UpdatePickupables();
@@ -200,6 +201,14 @@ namespace Client
 
             }
 
+        }
+
+        private void DrawCollidables()
+        {
+            foreach (var item in GameState.Collidables)
+            {
+                GameWindow.Draw(item);
+            }
         }
 
         private void CreatePlayers(List<PlayerDTO> playerDTOs)
@@ -234,6 +243,8 @@ namespace Client
                 GameWindow.Draw(player);
                 Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
                 player.PlayerBar.Position = playerBarPos;
+                player.UpdateSpeed();
+                player.TranslateFromSpeed();
                 player.Update();
                 GameWindow.Draw(player.PlayerBar);
                 
@@ -404,6 +415,7 @@ namespace Client
             float moveDistance = movementSpeed * dt;
             float movementX = 0;
             float movementY = 0;
+
             // Polling key presses is better than events if we
             // need to detect multiple key presses at same time
             if (Keyboard.IsKeyPressed(Keyboard.Key.W))
@@ -470,8 +482,7 @@ namespace Client
                 }
 
             }
-            MainPlayer.Translate(movementX, movementY);
-
+            //MainPlayer.Translate(movementX, movementY);
             if(Keyboard.IsKeyPressed(Keyboard.Key.M))
             {
                 SpawnMedkit();
