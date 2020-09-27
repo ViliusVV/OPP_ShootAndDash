@@ -23,6 +23,8 @@ namespace Client.Models
         public float SpeedMultiplier { get; private set; } = 1;
 
         public Weapon Weapon { get; private set; }
+
+
         public Player() { }
         public Player(PlayerDTO playerDTO)
         {
@@ -32,10 +34,13 @@ namespace Client.Models
             Position = playerDTO.Position;
             TextureRect = new IntRect(0, 0, 36, 64);
         }
+
         public void SetWeapon(Weapon wep)
         {
             this.Weapon = wep;
         }
+
+
         public void ApplyDamage(float amount)
         {
             float newHealth = Health + amount;
@@ -74,11 +79,13 @@ namespace Client.Models
                 return false;
             }
         }
+
         public void IncreaseMovementSpeed(float multiplier, float durationInMilis)
         {
             SpeedMultiplier = 2;
             Task.Delay((int)durationInMilis).ContinueWith(o => SpeedMultiplier = 1);
         }
+
         public float GetHealth(float scale)
         {
             if (Health > 0)

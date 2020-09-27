@@ -1,4 +1,5 @@
-﻿using Common.DTO;
+﻿using Client.Utilities;
+using Common.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,9 +8,14 @@ namespace Common
 {
     public class GameState
     {
-        public List<PlayerDTO> players { get; set; }
+        public List<PlayerDTO> Players { get; set; }
+        //public List<Pickupable> Pickupables { get; set; }
 
-        public GameState() { }
+        //public MapGeneration Map {get;set;}
+
+        public GameState() {
+            this.Players = new List<PlayerDTO>();
+        }
 
     }
 }

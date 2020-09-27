@@ -44,6 +44,7 @@ namespace Client
         private SoundHolder Sounds { get; } = new SoundHolder();
         private FontHolder Fonts { get; } = new FontHolder();
         private ConnectionManager ConnectionManager { get; set; }
+
         static Texture bulletTexture = new Texture("Assets/bullet.png");
         static Sprite bullet = new Sprite(bulletTexture);
 
@@ -108,7 +109,7 @@ namespace Client
             GameWindow = CreateRenderWindow(Styles.Close);
             Vector2f winSize = GameWindow.GetView().Size;
 
-            Vector2fSerializable vectorSer = new Vector2fSerializable();
+            Vector2fS vectorSer = new Vector2fS();
             Vector2f vec0 = new Vector2f(15.0f, 14.4f);
             Vector2f vec2 = new Vector2f(1.0f, 4.5f);
             vec0 = vectorSer;
@@ -170,7 +171,11 @@ namespace Client
                 this.ProccesKeyboardInput(deltaTime);
                 var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
                 var middlePoint = VectorUtils.GetMiddlePoint(mainPlayer.Position, mPos);
-                float rotation = VectorUtils.GetAngleBetweenVectors(mainPlayer.Position, mPos);
+                    middlePoint.X = MathF.Round(middlePoint.X);
+                    middlePoint.Y = MathF.Round(middlePoint.Y);
+                    middlePoint.X += 0.375f;
+                    middlePoint.Y += 0.375f;
+                    float rotation = VectorUtils.GetAngleBetweenVectors(mainPlayer.Position, mPos);
 
                 Vector2f playerBarPos = new Vector2f(mainPlayer.Position.X, mainPlayer.Position.Y - 40);
 

@@ -6,7 +6,7 @@ using System.Text;
 namespace Common.DTO
 {
     [Serializable()]
-    public class Vector2fSerializable
+    public struct Vector2fS
 
     {
         [NonSerialized()]
@@ -24,15 +24,13 @@ namespace Common.DTO
             set => _vector.Y = value;
         }
 
-        public Vector2fSerializable() { }
-
-        public Vector2fSerializable(Vector2f vector)
+        public Vector2fS(Vector2f vector)
         {
             this._vector = vector;
         }
 
-        public static implicit operator Vector2f(Vector2fSerializable v) => v._vector;
-        public static implicit operator Vector2fSerializable(Vector2f v) => new Vector2fSerializable(v);
+        public static implicit operator Vector2f(Vector2fS v) => v._vector;
+        public static implicit operator Vector2fS(Vector2f v) => new Vector2fS(v);
 
         public override string ToString()
         {

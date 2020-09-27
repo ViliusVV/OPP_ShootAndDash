@@ -10,7 +10,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DTO\PlayerDTO.cs" />
-    <Compile Include="..\Common\DTO\Vector2fSerializable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ModelInterfaces\IProjectile.cs" />
+    <Compile Include="..\Common\Enums\GunId.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ModelInterfaces\IGun.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ModelInterfaces\IPlayer.cs" />
+    <Compile Include="..\Common\DTO\Vector2fS.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\VectorUtils.cs" />
   </ItemGroup>

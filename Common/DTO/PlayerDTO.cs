@@ -1,6 +1,9 @@
-﻿using SFML.System;
+﻿using Client.Models;
+using Client.Objects;
+using SFML.System;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Text;
 
 namespace Common.DTO
@@ -8,15 +11,20 @@ namespace Common.DTO
     [Serializable()]
     public class PlayerDTO
     {
+
         public string Name { get; set; }
         public float Health { get; set; } = 100;
 
-        public Vector2fSerializable Speed { get; set; }
-        public Vector2fSerializable Position { get; set; }
+        public float MaxSpeed { get; set; }
+        public Vector2fS Speed { get; set; }
+        public Vector2fS Position { get; set; }
 
-        public bool IsDead { get; private set; } = false;
+        public bool IsDead { get; set; } = false;
         public float SpeedMultiplier { get; set; } = 1;
         public string Appearance { get; set; }
+
+        // List of all projectiles that player has shot and currently is in world
+        public List<Projectile> Projectiles { get; set; }
 
         public PlayerDTO() { }
 
