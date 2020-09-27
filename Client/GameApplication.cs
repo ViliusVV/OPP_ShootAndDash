@@ -33,7 +33,6 @@ namespace Client
         RenderWindow GameWindow { get; set; }
         private View MainView { get; set; }
         private View ZoomedView { get; set; }
-        private View HUDView { get; set; }
         private bool FullScreen { get; set; }
         private bool PrevFullScreen { get; set; }
         float zoomView = 1.0f;
@@ -41,9 +40,9 @@ namespace Client
 
 
         // Resources
-        private TextureHolder Textures { get; } = new TextureHolder();
-        private SoundHolder Sounds { get; } = new SoundHolder();
-        private FontHolder Fonts { get; } = new FontHolder();
+        private TextureHolder Textures { get; set; } = TextureHolder.GetInstance();
+        private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
+        private FontHolder Fonts { get; set; } = FontHolder.GetInstance();
         private ConnectionManager ConnectionManager { get; set; }
 
         static Texture bulletTexture = new Texture("Assets/bullet.png");
@@ -52,9 +51,6 @@ namespace Client
         Sprite bgSprite;
         Sprite bulletSprite;
         Sprite ak47Sprite;
-        Sprite playerBar;
-        Sprite playerBarMask;
-        Sprite playerBarAmmoMask;
         Sprite crate;
         Sprite medkitSprite;
         Sprite movementSyringeSprite;
@@ -64,7 +60,7 @@ namespace Client
         Sprite bushSprite;
         Sprite scoreboardSprite;
 
-        Player mainPlayer = new Player();
+        Player mainPlayer;
         IntRect playerAnimation = new IntRect(36, 0, 36, 64);
         IntRect playerIdle = new IntRect(0, 0, 36, 64);
         Clock animationSpeed = new Clock();
@@ -133,17 +129,14 @@ namespace Client
 
 
             // Set initial posision for text
+            mainPlayer = new Player();
             mainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
 
             mainPlayer.TextureRect = playerAnimation;
             // Configure sprite
             mainPlayer.Origin = SpriteUtils.GetSpriteCenter(mainPlayer);
-            playerBar.Origin = SpriteUtils.GetSpriteCenter(playerBar);
-            playerBarMask.Origin = SpriteUtils.GetSpriteCenter(playerBarMask);
-            playerBarAmmoMask.Origin = SpriteUtils.GetSpriteCenter(playerBarAmmoMask);
             ak47Sprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(ak47Sprite).X, 0.0f);
 
-            playerBar.Scale = new Vector2f(1.5f, 1.5f);
 
             // Connect to game hub server
             ConnectionManager = new ConnectionManager("https://shoot-and-dash.azurewebsites.net/sd-server");
@@ -151,9 +144,7 @@ namespace Client
 
             CreatePlayer();
 
-            playerBarMask.Scale = new Vector2f(1.5f, 1.5f);
-            playerBarAmmoMask.Scale = new Vector2f(1.5f, 1.5f);
-
+            mainPlayer.Weapon = wep;
             players.Add(mainPlayer);
 
 
@@ -162,6 +153,7 @@ namespace Client
 
             Clock clock = new Clock();
             Clock sendClock = new Clock();
+
             while (GameWindow.IsOpen)
             {
                 if (true) { 
@@ -187,19 +179,14 @@ namespace Client
                     Vector2f scoreboardTextPos = new Vector2f(0, 0);
 
                     ak47Sprite.Position = mainPlayer.Position;
-                    playerBar.Position = playerBarPos;
+                    mainPlayer.PlayerBar.Position = playerBarPos;
                     scoreboardSprite.Position = scoreboardPos;
                     scoreboardText.Position = scoreboardTextPos;
-                    playerBarMask.Position = playerBarPos;
-                    playerBarAmmoMask.Position = playerBarPos;
                     crate.Position = new Vector2f(1000, 400);
                     bushSprite.Position = new Vector2f(500, 400);
                     ak47Sprite.Rotation = rotation;
                     ak47Sprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
-                    playerBarMask.Scale = new Vector2f(mainPlayer.GetHealth(1.5f), 1.5f);
-                    playerBarMask.Position = new Vector2f(mainPlayer.Position.X - mainPlayer.HealthOffSet(1.5f), mainPlayer.Position.Y - 40);
-                    playerBarAmmoMask.Scale = new Vector2f(wep.GetAmmo(1.5f), 1.5f);
-                    playerBarAmmoMask.Position = new Vector2f(mainPlayer.Position.X - wep.AmmoOffSet(1.5f), mainPlayer.Position.Y - 40);
+                    mainPlayer.UpdatePlayerBar();
 
 
                     // Run player animation
@@ -219,14 +206,12 @@ namespace Client
                         mainPlayer.TextureRect = playerIdle;
                     }
 
-                        //Draw order is important
-                        //GameWindow.Draw(bgSprite);
+                    //Draw order is important
+                    //GameWindow.Draw(bgSprite);
                     GameWindow.Draw(map.map);
                     RenderPlayers();
+                    GameWindow.Draw(mainPlayer.PlayerBar);
                     GameWindow.Draw(ak47Sprite);
-                    GameWindow.Draw(playerBarMask);
-                    GameWindow.Draw(playerBarAmmoMask);
-                    GameWindow.Draw(playerBar);
                     GameWindow.Draw(crate);
                     GameWindow.Draw(bushSprite);
                     attackCooldown -= deltaTime.AsMilliseconds();
@@ -251,7 +236,6 @@ namespace Client
                     GameWindow.SetView(ZoomedView);
 
                     GameWindow.Display();
-
                 }
 
             }
@@ -631,14 +615,10 @@ namespace Client
         {
 
             Console.WriteLine("Loading sprites...");
-            mainPlayer.Texture = Textures.Get(TextureIdentifier.MainCharacter);
             IntRect rect = new IntRect(0, 0, 1280, 720);
             bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
             bulletSprite = new Sprite(Textures.Get(TextureIdentifier.Bullet));
             ak47Sprite = new Sprite(Textures.Get(TextureIdentifier.GunAk47));
-            playerBar = new Sprite(Textures.Get(TextureIdentifier.PlayerBar));
-            playerBarMask = new Sprite(Textures.Get(TextureIdentifier.PlayerBarMask));
-            playerBarAmmoMask = new Sprite(Textures.Get(TextureIdentifier.PlayerBarAmmoMask));
             cursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
             crate = new Sprite(Textures.Get(TextureIdentifier.Crate));
             medkitSprite = new Sprite(Textures.Get(TextureIdentifier.Medkit));

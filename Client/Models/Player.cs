@@ -1,5 +1,7 @@
 ﻿using Client.Collisions;
+using Client.Config;
 using Client.Objects;
+using Client.UI;
 using Client.Utilities;
 using Common.DTO;
 using SFML.Graphics;
@@ -22,10 +24,18 @@ namespace Client.Models
         public bool IsDead { get; private set; } = false;
         public float SpeedMultiplier { get; private set; } = 1;
 
-        public Weapon Weapon { get; private set; }
+        public Weapon Weapon { get; set; }
+
+        public PlayerBar PlayerBar { get; set; }
 
 
-        public Player() { }
+        public Player()
+        {
+            this.PlayerBar = new PlayerBar();
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.MainCharacter);
+        }
+
+
         public Player(PlayerDTO playerDTO)
         {
             Name = playerDTO.Name;
@@ -120,6 +130,11 @@ namespace Client.Models
             tmpDto.Speed = Speed;
 
             return tmpDto;
+        }
+
+        public void UpdatePlayerBar()
+        {
+            PlayerBar.Update(15.0f, 20.0f);
         }
 
 
