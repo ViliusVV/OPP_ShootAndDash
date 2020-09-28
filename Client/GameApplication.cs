@@ -43,7 +43,7 @@ namespace Client
         private FontHolder Fonts { get; set; } = FontHolder.GetInstance();
 
         GameState GameState { get; set; } = GameState.GetInstance();
-        private ConnectionManager ConnectionManager { get; set; } = new ConnectionManager("http://localhost:5000/sd-server");
+        private ConnectionManager ConnectionManager { get; set; } = new ConnectionManager("https://shoot-and-dash.azurewebsites.net/sd-server");
 
 
         Player MainPlayer { get; set; }
