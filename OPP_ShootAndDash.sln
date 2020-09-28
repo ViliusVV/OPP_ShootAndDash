@@ -11,6 +11,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Common", "Common\Common.shp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientXUnitTests", "XUnitTests\ClientXUnitTests.csproj", "{D70BFFC8-8BB8-4846-826D-1F87DCEBB81F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerXUnitTests", "ServerXUnitTests\ServerXUnitTests.csproj", "{AA46B56D-D252-49F7-A606-7D620E4BACDA}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Common\Common.projitems*{382069e3-6add-4847-a418-156b37bf08a8}*SharedItemsImports = 13
@@ -34,6 +36,10 @@ Global
 		{D70BFFC8-8BB8-4846-826D-1F87DCEBB81F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D70BFFC8-8BB8-4846-826D-1F87DCEBB81F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D70BFFC8-8BB8-4846-826D-1F87DCEBB81F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA46B56D-D252-49F7-A606-7D620E4BACDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA46B56D-D252-49F7-A606-7D620E4BACDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA46B56D-D252-49F7-A606-7D620E4BACDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA46B56D-D252-49F7-A606-7D620E4BACDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
