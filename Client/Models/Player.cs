@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Client.Models
 {
-    class Player: Sprite
+    public class Player: Sprite
     {
         public string Name { get; set; } = new Random().Next(1, 888).ToString();
         public float Health { get; private set; } = 100;

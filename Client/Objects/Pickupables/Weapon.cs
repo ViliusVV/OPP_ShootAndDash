@@ -12,7 +12,7 @@ using System.Numerics;
 using System.Text;
 namespace Client.Objects
 {
-    class Weapon : Pickupable
+    public class Weapon : Pickupable
     {
         public string Name { get; private set; }
         public int MagazineSize { get; private set; }

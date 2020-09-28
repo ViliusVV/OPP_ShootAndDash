@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Client.UI
 {
-    class PlayerBar: Drawable
+    public class PlayerBar: Drawable
     {
         public float BarScale { get; } = 1.5f;
 

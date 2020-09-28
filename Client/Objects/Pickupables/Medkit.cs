@@ -7,7 +7,7 @@ using SFML.Graphics;
 
 namespace Client.Objects
 {
-    class Medkit : Pickupable
+    public class Medkit : Pickupable
     {
         public Medkit()
         {
