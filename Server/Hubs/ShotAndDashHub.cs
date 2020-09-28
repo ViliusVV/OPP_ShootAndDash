@@ -16,7 +16,7 @@ namespace Server.Hubs
         public readonly GameManager _gameManager = GameManager.GetInstance();
 
         public async Task ReceivePos(PlayerDTO dto)
-        {wadas
+        {
             _gameManager.Players[Context.ConnectionId] = dto;
             await Clients.All.SendAsync("UpdateState", _gameManager.GetGameStateDTO());
         }

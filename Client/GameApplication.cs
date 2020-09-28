@@ -124,7 +124,7 @@ namespace Client
                 if (true) {
 
                     Time deltaTime = FrameClock.Restart();
-                    if (ConnectionManager.ActivityClock.ElapsedTime.AsSeconds() > (1f / 30f) && ConnectionManager.Connected)
+                    if (ConnectionManager.ActivityClock.ElapsedTime.AsSeconds() > (1f / 60f) && ConnectionManager.Connected)
                     {
                         ConnectionManager.ActivityClock.Restart();
                         SendPos(ConnectionManager.Connection);
@@ -228,9 +228,9 @@ namespace Client
             foreach(var dto in stateDTO.Players)
             {
                 Player player = GameState.Players.Find(p => p.Name.Equals(dto.Name));
-                if(player != null && !MainPlayer.Equals(player))
+                if (player != null && !MainPlayer.Equals(player))
                 {
-                    player.Position = dto.Position;
+                    player.RefreshData(dto);
                 }
             }
         }

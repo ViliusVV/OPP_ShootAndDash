@@ -34,8 +34,6 @@ namespace Client.Models
         public bool IsMainPlayer { get; set; }
         public Weapon Weapon { get; set; }
 
-        public static UInt64 counter { get; set; }
-
 
         public PlayerBar PlayerBar { get; set; }
         public Player()
@@ -171,15 +169,9 @@ namespace Client.Models
         {
             foreach (var item in GameState.GetInstance().Collidables)
             {
-                counter++;
                 if(this.GetGlobalBounds().Intersects(item.GetGlobalBounds()))
                 {
                     return true;
-                }
-
-                if(counter % 100 == 0)
-                {
-                    Console.WriteLine(counter);
                 }
             }
             return false;
@@ -234,7 +226,7 @@ namespace Client.Models
         {
             Health = playerDto.Health;
             Position = playerDto.Position;
-            Speed = playerDto.Speed;
+            //Speed = playerDto.Speed;
         }
 
     }
