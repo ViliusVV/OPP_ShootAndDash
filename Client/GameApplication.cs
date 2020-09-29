@@ -173,19 +173,8 @@ namespace Client
                         ReloadGun();
                     }
 
-                    GameWindow.Draw(map.map);
-                    RenderPlayers();
-                    DrawCollidables();
-                    GameWindow.Draw(bushSprite);
-                    UpdatePickupables();
-                    DrawPickupables();
-                    UpdateBullets(deltaTime);
-                    DrawProjectiles();
-                    AimCursor.Update(mPos);
-                    GameWindow.Draw(AimCursor);
-
-                    AimCursor.Update(mPos);
-                    GameWindow.Draw(AimCursor);
+                    UpdateLoop(deltaTime, mPos);
+                    DrawLoop();
 
                     GameWindow.SetView(MainView);
                     GameWindow.Draw(scoreboardText);
@@ -323,9 +312,25 @@ namespace Client
                 GameWindow.Draw(GameState.Pickupables[i]);
             }
         }
-
+        public void DrawLoop()
+        {
+            GameWindow.Draw(map.map);
+            RenderPlayers();
+            DrawCollidables();
+            GameWindow.Draw(bushSprite);
+            DrawPickupables();
+            DrawProjectiles();
+            GameWindow.Draw(AimCursor);
+        }
+        public void UpdateLoop(Time deltaTime, Vector2f mPos)
+        {
+            UpdatePickupables();
+            UpdateBullets(deltaTime);
+            AimCursor.Update(mPos);
+        }
         public void GameLoop()
         {
+
         }
         public RenderWindow CreateRenderWindow(Styles windowStyle)
         {
