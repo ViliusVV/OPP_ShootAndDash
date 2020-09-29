@@ -29,7 +29,6 @@ namespace Client.Objects
         public Clock ReloadTimer { get; set; } = new Clock();
         public Sprite ProjectileSprite { get; private set; }
 
-
         public Weapon(string name, int magazineSize, int ammo, float dmg, float projectileSpd,
             float attackSpd, float reloadTime, int spreadAmount, bool canShoot)
         {
@@ -90,44 +89,14 @@ namespace Client.Objects
             {
                 ShootTimer.Restart();
 
-                Vector2f v = VectorUtils.AngleDegToUnitVector(this.Rotation);
-
-                //Sprite bulletSprite = new Sprite(ProjectileSprite);
                 const float projectileSpeed = 0.015f;
                 Projectile bullet = new Projectile(target * projectileSpeed, ProjectileSprite, this.Position, this.Rotation);
-                //bullet.ProjectileSprite.Rotation = this.Rotation;
-                //bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(bulletSprite), this.Position);
-
-
                 Projectiles.Add(bullet);
                 AmmoConsume(-1);
 
                 Sound sound = SoundHolder.GetInstance().Get(SoundIdentifier.GenericGun);
                 sound.Play();
             }
-
-            //List<Projectile> projectiles = new List<Projectile>();
-            //for (int i = 0; i < bulletCount; i++)
-            //{
-            //    Vector2 target = new Vector2(
-            //        cursorPos.X - playerPos.X,
-            //        cursorPos.Y - playerPos.Y
-            //    );
-            //    target.X += GameApplication.Rnd.Next(SpreadAmount);
-            //    target.Y += GameApplication.Rnd.Next(SpreadAmount);
-            //    target = Vector2.Normalize(target);
-            //    Projectile bullet = new Projectile(target.X * ProjectileSpeed,
-            //        target.Y * ProjectileSpeed, ProjectileSprite);
-            //    bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(ProjectileSprite), playerPos);
-            //    bullet.ProjectileSprite.Rotation = VectorUtils.VectorToAngle(target.X, target.Y);
-            //    Ammo--;
-            //    projectiles.Add(bullet);
-            //}
-
-            //// play sound here
-            ////    bulletList.Add(bullet);
-            ////    Sound sound = Sounds.Get(SoundIdentifier.GenericGun);
-            //return projectiles;
         }
 
         public void AmmoConsume(int i)

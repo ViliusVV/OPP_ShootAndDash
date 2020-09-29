@@ -9,8 +9,6 @@ namespace Client.Objects
 {
     public class Projectile : Drawable
     {
-        //public float VelocityX { get; private set; }
-        //public float VelocityY { get; private set; }
         private Vector2f _velocity = new Vector2f(0.0f, 0.0f);
         public Vector2f Velocity { get => _velocity; set => _velocity = value; }
         public float SpeedMultiplier { get; set; } = 1; 
@@ -18,13 +16,6 @@ namespace Client.Objects
         public float DespawnBulletAfter { get; set; } = 1.5f;
         public Sprite ProjectileSprite { get; private set; }
 
-        //public Projectile(float velocityX, float velocityY, Sprite projectileSprite)
-        //{
-        //    this.VelocityX = velocityX;
-        //    this.VelocityY = velocityY;
-        //    this.ProjectileSprite = projectileSprite;
-        //    TimeSinceCreation = 0;
-        //}
         public Projectile(Vector2f velocity, Sprite projectileSprite, Vector2f position, float rotation)
         {
             this.Velocity = velocity;
@@ -47,15 +38,6 @@ namespace Client.Objects
         {
             TimeSinceCreation += deltaTime;
         }
-        //public void Move(float deltaTime)
-        //{
-        //    ProjectileSprite.Position += new Vector2f(VelocityX * deltaTime, VelocityY * deltaTime);
-        //}
-        //public void InitializeSpriteParams(Vector2f origin, Vector2f position)
-        //{
-        //    ProjectileSprite.Origin = origin;
-        //    ProjectileSprite.Position = position;
-        //}
 
         public void Draw(RenderTarget target, RenderStates states)
         {
