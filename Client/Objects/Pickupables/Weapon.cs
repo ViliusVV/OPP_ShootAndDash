@@ -89,8 +89,12 @@ namespace Client.Objects
             {
                 ShootTimer.Restart();
 
-                const float projectileSpeed = 0.015f;
-                Projectile bullet = new Projectile(target * projectileSpeed, ProjectileSprite, this.Position, this.Rotation);
+                // maybe figure out how to make this Vector2f -> Vector2 -> Vector2f mess cleaner later
+                const float projectileSpeed = 10f;
+                Vector2 normalizedTarget = new Vector2(target.X, target.Y);
+                normalizedTarget = Vector2.Normalize(normalizedTarget);
+                Vector2f myTarget = new Vector2f(normalizedTarget.X, normalizedTarget.Y);
+                Projectile bullet = new Projectile(myTarget * projectileSpeed, ProjectileSprite, this.Position, this.Rotation);
                 Projectiles.Add(bullet);
                 AmmoConsume(-1);
 
