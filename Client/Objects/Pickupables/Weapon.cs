@@ -25,7 +25,6 @@ namespace Client.Objects
         public bool CanShoot { get; private set; }
         public bool Reloading { get; set; }
         public List<Projectile> Projectiles {get;set;}
-
         public Clock ShootTimer { get; set; } = new Clock();
         public Clock ReloadTimer { get; set; } = new Clock();
         public Sprite ProjectileSprite { get; private set; }
@@ -41,34 +40,67 @@ namespace Client.Objects
             this.ProjectileSpeed = projectileSpd;
             this.AttackSpeed = attackSpd;
             this.ReloadTime = reloadTime;
+            this.Projectiles = new List<Projectile>();
             this.SpreadAmount = spreadAmount;
             this.CanShoot = canShoot;
             this.ProjectileSprite = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Bullet));
             this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GunAk47);
             this.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
         }
-
+        public void DrawProjectiles(RenderWindow gameWindow)
+        {
+            for (int i = 0; i < Projectiles.Count; i++)
+            {
+                if(Projectiles[i] != null)
+                {
+                    gameWindow.Draw(Projectiles[i]);
+                }
+            }
+        }
+        public void UpdateProjectiles(float deltaTimeInSeconds)
+        {
+            for (int i = 0; i < Projectiles.Count; i++)
+            {
+                if (Projectiles[i] != null)
+                {
+                    Projectile p = Projectiles[i];
+                    if (p.TimeSinceCreation > p.DespawnBulletAfter)
+                    {
+                        Projectiles.RemoveAt(i);
+                    }
+                    else
+                    {
+                        p.AddDeltaTime(deltaTimeInSeconds);
+                        p.Translate();
+                    }
+                }
+            }
+        }
         public override void Pickup(Player player)
         {
             player.SetWeapon(this);
         }
-
-        public void Shoot()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="target">cursor position - player position</param>
+        public void Shoot(Vector2f target)
         {
             if (Ammo != 0 && Reloading != true && ShootTimer.ElapsedTime.AsMilliseconds() > AttackSpeed )
             {
                 ShootTimer.Restart();
-                //Vector2f v = VectorUtils.AngleDegToUnitVector(this.Rotation);
+
+                Vector2f v = VectorUtils.AngleDegToUnitVector(this.Rotation);
 
                 //Sprite bulletSprite = new Sprite(ProjectileSprite);
-                //Projectile bullet = new Projectile(Ve, target.Y * 1000, bulletSprite);
-
+                const float projectileSpeed = 0.015f;
+                Projectile bullet = new Projectile(target * projectileSpeed, ProjectileSprite, this.Position, this.Rotation);
                 //bullet.ProjectileSprite.Rotation = this.Rotation;
                 //bullet.InitializeSpriteParams(SpriteUtils.GetSpriteCenter(bulletSprite), this.Position);
 
 
-                //Projectiles.Add(bullet);
-                //AmmoConsume(-1);
+                Projectiles.Add(bullet);
+                AmmoConsume(-1);
 
                 Sound sound = SoundHolder.GetInstance().Get(SoundIdentifier.GenericGun);
                 sound.Play();

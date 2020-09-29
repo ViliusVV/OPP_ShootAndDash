@@ -297,31 +297,32 @@ namespace Client
 
         private void UpdateBullets(Time deltaTime)
         {
-            for (int i = 0; i < bulletList.Count; i++)
-            {
-                Projectile bullet = bulletList[i];
-                bullet.TimeSinceCreation += deltaTime.AsMilliseconds();
-                if (bullet.TimeSinceCreation > 600)
-                {
-                    bullet.ProjectileSprite.Dispose();
-                    bulletList.RemoveAt(i);
-                }
-                else
-                {
-                    bulletList[i].Move(deltaTime.AsSeconds());
-                    if (CollisionTester.BoundingBoxTest(bullet.ProjectileSprite, MainPlayer))
-                    {
-                        Console.WriteLine("Bullet and character colliding");
-                    }
-                    if(CollisionTester.BoundingBoxTest(bullet.ProjectileSprite, crate))
-                    {
-                        Console.WriteLine("Crate was hit by a bullet");
-                        bullet.ProjectileSprite.Dispose();
-                        bulletList.RemoveAt(i);
-                    }
-                }
+            MainPlayer.Weapon.UpdateProjectiles(deltaTime.AsSeconds());
+            //for (int i = 0; i < bulletList.Count; i++)
+            //{
+            //    Projectile bullet = bulletList[i];
+            //    bullet.TimeSinceCreation += deltaTime.AsMilliseconds();
+            //    if (bullet.TimeSinceCreation > 600)
+            //    {
+            //        bullet.ProjectileSprite.Dispose();
+            //        bulletList.RemoveAt(i);
+            //    }
+            //    else
+            //    {
+            //        bulletList[i].Translate();
+            //        if (CollisionTester.BoundingBoxTest(bullet.ProjectileSprite, MainPlayer))
+            //        {
+            //            Console.WriteLine("Bullet and character colliding");
+            //        }
+            //        if(CollisionTester.BoundingBoxTest(bullet.ProjectileSprite, crate))
+            //        {
+            //            Console.WriteLine("Crate was hit by a bullet");
+            //            bullet.ProjectileSprite.Dispose();
+            //            bulletList.RemoveAt(i);
+            //        }
+            //    }
 
-            }
+            //}
         }
 
         private void UpdatePickupables()
@@ -338,10 +339,11 @@ namespace Client
         }
         private void DrawProjectiles()
         {
-            for (int i = 0; i < bulletList.Count; i++)
-            {
-                GameWindow.Draw(bulletList[i]);
-            }
+            //for (int i = 0; i < bulletList.Count; i++)
+            //{
+            //    GameWindow.Draw(bulletList[i]);
+            //}
+            MainPlayer.Weapon.DrawProjectiles(GameWindow);
         }
         private void DrawPickupables()
         {
@@ -428,7 +430,8 @@ namespace Client
 
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
             {
-                MainPlayer.Weapon.Shoot();
+                var target = AimCursor.Position - MainPlayer.Position;
+                MainPlayer.Weapon.Shoot(target);
             }
         }
 
