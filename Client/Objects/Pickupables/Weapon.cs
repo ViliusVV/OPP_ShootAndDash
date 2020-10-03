@@ -1,4 +1,5 @@
-﻿using Client.Config;
+﻿using Client.Collisions;
+using Client.Config;
 using Client.Models;
 using Client.UI;
 using Client.Utilities;
@@ -102,7 +103,27 @@ namespace Client.Objects
                 sound.Play();
             }
         }
+        public void CheckCollisions(List<Sprite> collidables)
+        {
+            // 2 sets of loops, because we cannot modify the list while we are iterating through it
+            List<int> indexesToRemove = new List<int>();
 
+            for (int i = 0; i < Projectiles.Count; i++)
+            {
+                for (int j = 0; j < collidables.Count; j++)
+                {
+                    if (CollisionTester.BoundingBoxTest(collidables[j], Projectiles[i].ProjectileSprite))
+                    {
+                        indexesToRemove.Add(i);
+                    }
+                }
+            }
+            // iterate from the end because indexes shift when we modify the list
+            for (int i = indexesToRemove.Count-1; i >= 0; i--) 
+            {
+                Projectiles.RemoveAt(indexesToRemove[i]);
+            }
+        }
         public void AmmoConsume(int i)
         {
             this.Ammo += i;

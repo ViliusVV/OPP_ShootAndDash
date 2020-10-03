@@ -52,6 +52,7 @@ namespace Client
 
         Sprite bgSprite;
         Sprite crate;
+        Sprite crate2;
         Sprite bushSprite;
 
         IntRect playerAnimation = new IntRect(36, 0, 36, 64);
@@ -63,8 +64,6 @@ namespace Client
         CustomText scoreboardText;
 
         AimCursor AimCursor = new AimCursor();
-        List<Projectile> bulletList = new List<Projectile>();
-
         public MapGeneration map;
         public GameApplication() { }
 
@@ -106,7 +105,7 @@ namespace Client
             MainPlayer.IsMainPlayer = true;
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
             MainPlayer.TextureRect = playerAnimation;
-            MainPlayer.Weapon = new Weapon("AK-47", 30, 29, 20, 2000, 200, 1, 20, true);
+            MainPlayer.Weapon = new Weapon("AK-47", 30, 29, 20, 2000, 20, 1, 20, true);
             // Configure sprite
 
 
@@ -117,7 +116,16 @@ namespace Client
 
             scoreboardText = new CustomText(Fonts.Get(FontIdentifier.PixelatedSmall), 21);
             scoreboardText.DisplayedString = "Player01 - 15/2";
+
+            crate.Position = new Vector2f(1000, 400);
+            crate2.Position = new Vector2f(1000, 500);
+            bushSprite.Position = new Vector2f(500, 400);
+
+
             GameState.Collidables.Add(crate);
+            GameState.Collidables.Add(crate2);
+
+            GameState.Collidables.Add(bushSprite);
 
             while (GameWindow.IsOpen)
             {
@@ -143,8 +151,7 @@ namespace Client
                     Vector2f scoreboardTextPos = new Vector2f(0, 0);
 
                     scoreboardText.Position = scoreboardTextPos;
-                    crate.Position = new Vector2f(1000, 400);
-                    bushSprite.Position = new Vector2f(500, 400);
+
                     MainPlayer.Weapon.Rotation = rotation;
                     MainPlayer.Weapon.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
 
@@ -283,10 +290,10 @@ namespace Client
                 GameWindow = CreateRenderWindow(windowStyle);
             }
         }
-
         private void UpdateBullets(Time deltaTime)
         {
             MainPlayer.Weapon.UpdateProjectiles(deltaTime.AsSeconds());
+            MainPlayer.Weapon.CheckCollisions(GameState.Collidables);
         }
 
         private void UpdatePickupables()
@@ -481,6 +488,7 @@ namespace Client
             bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
             AimCursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
             crate = new Sprite(Textures.Get(TextureIdentifier.Crate));
+            crate2 = new Sprite(Textures.Get(TextureIdentifier.Crate));
             bushSprite = new Sprite(Textures.Get(TextureIdentifier.Bush));
         }
 
