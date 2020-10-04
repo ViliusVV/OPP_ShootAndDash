@@ -8,7 +8,7 @@ namespace Client.Objects
 {
     abstract class AbstractFactory : GameApplication
     {
-        public abstract Destructable GetDestructable();
-        public abstract Indestructable GetIndestructable();
+        public abstract Destructible GetDestructible(string destructibleObj);
+        public abstract Indestructible GetIndestructible(string IndestructibleObj);
     }
 }

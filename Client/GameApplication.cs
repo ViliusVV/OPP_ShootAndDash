@@ -17,6 +17,7 @@ using Common.DTO;
 using Common.Utilities;
 using Client.Managers;
 using Common;
+using Client.Objects.Destructables;
 
 namespace Client
 {
@@ -416,8 +417,32 @@ namespace Client
                 var target = AimCursor.Position - MainPlayer.Position;
                 MainPlayer.Weapon.Shoot(target);
             }
+
+            // Testing abstract factory
+            if (Keyboard.IsKeyPressed(Keyboard.Key.O))
+            {
+                //SpawnDestructible();
+                SpawnIndestructible();
+            }
         }
 
+        private void SpawnDestructible()
+        {
+            AbstractFactory destrFactory = FactoryProducer.GetFactory("Destructible");
+            Sprite destrObj = destrFactory.GetDestructible("LandMine").SpawnObject();
+            destrObj.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
+            GameState.Collidables.Add(destrObj);
+        }
+
+        private void SpawnIndestructible()
+        {
+            AbstractFactory destrFactory = FactoryProducer.GetFactory("Indestructible");
+            Sprite indestrObj = destrFactory.GetIndestructible("Wall").SpawnObject();
+            indestrObj.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
+            GameState.Collidables.Add(indestrObj);
+        }
+
+        //
 
         private void SpawnRandomSyringe()
         {
@@ -482,7 +507,6 @@ namespace Client
         // TODO: Make it better
         private void CreateSprites()
         {
-
             Console.WriteLine("Loading sprites...");
             IntRect rect = new IntRect(0, 0, 1280, 720);
             bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);

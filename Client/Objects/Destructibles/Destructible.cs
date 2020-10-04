@@ -6,7 +6,7 @@ using SFML.Graphics;
 
 namespace Client.Objects.Destructables
 {
-    abstract class Destructable : Sprite
+    abstract class Destructible : Sprite
     {
         public abstract Sprite SpawnObject();
     }

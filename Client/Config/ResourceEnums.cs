@@ -28,9 +28,13 @@ namespace Client.Config
         [ResourceAttr("Assets/hudPlayerBar.png")] PlayerBar,
         [ResourceAttr("Assets/hudPlayerBarMask.png")] PlayerBarMask,
         [ResourceAttr("Assets/hudPlayerBarAmmoMask.png")] PlayerBarAmmoMask,
-        // Environment
+        // Destructible Objects
+        [ResourceAttr("Assets/LandMine.png")] LandMine,
         [ResourceAttr("Assets/Box.png")] Crate,
+        // Indestructible Objects
         [ResourceAttr("Assets/BushLong.png")] Bush,
+        [ResourceAttr("Assets/Wall.png")] Wall,
+        [ResourceAttr("Assets/BarbWire.png")] BarbWire,
         // Powerups
         [ResourceAttr("Assets/Medkit.png")] Medkit,
         [ResourceAttr("Assets/energyDrink.png")] MovementSyringe,

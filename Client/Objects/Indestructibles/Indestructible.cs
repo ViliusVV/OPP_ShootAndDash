@@ -6,7 +6,7 @@ using SFML.Graphics;
 
 namespace Client.Objects.Indestructables
 {
-    abstract class Indestructable : Sprite
+    abstract class Indestructible : Sprite
     {
         public abstract Sprite SpawnObject();
     }
