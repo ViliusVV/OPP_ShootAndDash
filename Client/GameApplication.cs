@@ -50,10 +50,10 @@ namespace Client
 
         Clock FrameClock { get; set; } = new Clock();
 
-        Sprite bgSprite;
-        Sprite crate;
-        Sprite crate2;
-        Sprite bushSprite;
+        //Sprite bgSprite;
+        //Sprite crate;
+        //Sprite crate2;
+        //Sprite bushSprite;
 
         IntRect playerAnimation = new IntRect(36, 0, 36, 64);
         IntRect playerIdle = new IntRect(0, 0, 36, 64);
@@ -92,7 +92,7 @@ namespace Client
 
 
             map = new MapGeneration();
-            map.CreateMap();
+            map.PrepareMap();
 
 
             // View
@@ -117,15 +117,15 @@ namespace Client
             scoreboardText = new CustomText(Fonts.Get(FontIdentifier.PixelatedSmall), 21);
             scoreboardText.DisplayedString = "Player01 - 15/2";
 
-            crate.Position = new Vector2f(1000, 400);
-            crate2.Position = new Vector2f(1000, 500);
-            bushSprite.Position = new Vector2f(500, 400);
+            //crate.Position = new Vector2f(1000, 400);
+            //crate2.Position = new Vector2f(1000, 500);
+            //bushSprite.Position = new Vector2f(500, 400);
 
 
-            GameState.Collidables.Add(crate);
-            GameState.Collidables.Add(crate2);
+            //GameState.Collidables.Add(crate);
+            //GameState.Collidables.Add(crate2);
 
-            GameState.Collidables.Add(bushSprite);
+            //GameState.Collidables.Add(bushSprite);
 
             while (GameWindow.IsOpen)
             {
@@ -324,7 +324,7 @@ namespace Client
             GameWindow.Draw(map.map);
             RenderPlayers();
             DrawCollidables();
-            GameWindow.Draw(bushSprite);
+            //GameWindow.Draw(bushSprite);
             DrawPickupables();
             DrawProjectiles();
             GameWindow.Draw(AimCursor);
@@ -485,11 +485,11 @@ namespace Client
 
             Console.WriteLine("Loading sprites...");
             IntRect rect = new IntRect(0, 0, 1280, 720);
-            bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
+//            bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
             AimCursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
-            crate = new Sprite(Textures.Get(TextureIdentifier.Crate));
-            crate2 = new Sprite(Textures.Get(TextureIdentifier.Crate));
-            bushSprite = new Sprite(Textures.Get(TextureIdentifier.Bush));
+            //crate = new Sprite(Textures.Get(TextureIdentifier.Crate));
+            //crate2 = new Sprite(Textures.Get(TextureIdentifier.Crate));
+            //bushSprite = new Sprite(Textures.Get(TextureIdentifier.Bush));
         }
 
 
