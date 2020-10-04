@@ -408,7 +408,10 @@ namespace Client
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.R))
             {
-                MainPlayer.Weapon.Reloading = true;
+                if (MainPlayer.Weapon.Ammo != MainPlayer.Weapon.MagazineSize)
+                {
+                    MainPlayer.Weapon.Reloading = true;
+                }
             }
 
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
