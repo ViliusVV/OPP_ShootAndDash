@@ -8,5 +8,6 @@ namespace Client.Objects.Indestructables
 {
     abstract class Indestructable : Sprite
     {
+        public abstract Sprite SpawnObject();
     }
 }
