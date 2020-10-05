@@ -19,7 +19,7 @@ namespace Client.Config
         [ResourceAttr("Assets/Char4Spritesheet.png")] MainCharacter,
         // UI
         [ResourceAttr("Assets/cursor.png")] AimCursor,
-        [ResourceAttr("Assets/ScoreboardBox.png")] ScoreboardBox,
+        //[ResourceAttr("Assets/ScoreboardBox.png")] ScoreboardBox,
         // Projectiles
         [ResourceAttr("Assets/bullet.png")] Bullet,
         // Guns

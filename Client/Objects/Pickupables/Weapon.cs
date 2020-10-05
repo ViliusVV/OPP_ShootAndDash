@@ -121,7 +121,10 @@ namespace Client.Objects
             // iterate from the end because indexes shift when we modify the list
             for (int i = indexesToRemove.Count-1; i >= 0; i--) 
             {
-                Projectiles.RemoveAt(indexesToRemove[i]);
+                if (Projectiles.Count != 0)
+                {
+                    Projectiles.RemoveAt(indexesToRemove[i]);
+                }
             }
         }
         public void AmmoConsume(int i)

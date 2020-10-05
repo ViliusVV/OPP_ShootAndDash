@@ -424,8 +424,8 @@ namespace Client
             // Testing abstract factory
             if (Keyboard.IsKeyPressed(Keyboard.Key.O))
             {
-                //SpawnDestructible();
-                SpawnIndestructible();
+                SpawnDestructible();
+                //SpawnIndestructible();
             }
         }
 
