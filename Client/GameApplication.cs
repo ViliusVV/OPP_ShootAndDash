@@ -18,6 +18,7 @@ using Common.Utilities;
 using Client.Managers;
 using Common;
 using Client.Objects.Destructables;
+using Client.Objects.BuilderObjects;
 
 namespace Client
 {
@@ -65,7 +66,9 @@ namespace Client
         CustomText scoreboardText;
 
         AimCursor AimCursor = new AimCursor();
-        public MapGeneration map;
+        public MapBuilder builder = new MapBuilder();
+        public Director director;
+        public TileMap tileMap;
         public GameApplication() { }
 
         public static GameApplication GetInstance()
@@ -91,10 +94,10 @@ namespace Client
             LoadFonts();
             CreateSprites();
 
-
-            map = new MapGeneration();
-            map.PrepareMap();
-
+            builder.LoadTextures();
+            director = new Director(builder);
+            director.Construct();
+            tileMap = builder.GetResult();
 
             // View
             MainView = GameWindow.DefaultView;
@@ -322,7 +325,7 @@ namespace Client
         }
         public void DrawLoop()
         {
-            GameWindow.Draw(map.map);
+            GameWindow.Draw(tileMap);
             RenderPlayers();
             DrawCollidables();
             //GameWindow.Draw(bushSprite);

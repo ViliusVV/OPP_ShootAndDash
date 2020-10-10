@@ -10,6 +10,9 @@ namespace Client.Utilities
 {
 	class TileMap : Drawable
 	{
+        public int[] level;
+        public int Length;
+        public int Width;
         public bool load(Vector2u tileSize, int[] tiles, uint width, uint height)
         {
 
@@ -62,7 +65,7 @@ namespace Client.Utilities
 
         public void CreateMap()
         {
-            int[] level = new int[]
+            level = new int[]
             {
                 0, 0, 0, 0, 0, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -116,6 +119,23 @@ namespace Client.Utilities
 
             Vector2u vect = new Vector2u(64, 64);
             if (!load(vect, level, 64, 48))
+            {
+                Console.WriteLine("error on map load");
+            };
+        }
+        public void CreateMap(int length, int width)
+        {
+            Length = length;
+            Width = width;
+
+            level = new int[length * width];
+            for (int i = 0; i < length * width; i++)
+            {
+                level[i] = 0;
+            }
+
+            Vector2u vect = new Vector2u(64, 64);
+            if (!load(vect, level, (uint)length, (uint)width))
             {
                 Console.WriteLine("error on map load");
             };
