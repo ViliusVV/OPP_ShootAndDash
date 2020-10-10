@@ -80,6 +80,11 @@ namespace Client.Objects.BuilderObjects
             Map.CreateMap(length, width);
             return this;
         }
+        public IBuilder Reset()
+        {
+            GameState.Collidables = new List<Sprite>();
+            return this;
+        }
         public TileMap GetResult()
         {
             return Map;

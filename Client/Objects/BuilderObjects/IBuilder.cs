@@ -10,6 +10,7 @@ namespace Client.Objects.BuilderObjects
         public IBuilder StartNew(int length, int width);
         public IBuilder BuildWalls();
         public IBuilder BuildBuilding();
-        
+        public IBuilder Reset();
+
     }
 }

@@ -430,6 +430,14 @@ namespace Client
                 SpawnDestructible();
                 //SpawnIndestructible();
             }
+            // testing builder
+            if (Keyboard.IsKeyPressed(Keyboard.Key.H))
+            {
+
+                director.ConstructBase();
+                tileMap = builder.GetResult();
+            }
+
         }
 
         private void SpawnDestructible()

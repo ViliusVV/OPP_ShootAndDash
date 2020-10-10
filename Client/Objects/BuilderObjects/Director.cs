@@ -14,7 +14,11 @@ namespace Client.Objects.BuilderObjects
         }
         public void Construct()
         {
-            Builder.StartNew(64, 48).BuildWalls().BuildBuilding();
+            Builder.Reset().StartNew(64, 48).BuildWalls().BuildBuilding();
+        }
+        public void ConstructBase()
+        {
+            Builder.Reset().StartNew(32, 32);
         }
     }
 }
