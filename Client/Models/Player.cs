@@ -137,7 +137,7 @@ namespace Client.Models
 
         public void UpdateSpeed()
         {
-            if (IsMainPlayer)
+            if (IsMainPlayer && GameApplication.GetInstance().HasFocus)
             {
                 bool left = Keyboard.IsKeyPressed(Keyboard.Key.A);
                 bool right = Keyboard.IsKeyPressed(Keyboard.Key.D);

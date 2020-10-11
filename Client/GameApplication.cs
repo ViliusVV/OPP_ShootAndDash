@@ -37,6 +37,7 @@ namespace Client
         private View ZoomedView { get; set; }
         private bool FullScreen { get; set; }
         private bool PrevFullScreen { get; set; }
+        public bool HasFocus { get; set; } = true;
         float zoomView = 1.0f;
         float previousZoom = 1.0f;
 
@@ -131,10 +132,11 @@ namespace Client
 
             
 
-
+            var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
             while (GameWindow.IsOpen)
             {
-                if (true) {
+                if (true)
+                {
 
                     Time deltaTime = FrameClock.Restart();
                     if (ConnectionManager.ActivityClock.ElapsedTime.AsSeconds() > (1f / 60f) && ConnectionManager.Connected)
@@ -146,8 +148,13 @@ namespace Client
                     GameWindow.Clear();
                     GameWindow.DispatchEvents();
 
-                    this.ProccesKeyboardInput();
-                    var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
+                   
+                    if (this.HasFocus)
+                    {
+                        this.ProccesKeyboardInput();
+                        mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
+                    }
+
                     var middlePoint = VectorUtils.GetMiddlePoint(MainPlayer.Position, mPos);
                     middlePoint.X += 0.375f;
 
@@ -391,6 +398,15 @@ namespace Client
                     previousZoom = zoomView;
                     
                 }
+            };
+
+            window.GainedFocus += (sender, e) => {
+                OurLogger.Log("Window gained focus");
+                this.HasFocus = true; 
+            };
+            window.LostFocus += (sender, e) => {
+                OurLogger.Log("Window lost focus");
+                this.HasFocus = false; 
             };
         }
 
