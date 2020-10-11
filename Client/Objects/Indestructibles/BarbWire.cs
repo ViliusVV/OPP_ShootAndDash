@@ -9,16 +9,16 @@ namespace Client.Objects.Indestructables
 {
     class BarbWire : Indestructible
     {
-        private Sprite barbWireObject;
-
+        public static float Damage { get; set; } = 1f;
+        
         public BarbWire()
         {
-            barbWireObject = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.BarbWire));
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.BarbWire);
         }
 
         public override Sprite SpawnObject()
         {
-            return barbWireObject;
+            return this;
         }
     }
 }
