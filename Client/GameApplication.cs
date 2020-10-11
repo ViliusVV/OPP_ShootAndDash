@@ -20,6 +20,7 @@ using Common;
 using Client.Objects.Destructables;
 using Client.Objects.BuilderObjects;
 using System.Linq;
+using Client.Objects.Pickupables.Strategy;
 
 namespace Client
 {
@@ -53,11 +54,6 @@ namespace Client
 
         Clock FrameClock { get; set; } = new Clock();
 
-        //Sprite bgSprite;
-        //Sprite crate;
-        //Sprite crate2;
-        //Sprite bushSprite;
-
         IntRect playerAnimation = new IntRect(36, 0, 36, 64);
         IntRect playerIdle = new IntRect(0, 0, 36, 64);
         Clock animationSpeed = new Clock();
@@ -70,6 +66,9 @@ namespace Client
         public MapBuilder builder = new MapBuilder();
         public Director director;
         public TileMap tileMap;
+
+        Weapon ghostWeapon;
+
         public GameApplication() { }
 
         public static GameApplication GetInstance()
@@ -113,7 +112,7 @@ namespace Client
             MainPlayer.IsMainPlayer = true;
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
             MainPlayer.TextureRect = playerAnimation;
-            MainPlayer.Weapon = new Weapon("AK-47", 30, 29, 20, 2000, 20, 1, 20, true);
+            MainPlayer.Weapon = new Weapon("AK-47", 50, 50, 20, 2000, 50, 5, 50, true);
             // Configure sprite
 
 
@@ -125,15 +124,13 @@ namespace Client
             scoreboardText = new CustomText(Fonts.Get(FontIdentifier.PixelatedSmall), 21);
             scoreboardText.DisplayedString = "Player01 - 15/2";
 
-            //crate.Position = new Vector2f(1000, 400);
-            //crate2.Position = new Vector2f(1000, 500);
-            //bushSprite.Position = new Vector2f(500, 400);
 
+            // Ghost weapon 
+            ghostWeapon = new Weapon("AK-47", 100000, 100000, 20, 2000, 200, 5, 50, true);
+            ghostWeapon.Position = new Vector2f(50f, 50f);
 
-            //GameState.Collidables.Add(crate);
-            //GameState.Collidables.Add(crate2);
+            
 
-            //GameState.Collidables.Add(bushSprite);
 
             while (GameWindow.IsOpen)
             {
@@ -334,6 +331,7 @@ namespace Client
             DrawCollidables();
             //GameWindow.Draw(bushSprite);
             DrawPickupables();
+            GameWindow.Draw(ghostWeapon);
             DrawProjectiles();
             GameWindow.Draw(AimCursor);
         }
@@ -401,18 +399,13 @@ namespace Client
         {
             // Polling key presses is better than events if we
             // need to detect multiple key presses at same time
-            
-            if(Keyboard.IsKeyPressed(Keyboard.Key.M))
-            {
-                SpawnMedkit();
-            }
             if (Keyboard.IsKeyPressed(Keyboard.Key.X))
             {
                 SpawnRandomSyringe();
             }
             if(Keyboard.IsKeyPressed(Keyboard.Key.Z))
             {
-                MainPlayer.ApplyDamage(-1);
+                MainPlayer.ChangeHealth(-1);
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.R))
             {
@@ -521,34 +514,32 @@ namespace Client
 
         private void SpawnRandomSyringe()
         {
-            int num = Rnd.Next(4);
-            Pickupable syringe;
+            int num = Rnd.Next(5);
+            PowerUp powerUp;
+
             switch (num)
             {
                 case 0:
-                    syringe = new MovementSyringe();
+                    powerUp = new MovementSyringe();
                     break;
                 case 1:
-                    syringe = new ReloadSyringe();
+                    powerUp = new ReloadSyringe();
                     break;
                 case 2:
-                    syringe = new HealingSyringe();
+                    powerUp = new HealingSyringe();
+                    break;
+                case 3:
+                    powerUp = new DeflectionSyringe();
                     break;
                 default:
-                    syringe = new DeflectionSyringe();
+                    powerUp = new Medkit();
+                    powerUp.PowerUpStrategy = new HealingStrategy(100f);
                     break;
             }
-            syringe.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
-            GameState.Pickupables.Add(syringe);
+            
+            powerUp.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
+            GameState.Pickupables.Add(powerUp);
 
-        }
-
-
-        private void SpawnMedkit()
-        {
-            Medkit medkit = new Medkit();
-            medkit.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
-            GameState.Pickupables.Add(medkit);
         }
 
 

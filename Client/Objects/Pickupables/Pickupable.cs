@@ -1,4 +1,5 @@
 ﻿using Client.Models;
+using Client.Objects.Pickupables.Strategy;
 using SFML.Graphics;
 using System;
 using System.Collections.Generic;

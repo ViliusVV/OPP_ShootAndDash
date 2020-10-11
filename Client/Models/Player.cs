@@ -2,6 +2,7 @@
 using Client.Config;
 using Client.Managers;
 using Client.Objects;
+using Client.Objects.Indestructables;
 using Client.UI;
 using Client.Utilities;
 using Common.DTO;
@@ -28,10 +29,11 @@ namespace Client.Models
         private Vector2f _speed = new Vector2f(0.0f, 0.0f);
         public Vector2f Speed { get => _speed; set => _speed = value; }
 
-        public bool IsDead { get; private set; } = false;
-        public float SpeedMultiplier { get; private set; } = 1;
+        public bool IsDead { get; set; } = false;
+        public float SpeedMultiplier { get; set; } = 1;
         public bool Running { get => Math.Abs(Speed.X) > 0.1 || Math.Abs(Speed.Y) > 0.1; }
         public bool IsMainPlayer { get; set; }
+        public bool IsInvincible { get; set; } = false;
         public Weapon Weapon { get; set; }
 
 
@@ -61,8 +63,13 @@ namespace Client.Models
         }
 
 
-        public void ApplyDamage(float amount)
+        public void ChangeHealth(float amount)
         {
+            if (this.IsInvincible && amount < 0)
+            {
+                return;
+            }
+
             float newHealth = Health + amount;
             if (newHealth <= 100)
             {
@@ -76,6 +83,26 @@ namespace Client.Models
             else
             {
                 Health = 100;
+            }
+        }
+
+        public void Heal(float amount)
+        {
+            if (amount > 0)
+            {
+                float newHealth = Health + amount;
+                if(newHealth <= 100)
+                {
+                    Health += amount;
+                }
+                else
+                {
+                    Health = 100;
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Can not heal with negative value");
             }
         }
 
@@ -171,16 +198,14 @@ namespace Client.Models
             {
                 if(this.GetGlobalBounds().Intersects(item.GetGlobalBounds()))
                 {
+                    if(item is BarbWire)
+                    {
+                        this.ChangeHealth(-5);
+                    }
                     return true;
                 }
             }
             return false;
-        }
-
-        public void IncreaseMovementSpeed(float multiplier, float durationInMilis)
-        {
-            SpeedMultiplier = 2;
-            Task.Delay((int)durationInMilis).ContinueWith(o => SpeedMultiplier = 1);
         }
 
         public PlayerDTO ToDTO()

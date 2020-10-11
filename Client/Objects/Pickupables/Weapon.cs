@@ -22,7 +22,7 @@ namespace Client.Objects
         public float Damage { get; private set; }
         public float ProjectileSpeed { get; private set; }
         public float AttackSpeed { get; private set; }
-        public float ReloadTime { get; private set; }
+        public float ReloadTime { get; set; }
         public int SpreadAmount { get; private set; }
         public bool CanShoot { get; private set; }
         public bool Reloading { get; set; }
@@ -81,6 +81,8 @@ namespace Client.Objects
         {
             player.SetWeapon(this);
         }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -132,6 +134,7 @@ namespace Client.Objects
                 }
             }
         }
+
         public void AmmoConsume(int i)
         {
             this.Ammo += i;

@@ -3,20 +3,17 @@ using System.Collections.Generic;
 using System.Text;
 using Client.Config;
 using Client.Models;
+using Client.Objects.Pickupables.Strategy;
 using Client.Utilities;
 
 namespace Client.Objects.Pickupables
 {
-    class ReloadSyringe : Pickupable
+    class ReloadSyringe : PowerUp
     {
         public ReloadSyringe()
         {
+            this.PowerUpStrategy = new ReloadSpeedStrategy();
             this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.ReloadSyringe);
-        }
-        public override void Pickup(Player player)
-        {
-            PickedUp = true;
-            Console.WriteLine("Reload syringe picked up");
         }
     }
 }

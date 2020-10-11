@@ -5,21 +5,17 @@ using Client.Config;
 using Client.Models;
 using SFML.Graphics;
 using Client.Utilities;
+using Client.Objects.Pickupables;
+using Client.Objects.Pickupables.Strategy;
 
 namespace Client.Objects
 {
-    class Medkit : Pickupable
+    class Medkit : PowerUp
     {
         public Medkit()
         {
+            this.PowerUpStrategy = new HealingStrategy();
             this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.Medkit);
-        }
-
-        public override void Pickup(Player player)
-        {
-            PickedUp = true;
-            Console.WriteLine("medkit picked up");
-            player.ApplyDamage(50);
         }
     }
 }
