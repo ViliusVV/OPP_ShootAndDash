@@ -19,6 +19,7 @@ using Client.Managers;
 using Common;
 using Client.Objects.Destructables;
 using Client.Objects.BuilderObjects;
+using System.Linq;
 
 namespace Client
 {
@@ -98,6 +99,9 @@ namespace Client
             director = new Director(builder);
             director.Construct();
             tileMap = builder.GetResult();
+
+            // Generate additional objects (destructibles, indestructibles)
+            SpawningManager(20, 15);
 
             // View
             MainView = GameWindow.DefaultView;
@@ -433,7 +437,7 @@ namespace Client
             if (Keyboard.IsKeyPressed(Keyboard.Key.O))
             {
                 SpawnDestructible();
-                //SpawnIndestructible();
+                SpawnIndestructible();
             }
             // testing builder
             if (Keyboard.IsKeyPressed(Keyboard.Key.H))
@@ -445,20 +449,77 @@ namespace Client
 
         }
 
+        private void SpawningManager(int destrCount, int indestrCount)
+        {
+            for (int i = 0; i < destrCount; i++)
+            {
+                SpawnDestructible();
+            }
+            for (int i = 0; i < indestrCount; i++)
+            {
+                SpawnIndestructible();
+            }
+        }
+
         private void SpawnDestructible()
         {
             AbstractFactory destrFactory = FactoryProducer.GetFactory("Destructible");
-            Sprite destrObj = destrFactory.GetDestructible("LandMine").SpawnObject();
-            destrObj.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
-            GameState.Collidables.Add(destrObj);
+            List<Sprite> destructables = new List<Sprite>();
+            Sprite landMineObj = destrFactory.GetDestructible("LandMine").SpawnObject();
+            Sprite itemCrateObj = destrFactory.GetDestructible("ItemCrate").SpawnObject();
+            destructables.Add(landMineObj);
+            destructables.Add(itemCrateObj);
+
+            foreach (Sprite destructable in destructables)
+            {
+                bool isSpawned = ObjectSpawnCollisionCheck(destructable);
+                if (isSpawned)
+                {
+                    GameState.Collidables.Add(destructable);
+                }
+            }
         }
 
         private void SpawnIndestructible()
         {
-            AbstractFactory destrFactory = FactoryProducer.GetFactory("Indestructible");
-            Sprite indestrObj = destrFactory.GetIndestructible("Wall").SpawnObject();
-            indestrObj.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
-            GameState.Collidables.Add(indestrObj);
+            AbstractFactory indestrFactory = FactoryProducer.GetFactory("Indestructible");
+            List<Sprite> indestructables = new List<Sprite>();
+            Sprite barbWireObj = indestrFactory.GetIndestructible("BarbWire").SpawnObject();
+            Sprite wallObj = indestrFactory.GetIndestructible("Wall").SpawnObject();
+            Sprite bushObj = indestrFactory.GetIndestructible("Bush").SpawnObject();
+            indestructables.Add(barbWireObj);
+            indestructables.Add(wallObj);
+            indestructables.Add(bushObj);
+
+            foreach (Sprite indestructable in indestructables)
+            {
+                bool isSpawned = ObjectSpawnCollisionCheck(indestructable);
+                if (isSpawned)
+                {
+                    GameState.Collidables.Add(indestructable);
+                }
+            }
+        }
+
+        private bool ObjectSpawnCollisionCheck(Sprite objectSprite)
+        {
+            bool objectSpawned = false;
+            while (!objectSpawned)
+            {
+                objectSpawned = true;
+                //destrObj.Position = new Vector2f(64 * Rnd.Next(60), 64 * Rnd.Next(45));
+                objectSprite.Position = new Vector2f(Rnd.Next(4000), Rnd.Next(3000));
+                foreach (Sprite collidable in GameState.Collidables.ToList())
+                {
+                    if (CollisionTester.BoundingBoxTest(collidable, objectSprite))
+                    {
+                        objectSpawned = false;
+                        Console.WriteLine("does not collide");
+                        break;
+                    }
+                }
+            }
+            return objectSpawned;
         }
 
         //
