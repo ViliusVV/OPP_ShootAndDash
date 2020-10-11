@@ -9,6 +9,7 @@ using SFML.Graphics;
 using SFML.System;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Text;
 namespace Client.Objects
@@ -118,6 +119,10 @@ namespace Client.Objects
                     }
                 }
             }
+
+            // Edge case: remove duplicate collisions
+            indexesToRemove = indexesToRemove.Distinct().ToList();
+
             // iterate from the end because indexes shift when we modify the list
             for (int i = indexesToRemove.Count-1; i >= 0; i--) 
             {
