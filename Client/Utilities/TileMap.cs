@@ -1,4 +1,5 @@
 ﻿using Client.Config;
+using Common.Utilities;
 using SFML.Graphics;
 using SFML.Graphics.Glsl;
 using SFML.System;
@@ -120,7 +121,7 @@ namespace Client.Utilities
             Vector2u vect = new Vector2u(64, 64);
             if (!load(vect, level, 64, 48))
             {
-                Console.WriteLine("error on map load");
+                OurLogger.Log("error on map load");
             };
         }
         public void CreateMap(int length, int width)
@@ -137,7 +138,7 @@ namespace Client.Utilities
             Vector2u vect = new Vector2u(64, 64);
             if (!load(vect, level, (uint)length, (uint)width))
             {
-                Console.WriteLine("error on map load");
+                OurLogger.Log("error on map load");
             };
         }
     }

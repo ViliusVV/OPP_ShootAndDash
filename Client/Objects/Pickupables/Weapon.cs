@@ -136,6 +136,29 @@ namespace Client.Objects
             }
         }
 
+        public void ReloadGun()
+        {
+            //Time deltaTime = FrameClock.Restart();
+            if (Ammo < MagazineSize)
+            {
+                if (ReloadTimer.ElapsedTime.AsMilliseconds() > ReloadTime)
+                {
+                    ReloadTimer.Restart();
+                    AmmoConsume(1);
+                }
+            }
+            //if (this.Weapon.Ammo < this.Weapon.MagazineSize)
+            //{
+            //    this.Weapon.AmmoConsume(1);ddd
+            //}
+            //this.Weapon.setAmmo((int)(this.Weapon.ReloadCooldown.ElapsedTime.AsSeconds() / this.Weapon.ReloadTime * 100));
+            if (ReloadCooldown.ElapsedTime.AsMilliseconds() > ReloadTime * 500)
+            {
+                Reloading = false;
+                ReloadCooldown.Restart();
+            }
+        }
+
         public void AmmoConsume(int i)
         {
             this.Ammo += i;

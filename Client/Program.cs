@@ -9,6 +9,7 @@ using System.Numerics;
 
 using Client.Utilities;
 using Client.UI;
+using Common.Utilities;
 
 namespace Client
 {
@@ -18,11 +19,11 @@ namespace Client
         {
             GameApplication game = GameApplication.GetInstance();
 
-            Console.WriteLine("Starting game...");
+            OurLogger.Log("Starting game...");
 
             game.Run();
 
-            Console.WriteLine("Game closed!");
+            OurLogger.Log("Game closed!");
         }
     }
 }

@@ -255,28 +255,5 @@ namespace Client.Models
             Position = playerDto.Position;
             //Speed = playerDto.Speed;
         }
-
-        public void ReloadGun()
-        {
-            //Time deltaTime = FrameClock.Restart();
-            if (this.Weapon.Ammo < this.Weapon.MagazineSize)
-            {
-                if (this.Weapon.ReloadTimer.ElapsedTime.AsMilliseconds() > this.Weapon.ReloadTime)
-                {
-                    this.Weapon.ReloadTimer.Restart();
-                    this.Weapon.AmmoConsume(1);
-                }
-            }
-            //if (this.Weapon.Ammo < this.Weapon.MagazineSize)
-            //{
-            //    this.Weapon.AmmoConsume(1);
-            //}
-            //this.Weapon.setAmmo((int)(this.Weapon.ReloadCooldown.ElapsedTime.AsSeconds() / this.Weapon.ReloadTime * 100));
-            if (this.Weapon.ReloadCooldown.ElapsedTime.AsMilliseconds() > this.Weapon.ReloadTime * 500)
-            {
-                this.Weapon.Reloading = false;
-                this.Weapon.ReloadCooldown.Restart();
-            }
-        }
     }
 }

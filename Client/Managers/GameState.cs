@@ -1,5 +1,6 @@
 ﻿using Client.Models;
 using Client.Objects;
+using Client.Utilities;
 using Common;
 using Common.DTO;
 using SFML.Graphics;
@@ -15,6 +16,8 @@ namespace Client.Managers
         public List<Player> Players { get; set; }
         public List<Pickupable> Pickupables { get; set; }
         public List<Sprite> Collidables { get; set; }
+        public TileMap TileMap { get; set; }
+
         private GameState()
         {
             this.Players = new List<Player>();

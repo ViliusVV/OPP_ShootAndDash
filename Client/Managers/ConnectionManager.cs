@@ -1,4 +1,5 @@
 ﻿using Common.DTO;
+using Common.Utilities;
 using Microsoft.AspNetCore.SignalR.Client;
 using SFML.System;
 using System;
@@ -34,19 +35,19 @@ namespace Client.Utilities
                 if (dt > 0.5)
                 {
                     clock.Restart();
-                    Console.WriteLine("Connecting...");
+                    OurLogger.Log("Connecting...");
                 }
             }
             if (Connection.State != HubConnectionState.Connected)
             {
-                Console.WriteLine("Connection failed!");
+                OurLogger.Log("Connection failed!");
                 Environment.Exit(1);
             }
             else
             {
-                Console.WriteLine("Connection succesfull!");
+                OurLogger.Log("Connection succesfull!");
             }
-            Console.WriteLine(Connection.State);
+            OurLogger.Log(Connection.State.ToString());
         }
     }
 }

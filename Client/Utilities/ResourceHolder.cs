@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Channels;
 using Client.Config;
+using Common.Utilities;
 using SFML.Audio;
 using SFML.Graphics;
 
@@ -23,7 +24,7 @@ namespace Client.Utilities
 
         protected void InsertResource(TIdentifier id, TResource resource)
         {
-            Console.WriteLine("Loaded resource: {0}", GameResourceHelper.GetResoucePath<Enum>(id as Enum));
+            OurLogger.Log("Loaded resource: " + GameResourceHelper.GetResoucePath<Enum>(id as Enum));
 
             resourceMap.Add(id, resource);
         }

@@ -47,6 +47,9 @@ namespace Client
         private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
         private FontHolder Fonts { get; set; } = FontHolder.GetInstance();
 
+        MapBuilder builder = new MapBuilder();
+        Director director;
+
         GameState GameState { get; set; } = GameState.GetInstance();
         private ConnectionManager ConnectionManager { get; set; } = new ConnectionManager("https://shoot-and-dash.azurewebsites.net/sd-server");
 
@@ -64,9 +67,6 @@ namespace Client
         CustomText scoreboardText;
 
         AimCursor AimCursor = new AimCursor();
-        public MapBuilder builder = new MapBuilder();
-        public Director director;
-        public TileMap tileMap;
 
         Weapon ghostWeapon;
 
@@ -95,10 +95,11 @@ namespace Client
             LoadFonts();
             CreateSprites();
 
-            builder.LoadTextures();
+            builder = new MapBuilder();
+            builder.LoadSprites();
             director = new Director(builder);
             director.Construct();
-            tileMap = builder.GetResult();
+            GameState.TileMap = builder.GetResult();
 
             // Generate additional objects (destructibles, indestructibles, pickupables)
             SpawningManager(20, 15, 60);
@@ -189,7 +190,7 @@ namespace Client
                     //GameWindow.Draw(bgSprite);
                     if (MainPlayer.Weapon.Reloading == true)
                     {
-                        MainPlayer.ReloadGun();
+                        MainPlayer.Weapon.ReloadGun();
                         //ReloadGun();
                     }
 
@@ -268,24 +269,6 @@ namespace Client
             connection.SendAsync("ReceivePos", tmpPlayer);
         }
 
-        public void ReloadGun()
-        {
-            if (MainPlayer.Weapon.Ammo < MainPlayer.Weapon.MagazineSize)
-            {
-                if (reloadClock.ElapsedTime.AsMilliseconds() > MainPlayer.Weapon.ReloadTime)
-                {
-                    reloadClock.Restart();
-                    MainPlayer.Weapon.AmmoConsume(1);
-                }
-            }
-            if (reloadTimer.ElapsedTime.AsMilliseconds() > MainPlayer.Weapon.ReloadTime*600)
-            {
-                MainPlayer.Weapon.Reloading = false;
-                reloadTimer.Restart();
-                Sound sound = Sounds.Get(SoundIdentifier.Reload);
-                sound.Play();
-            }
-        }
 
         public void CreatePlayer()
         {
@@ -334,7 +317,7 @@ namespace Client
         }
         public void DrawLoop()
         {
-            GameWindow.Draw(tileMap);
+            GameWindow.Draw(GameState.TileMap);
             RenderPlayers();
             DrawCollidables();
             //GameWindow.Draw(bushSprite);
@@ -453,7 +436,7 @@ namespace Client
             {
 
                 director.ConstructBase();
-                tileMap = builder.GetResult();
+                GameState.TileMap = builder.GetResult();
             }
 
         }
@@ -609,7 +592,7 @@ namespace Client
         // TODO: Make it better
         private void CreateSprites()
         {
-            Console.WriteLine("Loading sprites...");
+            OurLogger.Log("Loading sprites...");
             IntRect rect = new IntRect(0, 0, 1280, 720);
 //            bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
             AimCursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
@@ -622,7 +605,7 @@ namespace Client
         // Load all game textures
         public void LoadTextures()
         {
-            Console.WriteLine("Loading textures...");
+            OurLogger.Log("Loading textures...");
 
             // Iterate over all textures and load
             var allTextures = Enum.GetValues(typeof(TextureIdentifier));
@@ -639,7 +622,7 @@ namespace Client
         // Load all music and sound efects
         public void LoadSounds()
         {
-            Console.WriteLine("Loading sounds...");
+            OurLogger.Log("Loading sounds...");
 
             var allSounds = Enum.GetValues(typeof(SoundIdentifier));
             foreach (SoundIdentifier sound in allSounds)
@@ -652,7 +635,7 @@ namespace Client
         // Load all custom fonts
         public void LoadFonts()
         {
-            Console.WriteLine("Loading fonts...");
+            OurLogger.Log("Loading fonts...");
 
             var allFonts = Enum.GetValues(typeof(FontIdentifier));
             foreach (FontIdentifier font in allFonts)

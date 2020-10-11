@@ -17,7 +17,7 @@ namespace Client.Objects.BuilderObjects
         Sprite Wall;
 
         //Choose textures for collidables
-        public void LoadTextures()
+        public void LoadSprites()
         {
             Wall = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Wall));
         }
