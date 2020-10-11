@@ -100,8 +100,8 @@ namespace Client
             director.Construct();
             tileMap = builder.GetResult();
 
-            // Generate additional objects (destructibles, indestructibles)
-            SpawningManager(20, 15);
+            // Generate additional objects (destructibles, indestructibles, pickupables)
+            SpawningManager(20, 15, 60);
 
             // View
             MainView = GameWindow.DefaultView;
@@ -189,7 +189,8 @@ namespace Client
                     //GameWindow.Draw(bgSprite);
                     if (MainPlayer.Weapon.Reloading == true)
                     {
-                        ReloadGun();
+                        MainPlayer.ReloadGun();
+                        //ReloadGun();
                     }
 
                     UpdateLoop(deltaTime, mPos);
@@ -425,8 +426,12 @@ namespace Client
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.R))
             {
-                if (MainPlayer.Weapon.Ammo != MainPlayer.Weapon.MagazineSize)
+                if (MainPlayer.Weapon.Ammo != MainPlayer.Weapon.MagazineSize && MainPlayer.Weapon.Reloading != true)
                 {
+                    Sound sound = Sounds.Get(SoundIdentifier.Reload);
+                    sound.Play();
+                    MainPlayer.Weapon.AmmoConsume(-MainPlayer.Weapon.Ammo);
+                    MainPlayer.Weapon.ReloadCooldown.Restart();
                     MainPlayer.Weapon.Reloading = true;
                 }
             }
@@ -453,7 +458,7 @@ namespace Client
 
         }
 
-        private void SpawningManager(int destrCount, int indestrCount)
+        private void SpawningManager(int destrCount, int indestrCount, int syringeCount)
         {
             for (int i = 0; i < destrCount; i++)
             {
@@ -463,15 +468,19 @@ namespace Client
             {
                 SpawnIndestructible();
             }
+            for (int i = 0; i < syringeCount; i++)
+            {
+                SpawnRandomSyringe();
+            }
         }
 
         private void SpawnDestructible()
         {
             AbstractFactory destrFactory = FactoryProducer.GetFactory("Destructible");
             List<Sprite> destructables = new List<Sprite>();
-            Sprite landMineObj = destrFactory.GetDestructible("LandMine").SpawnObject();
+            Sprite explosiveBarrelObj = destrFactory.GetDestructible("ExplosiveBarrel").SpawnObject();
             Sprite itemCrateObj = destrFactory.GetDestructible("ItemCrate").SpawnObject();
-            destructables.Add(landMineObj);
+            destructables.Add(explosiveBarrelObj);
             destructables.Add(itemCrateObj);
 
             foreach (Sprite destructable in destructables)
@@ -518,7 +527,6 @@ namespace Client
                     if (CollisionTester.BoundingBoxTest(collidable, objectSprite))
                     {
                         objectSpawned = false;
-                        Console.WriteLine("does not collide");
                         break;
                     }
                 }
@@ -530,32 +538,43 @@ namespace Client
 
         private void SpawnRandomSyringe()
         {
-            int num = Rnd.Next(5);
-            PowerUp powerUp;
-
+            int num = Rnd.Next(4);
+            PickupableFactory pickFactory = new PickupableFactory();
+            Pickupable syringe;
             switch (num)
             {
                 case 0:
-                    powerUp = new MovementSyringe();
+                    syringe = pickFactory.GetPickupable("MovementSyringe");
                     break;
                 case 1:
-                    powerUp = new ReloadSyringe();
+                    syringe = pickFactory.GetPickupable("ReloadSyringe");
                     break;
                 case 2:
-                    powerUp = new HealingSyringe();
-                    break;
-                case 3:
-                    powerUp = new DeflectionSyringe();
+                    syringe = pickFactory.GetPickupable("HealingSyringe");
                     break;
                 default:
-                    powerUp = new Medkit();
-                    powerUp.PowerUpStrategy = new HealingStrategy(100f);
+                    syringe = pickFactory.GetPickupable("DeflectionSyringe");
                     break;
             }
+            bool isSpawned = ObjectSpawnCollisionCheck(syringe);
+            if (isSpawned)
+            {
+                GameState.Pickupables.Add(syringe);
+            }
             
-            powerUp.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
-            GameState.Pickupables.Add(powerUp);
 
+        }
+
+
+        private void SpawnMedkit()
+        {
+            PickupableFactory pickFactory = new PickupableFactory();
+            Pickupable medkit = pickFactory.GetPickupable("Medkit");
+            bool isSpawned = ObjectSpawnCollisionCheck(medkit);
+            if (isSpawned)
+            {
+                GameState.Pickupables.Add(medkit);
+            }
         }
 
 

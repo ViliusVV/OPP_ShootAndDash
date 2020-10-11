@@ -29,6 +29,7 @@ namespace Client.Objects
         public List<Projectile> Projectiles {get;set;}
         public Clock ShootTimer { get; set; } = new Clock();
         public Clock ReloadTimer { get; set; } = new Clock();
+        public Clock ReloadCooldown { get; set; } = new Clock();
         public Sprite ProjectileSprite { get; private set; }
 
         public Weapon(string name, int magazineSize, int ammo, float dmg, float projectileSpd,
@@ -138,6 +139,11 @@ namespace Client.Objects
         public void AmmoConsume(int i)
         {
             this.Ammo += i;
+        }
+
+        public void setAmmo(int i)
+        {
+            this.Ammo = (int)(MagazineSize * i / 100);
         }
     }
 }

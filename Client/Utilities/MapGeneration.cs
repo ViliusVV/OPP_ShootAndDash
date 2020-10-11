@@ -11,7 +11,7 @@ namespace Client.Utilities
 {
 	class MapGeneration
 	{
-        public TileMap map = new TileMap();
+        //public TileMap map = new TileMap();
 
         GameState GameState = GameState.GetInstance();
 
@@ -50,7 +50,7 @@ namespace Client.Utilities
 
         public void PrepareMap()
         {
-            map.CreateMap();
+            //map.CreateMap();
             LoadTextures();
             LoadPositions();
             AddCollidables();

@@ -9,5 +9,7 @@ namespace Client.Objects.Destructables
     abstract class Destructible : Sprite
     {
         public abstract Sprite SpawnObject();
+
+        
     }
 }

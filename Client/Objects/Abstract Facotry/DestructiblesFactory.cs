@@ -14,9 +14,12 @@ namespace Client.Objects
         }
         public override Destructible GetDestructible(string destructibleObj)
         {
-            if (destructibleObj.Equals("LandMine"))
+            if (destructibleObj == null)
+                return null;
+
+            if (destructibleObj.Equals("ExplosiveBarrel"))
             {
-                return new LandMine();
+                return new ExplosiveBarrel();
             }
             else if (destructibleObj.Equals("ItemCrate"))
             {

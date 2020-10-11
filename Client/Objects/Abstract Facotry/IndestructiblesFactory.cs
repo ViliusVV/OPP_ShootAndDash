@@ -14,6 +14,9 @@ namespace Client.Objects
         }
         public override Indestructible GetIndestructible(string indestructibleObj)
         {
+            if (indestructibleObj == null)
+                return null;
+
             if (indestructibleObj.Equals("Wall"))
             {
                 return new Wall();
