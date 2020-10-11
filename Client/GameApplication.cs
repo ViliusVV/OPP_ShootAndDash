@@ -538,24 +538,25 @@ namespace Client
 
         private void SpawnRandomSyringe()
         {
-            int num = Rnd.Next(4);
-            PickupableFactory pickFactory = new PickupableFactory();
+            int num = Rnd.Next(5);
+            PowerupFactory pickFactory = new PowerupFactory();
             Pickupable syringe;
             switch (num)
             {
                 case 0:
-                    syringe = pickFactory.GetPickupable("MovementSyringe");
+                    syringe = pickFactory.GetPowerup("MovementSyringe");
                     break;
                 case 1:
-                    syringe = pickFactory.GetPickupable("ReloadSyringe");
+                    syringe = pickFactory.GetPowerup("ReloadSyringe");
                     break;
                 case 2:
-                    syringe = pickFactory.GetPickupable("HealingSyringe");
+                    syringe = pickFactory.GetPowerup("HealingSyringe");
                     break;
                 default:
-                    syringe = pickFactory.GetPickupable("DeflectionSyringe");
+                    syringe = pickFactory.GetPowerup("DeflectionSyringe");
                     break;
             }
+
             bool isSpawned = ObjectSpawnCollisionCheck(syringe);
             if (isSpawned)
             {
@@ -568,8 +569,8 @@ namespace Client
 
         private void SpawnMedkit()
         {
-            PickupableFactory pickFactory = new PickupableFactory();
-            Pickupable medkit = pickFactory.GetPickupable("Medkit");
+            PowerupFactory pickFactory = new PowerupFactory();
+            Pickupable medkit = pickFactory.GetPowerup("Medkit");
             bool isSpawned = ObjectSpawnCollisionCheck(medkit);
             if (isSpawned)
             {
