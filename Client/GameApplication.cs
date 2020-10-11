@@ -181,7 +181,8 @@ namespace Client
                     //GameWindow.Draw(bgSprite);
                     if (MainPlayer.Weapon.Reloading == true)
                     {
-                        ReloadGun();
+                        MainPlayer.ReloadGun();
+                        //ReloadGun();
                     }
 
                     UpdateLoop(deltaTime, mPos);
@@ -412,8 +413,12 @@ namespace Client
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.R))
             {
-                if (MainPlayer.Weapon.Ammo != MainPlayer.Weapon.MagazineSize)
+                if (MainPlayer.Weapon.Ammo != MainPlayer.Weapon.MagazineSize && MainPlayer.Weapon.Reloading != true)
                 {
+                    Sound sound = Sounds.Get(SoundIdentifier.Reload);
+                    sound.Play();
+                    MainPlayer.Weapon.AmmoConsume(-MainPlayer.Weapon.Ammo);
+                    MainPlayer.Weapon.ReloadCooldown.Restart();
                     MainPlayer.Weapon.Reloading = true;
                 }
             }

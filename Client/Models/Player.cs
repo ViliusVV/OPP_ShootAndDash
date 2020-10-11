@@ -8,6 +8,7 @@ using Common.DTO;
 using Common.Utilities;
 using SFML.Graphics;
 using SFML.System;
+using SFML.Audio;
 using SFML.Window;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace Client.Models
 {
     class Player: Sprite
     {
+        private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
         public string Name { get; set; } = new Random().Next(1, 888).ToString();
         public float Health { get; set; } = 100;
 
@@ -229,5 +231,27 @@ namespace Client.Models
             //Speed = playerDto.Speed;
         }
 
+        public void ReloadGun()
+        {
+            //Time deltaTime = FrameClock.Restart();
+            if (this.Weapon.Ammo < this.Weapon.MagazineSize)
+            {
+                if (this.Weapon.ReloadTimer.ElapsedTime.AsMilliseconds() > this.Weapon.ReloadTime)
+                {
+                    this.Weapon.ReloadTimer.Restart();
+                    this.Weapon.AmmoConsume(1);
+                }
+            }
+            //if (this.Weapon.Ammo < this.Weapon.MagazineSize)
+            //{
+            //    this.Weapon.AmmoConsume(1);
+            //}
+            //this.Weapon.setAmmo((int)(this.Weapon.ReloadCooldown.ElapsedTime.AsSeconds() / this.Weapon.ReloadTime * 100));
+            if (this.Weapon.ReloadCooldown.ElapsedTime.AsMilliseconds() > this.Weapon.ReloadTime * 500)
+            {
+                this.Weapon.Reloading = false;
+                this.Weapon.ReloadCooldown.Restart();
+            }
+        }
     }
 }
