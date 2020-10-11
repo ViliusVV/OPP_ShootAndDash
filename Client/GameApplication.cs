@@ -61,8 +61,6 @@ namespace Client
         IntRect playerAnimation = new IntRect(36, 0, 36, 64);
         IntRect playerIdle = new IntRect(0, 0, 36, 64);
         Clock animationSpeed = new Clock();
-        Clock reloadClock = new Clock();
-        Clock reloadTimer = new Clock();
 
         CustomText scoreboardText;
 
@@ -114,7 +112,7 @@ namespace Client
             MainPlayer.IsMainPlayer = true;
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
             MainPlayer.TextureRect = playerAnimation;
-            MainPlayer.Weapon = new Weapon("AK-47", 50, 50, 20, 2000, 50, 5, 50, true);
+            MainPlayer.Weapon = new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
             // Configure sprite
 
 
@@ -128,7 +126,7 @@ namespace Client
 
 
             // Ghost weapon 
-            ghostWeapon = new Weapon("AK-47", 100000, 100000, 20, 2000, 200, 5, 50, true);
+            ghostWeapon = new Weapon("AK-47", 100000, 20, 2000, 200, 5, 50);
             ghostWeapon.Position = new Vector2f(50f, 50f);
 
             
@@ -186,13 +184,6 @@ namespace Client
                         MainPlayer.TextureRect = playerIdle;
                     }
 
-                    //Draw order is important
-                    //GameWindow.Draw(bgSprite);
-                    if (MainPlayer.Weapon.Reloading == true)
-                    {
-                        MainPlayer.Weapon.ReloadGun();
-                        //ReloadGun();
-                    }
 
                     UpdateLoop(deltaTime, mPos);
                     DrawLoop();
@@ -409,14 +400,7 @@ namespace Client
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.R))
             {
-                if (MainPlayer.Weapon.Ammo != MainPlayer.Weapon.MagazineSize && MainPlayer.Weapon.Reloading != true)
-                {
-                    Sound sound = Sounds.Get(SoundIdentifier.Reload);
-                    sound.Play();
-                    MainPlayer.Weapon.AmmoConsume(-MainPlayer.Weapon.Ammo);
-                    MainPlayer.Weapon.ReloadCooldown.Restart();
-                    MainPlayer.Weapon.Reloading = true;
-                }
+                MainPlayer.Weapon.Reload();
             }
 
             if (Mouse.IsButtonPressed(Mouse.Button.Left))

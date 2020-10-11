@@ -224,8 +224,8 @@ namespace Client.Models
 
         public void Update()
         {
-            UpdatePlayerBar();
             UpdateWeapon();
+            UpdatePlayerBar();
 
         }
 
@@ -234,6 +234,11 @@ namespace Client.Models
             if(Weapon != null)
             {
                 Weapon.Position = this.Position;
+            }
+
+            if (this.Weapon.Reloading)
+            {
+                this.Weapon.ReloadGunAnimation();
             }
         }
 

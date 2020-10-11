@@ -23,10 +23,10 @@ namespace Client.Objects.Pickupables.Strategy
         {
             OurLogger.Log("Executing reload speed powerup strategy");
 
-            float oldRelaodTime = player.Weapon.ReloadTime;
-            player.Weapon.ReloadTime = oldRelaodTime / ReloadReduction;
+            float oldRelaodTime = player.Weapon.ReloadDuration;
+            player.Weapon.ReloadDuration = oldRelaodTime / ReloadReduction;
 
-            Task.Delay((int)Duration).ContinueWith(o => player.Weapon.ReloadTime = oldRelaodTime);
+            Task.Delay((int)Duration).ContinueWith(o => player.Weapon.ReloadDuration = oldRelaodTime);
         }
     }
 }

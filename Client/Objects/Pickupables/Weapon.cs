@@ -22,7 +22,7 @@ namespace Client.Objects
         public float Damage { get; private set; }
         public float ProjectileSpeed { get; private set; }
         public float AttackSpeed { get; private set; }
-        public float ReloadTime { get; set; }
+        public float ReloadDuration { get; set; }
         public int SpreadAmount { get; private set; }
         public bool CanShoot { get; private set; }
         public bool Reloading { get; set; }
@@ -32,23 +32,24 @@ namespace Client.Objects
         public Clock ReloadCooldown { get; set; } = new Clock();
         public Sprite ProjectileSprite { get; private set; }
 
-        public Weapon(string name, int magazineSize, int ammo, float dmg, float projectileSpd,
-            float attackSpd, float reloadTime, int spreadAmount, bool canShoot)
+        public Weapon(string name, int magazineSize, float dmg, float projectileSpd,
+            float attackSpd, float reloadTime, int spreadAmount)
         {
             this.Name = name;
             this.MagazineSize = magazineSize;
-            this.Ammo = ammo;
+            this.Ammo = magazineSize;
             this.Damage = dmg;
             this.ProjectileSpeed = projectileSpd;
             this.AttackSpeed = attackSpd;
-            this.ReloadTime = reloadTime;
+            this.ReloadDuration = reloadTime;
             this.Projectiles = new List<Projectile>();
             this.SpreadAmount = spreadAmount;
-            this.CanShoot = canShoot;
+            this.CanShoot = true;
             this.ProjectileSprite = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Bullet));
             this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GunAk47);
             this.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
         }
+
         public void DrawProjectiles(RenderWindow gameWindow)
         {
             for (int i = 0; i < Projectiles.Count; i++)
@@ -101,7 +102,7 @@ namespace Client.Objects
                 Vector2f myTarget = new Vector2f(normalizedTarget.X, normalizedTarget.Y);
                 Projectile bullet = new Projectile(myTarget * projectileSpeed, ProjectileSprite, this.Position, this.Rotation);
                 Projectiles.Add(bullet);
-                AmmoConsume(-1);
+                ChangeAmmo(-1);
 
                 Sound sound = SoundHolder.GetInstance().Get(SoundIdentifier.GenericGun);
                 sound.Play();
@@ -136,37 +137,48 @@ namespace Client.Objects
             }
         }
 
-        public void ReloadGun()
+        public void Reload()
         {
-            //Time deltaTime = FrameClock.Restart();
-            if (Ammo < MagazineSize)
+            if (this.Ammo != this.MagazineSize && this.Reloading != true)
             {
-                if (ReloadTimer.ElapsedTime.AsMilliseconds() > ReloadTime)
-                {
-                    ReloadTimer.Restart();
-                    AmmoConsume(1);
-                }
-            }
-            //if (this.Weapon.Ammo < this.Weapon.MagazineSize)
-            //{
-            //    this.Weapon.AmmoConsume(1);ddd
-            //}
-            //this.Weapon.setAmmo((int)(this.Weapon.ReloadCooldown.ElapsedTime.AsSeconds() / this.Weapon.ReloadTime * 100));
-            if (ReloadCooldown.ElapsedTime.AsMilliseconds() > ReloadTime * 500)
-            {
-                Reloading = false;
-                ReloadCooldown.Restart();
+                Sound sound = SoundHolder.GetInstance().Get(SoundIdentifier.Reload);
+                sound.Play();
+
+                this.ChangeAmmo(-this.Ammo);
+                this.ReloadTimer.Restart();
+                this.Reloading = true;
             }
         }
 
-        public void AmmoConsume(int i)
+        public void ReloadGunAnimation()
         {
-            this.Ammo += i;
+            int elapsed = this.ReloadTimer.ElapsedTime.AsMilliseconds();
+
+            SetAmmoPercent(elapsed / this.ReloadDuration * 100);
+            
+            if (this.Ammo >= this.MagazineSize && elapsed >= this.ReloadDuration)
+            {
+                OurLogger.Log("Gun finished reloading!");
+                this.Reloading = false;
+            }
         }
 
-        public void setAmmo(int i)
+        public void ChangeAmmo(int ammo)
         {
-            this.Ammo = (int)(MagazineSize * i / 100);
+            this.Ammo = CheckAmmoBounds(this.Ammo + ammo);
+        }
+
+        public void SetAmmoPercent(double p)
+        {
+            this.Ammo = CheckAmmoBounds((int)Math.Ceiling(this.MagazineSize * (p / 100d)));
+        }
+
+        public int CheckAmmoBounds(int ammo)
+        {
+            if (ammo < 0) return 0;
+            if (ammo > this.MagazineSize) return MagazineSize;
+
+            return ammo;
         }
     }
 }
