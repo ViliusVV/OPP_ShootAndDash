@@ -101,7 +101,7 @@ namespace Client
             tileMap = builder.GetResult();
 
             // Generate additional objects (destructibles, indestructibles)
-            SpawningManager(20, 15);
+            SpawningManager(20, 15, 60);
 
             // View
             MainView = GameWindow.DefaultView;
@@ -444,7 +444,7 @@ namespace Client
 
         }
 
-        private void SpawningManager(int destrCount, int indestrCount)
+        private void SpawningManager(int destrCount, int indestrCount, int syringeCount)
         {
             for (int i = 0; i < destrCount; i++)
             {
@@ -453,6 +453,10 @@ namespace Client
             for (int i = 0; i < indestrCount; i++)
             {
                 SpawnIndestructible();
+            }
+            for (int i = 0; i < syringeCount; i++)
+            {
+                SpawnRandomSyringe();
             }
         }
 
@@ -522,31 +526,37 @@ namespace Client
         private void SpawnRandomSyringe()
         {
             int num = Rnd.Next(4);
+            PickupableFactory pickFactory = new PickupableFactory();
             Pickupable syringe;
             switch (num)
             {
                 case 0:
-                    syringe = new MovementSyringe();
+                    syringe = pickFactory.GetPickupable("MovementSyringe");
                     break;
                 case 1:
-                    syringe = new ReloadSyringe();
+                    syringe = pickFactory.GetPickupable("ReloadSyringe");
                     break;
                 case 2:
-                    syringe = new HealingSyringe();
+                    syringe = pickFactory.GetPickupable("HealingSyringe");
                     break;
                 default:
-                    syringe = new DeflectionSyringe();
+                    syringe = pickFactory.GetPickupable("DeflectionSyringe");
                     break;
             }
-            syringe.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
-            GameState.Pickupables.Add(syringe);
+            bool isSpawned = ObjectSpawnCollisionCheck(syringe);
+            if (isSpawned)
+            {
+                GameState.Pickupables.Add(syringe);
+            }
+            
 
         }
 
 
         private void SpawnMedkit()
         {
-            Medkit medkit = new Medkit();
+            PickupableFactory pickFactory = new PickupableFactory();
+            Pickupable medkit = pickFactory.GetPickupable("Medkit");
             medkit.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
             GameState.Pickupables.Add(medkit);
         }
