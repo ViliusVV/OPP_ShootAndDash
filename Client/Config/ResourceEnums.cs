@@ -29,7 +29,7 @@ namespace Client.Config
         [ResourceAttr("Assets/hudPlayerBarMask.png")] PlayerBarMask,
         [ResourceAttr("Assets/hudPlayerBarAmmoMask.png")] PlayerBarAmmoMask,
         // Destructible Objects
-        [ResourceAttr("Assets/LandMine.png")] LandMine,
+        [ResourceAttr("Assets/ExplosiveBarrel.png")] ExplosiveBarrel,
         [ResourceAttr("Assets/Box.png")] Crate,
         // Indestructible Objects
         [ResourceAttr("Assets/BushLong.png")] Bush,

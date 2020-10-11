@@ -8,19 +8,18 @@ using Client.Utilities;
 
 namespace Client.Objects.Destructables
 {
-    class LandMine : Destructible
+    class ExplosiveBarrel : Destructible
     {
-        private Sprite landMineObject;
+        private Sprite explosiveBarrelObject;
 
-        public LandMine()
+        public ExplosiveBarrel()
         {
-            landMineObject = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.LandMine));
+            explosiveBarrelObject = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.ExplosiveBarrel));
         }
 
         public override Sprite SpawnObject()
         {
-            Console.WriteLine("Land mine spawned");
-            return landMineObject;
+            return explosiveBarrelObject;
         }
     }
 }

@@ -100,7 +100,7 @@ namespace Client
             director.Construct();
             tileMap = builder.GetResult();
 
-            // Generate additional objects (destructibles, indestructibles)
+            // Generate additional objects (destructibles, indestructibles, pickupables)
             SpawningManager(20, 15, 60);
 
             // View
@@ -469,9 +469,9 @@ namespace Client
         {
             AbstractFactory destrFactory = FactoryProducer.GetFactory("Destructible");
             List<Sprite> destructables = new List<Sprite>();
-            Sprite landMineObj = destrFactory.GetDestructible("LandMine").SpawnObject();
+            Sprite explosiveBarrelObj = destrFactory.GetDestructible("ExplosiveBarrel").SpawnObject();
             Sprite itemCrateObj = destrFactory.GetDestructible("ItemCrate").SpawnObject();
-            destructables.Add(landMineObj);
+            destructables.Add(explosiveBarrelObj);
             destructables.Add(itemCrateObj);
 
             foreach (Sprite destructable in destructables)
@@ -518,7 +518,6 @@ namespace Client
                     if (CollisionTester.BoundingBoxTest(collidable, objectSprite))
                     {
                         objectSpawned = false;
-                        Console.WriteLine("does not collide");
                         break;
                     }
                 }
@@ -562,8 +561,11 @@ namespace Client
         {
             PickupableFactory pickFactory = new PickupableFactory();
             Pickupable medkit = pickFactory.GetPickupable("Medkit");
-            medkit.Position = new Vector2f(Rnd.Next(1000), Rnd.Next(1000));
-            GameState.Pickupables.Add(medkit);
+            bool isSpawned = ObjectSpawnCollisionCheck(medkit);
+            if (isSpawned)
+            {
+                GameState.Pickupables.Add(medkit);
+            }
         }
 
 
