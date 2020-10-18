@@ -3,6 +3,7 @@ using Client.Config;
 using Client.Managers;
 using Client.Models;
 using Client.Objects.Destructables;
+using Client.Objects.Prototype;
 using Client.UI;
 using Client.Utilities;
 using Common.Utilities;
@@ -16,7 +17,7 @@ using System.Numerics;
 using System.Text;
 namespace Client.Objects
 {
-    class Weapon : Pickupable
+    class Weapon : Pickupable, IWeaponPrototype
     {
         public string Name { get; private set; }
         public int MagazineSize { get; private set; }
@@ -193,6 +194,16 @@ namespace Client.Objects
             if (ammo > this.MagazineSize) return MagazineSize;
 
             return ammo;
+        }
+
+        public IWeaponPrototype Clone()
+        {
+            Weapon copy = (Weapon) this.MemberwiseClone();
+            copy.Projectiles = new List<Projectile>();
+            copy.ReloadTimer = new Clock();
+            copy.ShootTimer = new Clock();
+            copy.ReloadCooldown = new Clock();
+            return copy;
         }
     }
 }
