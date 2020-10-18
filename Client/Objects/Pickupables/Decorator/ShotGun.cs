@@ -7,9 +7,9 @@ using Client.Utilities;
 
 namespace Client.Objects.Pickupables.Decorator
 {
-    class Pistol : Weapon
+    class Shotgun : WeaponDecorator
     {
-        public Pistol(string name, int magazineSize, float dmg, float projectileSpd,
+        public Shotgun(string name, int magazineSize, float dmg, float projectileSpd,
 float attackSpd, float reloadTime, int spreadAmount) : base(name, magazineSize, dmg, projectileSpd, attackSpd,
 reloadTime, spreadAmount)
         {

@@ -13,14 +13,9 @@ namespace Client.Objects.Pickupables.Decorator
     float attackSpd, float reloadTime, int spreadAmount) : base(name, magazineSize, dmg, projectileSpd, attackSpd,
         reloadTime, spreadAmount)
         {
-            GetTexture();
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.Pistol);
             //this.decoratedWeapon = DecoratedWeapon;
             //this.decoratedWeapon.Texture 
-        }
-
-        public void GetTexture()
-        {
-            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GunAk47);
         }
     }
 }
