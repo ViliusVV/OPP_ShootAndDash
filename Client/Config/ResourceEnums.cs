@@ -23,7 +23,11 @@ namespace Client.Config
         // Projectiles
         [ResourceAttr("Assets/bullet.png")] Bullet,
         // Guns
-        [ResourceAttr("Assets/Minigun.png")] GunAk47,
+        [ResourceAttr("Assets/gunAk47.png")] GunAk47,
+        [ResourceAttr("Assets/Minigun.png")] Minigun,
+        [ResourceAttr("Assets/Pistol.png")] Pistol,
+        [ResourceAttr("Assets/Shotgun.png")] Shotgun,
+        [ResourceAttr("Assets/SniperRifle.png")] SniperRifle,
         // HUD
         [ResourceAttr("Assets/hudPlayerBar.png")] PlayerBar,
         [ResourceAttr("Assets/hudPlayerBarMask.png")] PlayerBarMask,

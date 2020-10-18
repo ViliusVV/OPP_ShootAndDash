@@ -3,6 +3,7 @@ using Client.Config;
 using Client.Managers;
 using Client.Models;
 using Client.Objects.Destructables;
+using Client.Objects.Pickupables.Decorator;
 using Client.Objects.Prototype;
 using Client.UI;
 using Client.Utilities;
@@ -17,7 +18,7 @@ using System.Numerics;
 using System.Text;
 namespace Client.Objects
 {
-    class Weapon : Pickupable, IWeaponPrototype
+    class Weapon : Pickupable, IWeaponPrototype, DecorateText
     {
         public string Name { get; private set; }
         public int MagazineSize { get; private set; }
@@ -49,8 +50,13 @@ namespace Client.Objects
             this.SpreadAmount = spreadAmount;
             this.CanShoot = true;
             this.ProjectileSprite = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Bullet));
-            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GunAk47);
+            //this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GunAk47);
             this.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
+        }
+
+        public DecorateText Textur()
+        {
+            return this;
         }
 
         public void DrawProjectiles(RenderWindow gameWindow)
@@ -218,5 +224,11 @@ namespace Client.Objects
             copy.ReloadCooldown = new Clock();
             return copy;
         }
+
+        //public DecorateText Textur()
+        //{
+        //    Weapon copy = (Weapon)this.MemberwiseClone();
+        //    //copy.Texture = 
+        //}
     }
 }

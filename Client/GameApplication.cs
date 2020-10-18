@@ -21,6 +21,7 @@ using Client.Objects.Destructables;
 using Client.Objects.BuilderObjects;
 using System.Linq;
 using Client.Objects.Pickupables.Strategy;
+using Client.Objects.Pickupables.Decorator;
 
 namespace Client
 {
@@ -110,7 +111,8 @@ namespace Client
 
             // weapon prototype
             weaponProtoype = new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
-
+            //weaponProtoype = new AssaultRifle("AK-47", 50, 20, 2000, 50, 5000, 50);
+            Pistol name = new Pistol("AK-47", 50, 20, 2000, 50, 5000, 50);
             MainPlayer = new Player();
             MainPlayer.IsMainPlayer = true;
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
