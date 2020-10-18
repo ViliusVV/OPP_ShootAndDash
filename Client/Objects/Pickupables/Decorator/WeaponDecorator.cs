@@ -4,13 +4,15 @@ using System.Text;
 
 namespace Client.Objects.Pickupables.Decorator
 {
-    abstract class WeaponDecorator
+    abstract class WeaponDecorator : Weapon
     {
-        public Weapon decoratedWeapon;
+        //public Weapon decoratedWeapon;
 
-        public WeaponDecorator(Weapon DecoratedWeapon)
+        public WeaponDecorator(string name, int magazineSize, float dmg, float projectileSpd,
+            float attackSpd, float reloadTime, int spreadAmount) : base(name, magazineSize, dmg, projectileSpd, attackSpd,
+                reloadTime, spreadAmount)
         {
-            this.decoratedWeapon = DecoratedWeapon;
+            //this.decoratedWeapon = DecoratedWeapon;
             //this.decoratedWeapon.Texture 
         }
 

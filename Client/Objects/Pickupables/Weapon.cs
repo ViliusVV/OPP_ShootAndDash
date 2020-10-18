@@ -18,7 +18,7 @@ using System.Numerics;
 using System.Text;
 namespace Client.Objects
 {
-    class Weapon : Pickupable, IWeaponPrototype, DecorateText
+    class Weapon : Pickupable, IWeaponPrototype
     {
         public string Name { get; private set; }
         public int MagazineSize { get; private set; }
@@ -52,11 +52,6 @@ namespace Client.Objects
             this.ProjectileSprite = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Bullet));
             //this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GunAk47);
             this.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
-        }
-
-        public DecorateText Textur()
-        {
-            return this;
         }
 
         public void DrawProjectiles(RenderWindow gameWindow)
@@ -211,11 +206,5 @@ namespace Client.Objects
             copy.ReloadCooldown = new Clock();
             return copy;
         }
-
-        //public DecorateText Textur()
-        //{
-        //    Weapon copy = (Weapon)this.MemberwiseClone();
-        //    //copy.Texture = 
-        //}
     }
 }
