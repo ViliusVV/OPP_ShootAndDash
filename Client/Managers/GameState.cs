@@ -1,5 +1,7 @@
 ﻿using Client.Models;
 using Client.Objects;
+using Client.Objects.Destructables;
+using Client.Objects.Indestructables;
 using Client.Utilities;
 using Common;
 using Common.DTO;
@@ -17,12 +19,14 @@ namespace Client.Managers
         public List<Pickupable> Pickupables { get; set; }
         public List<Sprite> Collidables { get; set; }
         public TileMap TileMap { get; set; }
+        public List<Sprite> NonCollidables { get; set; }
 
         private GameState()
         {
             this.Players = new List<Player>();
             this.Pickupables = new List<Pickupable>();
             this.Collidables = new List<Sprite>();
+            this.NonCollidables = new List<Sprite>();
         }
         public static GameState GetInstance()
         {

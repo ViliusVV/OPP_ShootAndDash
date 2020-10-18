@@ -213,11 +213,19 @@ namespace Client
             }
         }
 
+        private void DrawNonCollidables()
+        {
+            foreach (var item in GameState.NonCollidables)
+            {
+                GameWindow.Draw(item);
+            }
+        }
+
         private void CreatePlayers(GameStateDTO stateDto)
         {
-            foreach(var playerDto in stateDto.Players)
+            foreach (var playerDto in stateDto.Players)
             {
-                if(GameState.Players.FindIndex(player => player.Name.Equals(playerDto.Name)) < 0)
+                if (GameState.Players.FindIndex(player => player.Name.Equals(playerDto.Name)) < 0)
                 {
                     Player tmpPlayer = new Player(playerDto);
                     GameState.Players.Add(tmpPlayer);
@@ -227,7 +235,7 @@ namespace Client
 
         private void UpdatePlayers(GameStateDTO stateDTO)
         {
-            foreach(var dto in stateDTO.Players)
+            foreach (var dto in stateDTO.Players)
             {
                 Player player = GameState.Players.Find(p => p.Name.Equals(dto.Name));
                 if (player != null && !MainPlayer.Equals(player))
@@ -296,6 +304,7 @@ namespace Client
                 }
             }
         }
+
         private void DrawProjectiles()
         {
             MainPlayer.Weapon.DrawProjectiles(GameWindow);
@@ -312,11 +321,13 @@ namespace Client
             GameWindow.Draw(GameState.TileMap);
             RenderPlayers();
             DrawCollidables();
+            DrawNonCollidables();
             //GameWindow.Draw(bushSprite);
             DrawPickupables();
             DrawProjectiles();
             GameWindow.Draw(AimCursor);
         }
+
         public void UpdateLoop(Time deltaTime, Vector2f mPos)
         {
             UpdatePickupables();
@@ -476,7 +487,12 @@ namespace Client
                 bool isSpawned = ObjectSpawnCollisionCheck(indestructable);
                 if (isSpawned)
                 {
-                    GameState.Collidables.Add(indestructable);
+                    if (indestructable != bushObj)
+                    {
+                        GameState.Collidables.Add(indestructable);
+                    }
+                    else
+                        GameState.NonCollidables.Add(indestructable);
                 }
             }
         }

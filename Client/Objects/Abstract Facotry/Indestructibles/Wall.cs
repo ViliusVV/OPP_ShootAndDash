@@ -10,16 +10,15 @@ namespace Client.Objects.Indestructables
 {
     class Wall : Indestructible
     {
-        private Sprite wallObject;
 
         public Wall()
         {
-            wallObject = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Wall));
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.Wall);
         }
 
         public override Sprite SpawnObject()
         {
-            return wallObject;
+            return this;
         }
     }
 }

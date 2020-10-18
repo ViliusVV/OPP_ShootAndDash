@@ -1,6 +1,8 @@
 ﻿using Client.Collisions;
 using Client.Config;
+using Client.Managers;
 using Client.Models;
+using Client.Objects.Destructables;
 using Client.Objects.Prototype;
 using Client.UI;
 using Client.Utilities;
@@ -121,6 +123,15 @@ namespace Client.Objects
                     if (CollisionTester.BoundingBoxTest(collidables[j], Projectiles[i].ProjectileSprite))
                     {
                         indexesToRemove.Add(i);
+
+                        if (collidables[j] is ItemCrate)
+                        {
+                            collidables.RemoveAt(j);
+                        }
+                        if (collidables[j] is ExplosiveBarrel)
+                        {
+                            collidables.RemoveAt(j);
+                        }
                     }
                 }
             }
@@ -137,6 +148,22 @@ namespace Client.Objects
                 }
             }
         }
+
+        //public bool CheckCollisions()
+        //{
+        //    foreach (var item in GameState.GetInstance().Collidables)
+        //    {
+        //        if (this.GetGlobalBounds().Intersects(item.GetGlobalBounds()))
+        //        {
+        //            if (item is BarbWire)
+        //            {
+        //                this.ChangeHealth(-5);
+        //            }
+        //            return true;
+        //        }
+        //    }
+        //    return false;
+        //}
 
         public void Reload()
         {
