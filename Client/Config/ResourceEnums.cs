@@ -42,7 +42,9 @@ namespace Client.Config
         [ResourceAttr("Assets/syringeHealing.png")] HealingSyringe,
         [ResourceAttr("Assets/syringeDeflection.png")] DeflectionSyringe,
         // Tilemaps
-        [ResourceAttr("Assets/tilemap.png")] TileMap
+        [ResourceAttr("Assets/tilemap.png")] TileMap,
+        // Particles
+        [ResourceAttr("Assets/Explosion.png")] Explosion
     }
 
     public enum FontIdentifier
