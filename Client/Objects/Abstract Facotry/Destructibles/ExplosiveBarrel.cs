@@ -10,16 +10,15 @@ namespace Client.Objects.Destructables
 {
     class ExplosiveBarrel : Destructible
     {
-        private Sprite explosiveBarrelObject;
 
         public ExplosiveBarrel()
         {
-            explosiveBarrelObject = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.ExplosiveBarrel));
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.ExplosiveBarrel);
         }
 
         public override Sprite SpawnObject()
         {
-            return explosiveBarrelObject;
+            return this;
         }
     }
 }

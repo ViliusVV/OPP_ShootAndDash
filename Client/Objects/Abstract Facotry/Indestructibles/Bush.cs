@@ -10,16 +10,15 @@ namespace Client.Objects.Indestructables
 {
     class Bush : Indestructible
     {
-        private Sprite bushObject;
 
         public Bush()
         {
-            bushObject = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Bush));
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.Bush);
         }
 
         public override Sprite SpawnObject()
         {
-            return bushObject;
+            return this;
         }
     }
 }

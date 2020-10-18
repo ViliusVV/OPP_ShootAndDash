@@ -10,16 +10,15 @@ namespace Client.Objects.Destructables
 {
     class ItemCrate : Destructible
     {
-        private Sprite itemCrateObject;
-
+        
         public ItemCrate()
         {
-            itemCrateObject = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Crate));
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.Crate);
         }
 
         public override Sprite SpawnObject()
         {
-            return itemCrateObject;
+            return this;
         }
     }
 }
