@@ -10,7 +10,6 @@ namespace Client.Objects.Destructables
 {
     class ExplosiveBarrel : Destructible
     {
-
         public ExplosiveBarrel()
         {
             this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.ExplosiveBarrel);
@@ -20,5 +19,11 @@ namespace Client.Objects.Destructables
         {
             return this;
         }
+
+        public static Sprite Explosion()
+        {
+            return null;
+        }
+
     }
 }

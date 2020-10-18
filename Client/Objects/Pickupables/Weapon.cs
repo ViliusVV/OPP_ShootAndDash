@@ -130,14 +130,17 @@ namespace Client.Objects
                     {
                         indexesToRemove.Add(i);
 
+                        if (collidables[j] is ExplosiveBarrel)
+                        {
+                            collidables.RemoveAt(j);
+                            Particle explosion = new Particle(Projectiles[i].ProjectileSprite.Position);
+                            GameState.GetInstance().NonCollidables.Add(explosion);
+                        }
                         if (collidables[j] is ItemCrate)
                         {
                             collidables.RemoveAt(j);
                         }
-                        if (collidables[j] is ExplosiveBarrel)
-                        {
-                            collidables.RemoveAt(j);
-                        }
+
                     }
                 }
             }
@@ -154,22 +157,6 @@ namespace Client.Objects
                 }
             }
         }
-
-        //public bool CheckCollisions()
-        //{
-        //    foreach (var item in GameState.GetInstance().Collidables)
-        //    {
-        //        if (this.GetGlobalBounds().Intersects(item.GetGlobalBounds()))
-        //        {
-        //            if (item is BarbWire)
-        //            {
-        //                this.ChangeHealth(-5);
-        //            }
-        //            return true;
-        //        }
-        //    }
-        //    return false;
-        //}
 
         public void Reload()
         {
