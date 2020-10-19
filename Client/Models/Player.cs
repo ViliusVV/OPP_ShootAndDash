@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Client.Models
 {
-    class Player: Sprite, ICommand
+    public class Player: Sprite, ICommand
     {
         private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
         public string Name { get; set; } = new Random().Next(1, 888).ToString();

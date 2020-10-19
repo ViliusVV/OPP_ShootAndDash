@@ -18,7 +18,7 @@ using System.Numerics;
 using System.Text;
 namespace Client.Objects
 {
-    class Weapon : Pickupable, IWeaponPrototype
+    public class Weapon : Pickupable, IWeaponPrototype
     {
         public string Name { get; private set; }
         public int MagazineSize { get; private set; }

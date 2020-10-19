@@ -10,7 +10,7 @@ using Client.Objects.Pickupables.Strategy;
 
 namespace Client.Objects
 {
-    class Medkit : PowerUp
+    public class Medkit : PowerUp
     {
         public Medkit()
         {
