@@ -111,12 +111,16 @@ namespace Client
 
             // weapon prototype
             //weaponProtoype = new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
-            weaponProtoype = new SniperRifle("AK-47", 50, 20, 2000, 50, 5000, 50);
+            weaponProtoype = new AssaultRifle("AK-47", 50, 20, 2000, 50, 5000, 50);
+            Weapon Test1 = new Pistol("Pistol", 50, 20, 2000, 50, 5000, 50);
             MainPlayer = new Player();
             MainPlayer.IsMainPlayer = true;
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
             MainPlayer.TextureRect = playerAnimation;
             MainPlayer.Weapon = (Weapon)weaponProtoype.Clone(); //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
+            MainPlayer.HoldingWeapon[0] = Test1;
+            MainPlayer.HoldingWeapon[1] = (Weapon)weaponProtoype.Clone();
+            MainPlayer.PreviousWeapon = "Pistol";
             // Configure sprite
 
 
@@ -434,7 +438,10 @@ namespace Client
                 director.ConstructBase();
                 GameState.TileMap = builder.GetResult();
             }
-
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Q))
+			{
+                MainPlayer.execute();
+			}
         }
 
         private void SpawningManager(int destrCount, int indestrCount, int syringeCount)

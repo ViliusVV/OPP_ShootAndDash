@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Client.Models
 {
-    class Player: Sprite
+    class Player: Sprite, ICommand
     {
         private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
         public string Name { get; set; } = new Random().Next(1, 888).ToString();
@@ -38,6 +38,7 @@ namespace Client.Models
         public bool IsInvincible { get; set; } = false;
         public Weapon Weapon { get; set; }
         public Weapon[] HoldingWeapon { get; set; }
+        public string PreviousWeapon { get; set; }
 
 
         public PlayerBar PlayerBar { get; set; }
@@ -45,6 +46,7 @@ namespace Client.Models
         {
             this.PlayerBar = new PlayerBar();
             this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.MainCharacter);
+            this.HoldingWeapon = new Weapon[3];
         }
 
 
@@ -65,6 +67,21 @@ namespace Client.Models
             this.Weapon = wep;
         }
 
+        public void execute()
+		{
+            if (HoldingWeapon != null)
+                for(int i = 0; i < HoldingWeapon.Length; i++)
+			    {
+                    if(HoldingWeapon[i] != null && HoldingWeapon[i].Name == PreviousWeapon)
+				    {
+                            PreviousWeapon = this.Weapon.Name;
+                            SetWeapon(HoldingWeapon[i]);
+                            this.Weapon.Projectiles = HoldingWeapon[i].Projectiles;
+                            //HoldingWeapon[i].Projectiles.Clear();
+                            break;
+                    }
+			    }
+		}
 
         public void ChangeHealth(float amount)
         {
