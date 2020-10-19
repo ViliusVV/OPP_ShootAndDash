@@ -37,6 +37,7 @@ namespace Client.Models
         public bool IsMainPlayer { get; set; }
         public bool IsInvincible { get; set; } = false;
         public Weapon Weapon { get; set; }
+        public Weapon[] HoldingWeapon { get; set; }
 
 
         public PlayerBar PlayerBar { get; set; }

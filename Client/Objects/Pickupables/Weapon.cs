@@ -51,7 +51,7 @@ namespace Client.Objects
             this.CanShoot = true;
             this.ProjectileSprite = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Bullet));
             //this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GunAk47);
-            this.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
+            //this.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
         }
 
         public void DrawProjectiles(RenderWindow gameWindow)
