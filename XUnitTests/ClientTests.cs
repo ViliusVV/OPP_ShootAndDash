@@ -62,6 +62,15 @@ namespace XUnitTests
         //        this.Scale = new Vector2f(-1, 1);
         //    }
         //}
+
+        [Fact]
+        public void TestSetPlayerWeapon()
+        {
+            Player player = new Player();
+            Weapon wep = new Weapon("AK-47", 10, 4, 11111, 555, 1231, 155);
+            player.SetWeapon(wep);
+            Assert.Equal(player.Weapon, wep);
+        }
         [Theory]
         [InlineData(10, 10, 1)]
         [InlineData(10, 0, 1)]
