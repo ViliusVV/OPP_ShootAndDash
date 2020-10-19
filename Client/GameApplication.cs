@@ -118,9 +118,9 @@ namespace Client
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
             MainPlayer.TextureRect = playerAnimation;
             MainPlayer.Weapon = (Weapon)weaponProtoype.Clone(); //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
-            MainPlayer.HoldingWeapon[0] = Test1;
-            MainPlayer.HoldingWeapon[1] = (Weapon)weaponProtoype.Clone();
-            MainPlayer.PreviousWeapon = "Pistol";
+            MainPlayer.HoldingWeapon[0] = Test1;            //for testing purposes
+            MainPlayer.HoldingWeapon[1] = (Weapon)weaponProtoype.Clone();           //for testing purposes
+            MainPlayer.PreviousWeapon = "Pistol";           //for testing purposes
             // Configure sprite
 
 
