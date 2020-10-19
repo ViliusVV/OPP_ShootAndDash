@@ -5,6 +5,7 @@ using Client.Objects;
 using Client.Config;
 using Client;
 using TextureIdentifierClient = Client.Config;
+using Client.Utilities;
 
 namespace XUnitTests
 {
@@ -13,6 +14,7 @@ namespace XUnitTests
         TextureHolder Textures = TextureHolder.GetInstance();
         SoundHolder Sounds = SoundHolder.GetInstance();
         FontHolder Fonts = FontHolder.GetInstance();
+
         public ClientTests()
         {
             LoadTextures();
@@ -51,7 +53,7 @@ namespace XUnitTests
         {
             Player player = new Player();
             Medkit medkit = new Medkit();
-            player.ApplyDamage(-80);
+            player.ChangeHealth(80);
             medkit.Pickup(player);
             Assert.Equal(70, player.Health);
         }
