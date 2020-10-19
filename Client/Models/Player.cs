@@ -82,47 +82,25 @@ namespace Client.Models
                     }
 			    }
 		}
-
-        public void ChangeHealth(float amount)
+        public void AddHealth(float amount)
         {
-            if (this.IsInvincible && amount < 0)
-            {
-                return;
-            }
-
-            float newHealth = Health + amount;
-            if (newHealth <= 100)
+            // heal player
+            if(amount >= 0)
             {
                 Health += amount;
-                if (Health <= 0)
-                {
-                    IsDead = true;
-                    Health = 0;
-                }
-            }
-            else
-            {
-                Health = 100;
-            }
-        }
-
-        public void Heal(float amount)
-        {
-            if (amount > 0)
-            {
-                float newHealth = Health + amount;
-                if(newHealth <= 100)
-                {
-                    Health += amount;
-                }
-                else
+                if(Health > 100)
                 {
                     Health = 100;
                 }
             }
+            // damage player
             else
             {
-                throw new ArgumentException("Can not heal with negative value");
+                Health += amount;
+                if(Health <= 0)
+                {
+                    IsDead = true;
+                }
             }
         }
 
@@ -220,7 +198,7 @@ namespace Client.Models
                 {
                     if(item is BarbWire)
                     {
-                        this.ChangeHealth(-5);
+                        this.AddHealth(-5);
                     }
                     return true;
                 }

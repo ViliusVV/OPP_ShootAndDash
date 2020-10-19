@@ -412,7 +412,7 @@ namespace Client
             }
             if(Keyboard.IsKeyPressed(Keyboard.Key.Z))
             {
-                MainPlayer.ChangeHealth(-1);
+                MainPlayer.AddHealth(-1);
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.R))
             {
