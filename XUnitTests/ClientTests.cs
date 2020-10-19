@@ -14,7 +14,6 @@ namespace XUnitTests
         TextureHolder Textures = TextureHolder.GetInstance();
         SoundHolder Sounds = SoundHolder.GetInstance();
         FontHolder Fonts = FontHolder.GetInstance();
-
         public ClientTests()
         {
             LoadTextures();
@@ -48,14 +47,61 @@ namespace XUnitTests
                 Fonts.Load(font);
             }
         }
-        [Fact]
-        public void Test1()
+        //public void UpdatePlayerFacingPosition()
+        //{
+        //    if (Math.Abs(Speed.X) < 0.01)
+        //    {
+        //        // leave this here, it fixes facing right/left
+        //    }
+        //    else if (Speed.X > 0)
+        //    {
+        //        this.Scale = new Vector2f(1, 1);
+        //    }
+        //    else if (Speed.X < 0)
+        //    {
+        //        this.Scale = new Vector2f(-1, 1);
+        //    }
+        //}
+        [Theory]
+        [InlineData(10, 10, 1)]
+        [InlineData(10, 0, 1)]
+        [InlineData(10, -10, 1)]
+        [InlineData(-10, 0, -1)]
+        [InlineData(-1, 10, -1)]
+        [InlineData(-5, 0, -1)]
+        [InlineData(-10, -10, -1)]
+        [InlineData(0, 0, 1)]
+        public void TestPlayerFacing(float x, float y, float direction)
         {
             Player player = new Player();
-            Medkit medkit = new Medkit();
-            player.ChangeHealth(80);
-            medkit.Pickup(player);
-            Assert.Equal(70, player.Health);
+            player.Speed = new SFML.System.Vector2f(x, y);
+            player.UpdatePlayerFacingPosition();
+            Assert.Equal(player.Scale.X, direction);
         }
+        [Theory]
+        [InlineData(-10, 90)]
+        [InlineData(-100, 0)]
+        [InlineData(0, 100)]
+        [InlineData(10, 100)]
+        public void TestDealDamage(int damage, int result)
+        {
+            Player player = new Player();
+            player.AddHealth(damage);
+            Assert.Equal(player.Health, result);
+        }
+        [Theory]
+        [InlineData(-10, -10)]
+        [InlineData(0, 0)]
+        [InlineData(10, 10)]
+        [InlineData(100, 100)]
+        [InlineData(101, 100)]
+        public void TestPlayerHeal(int healAmount, int result)
+        {
+            Player player = new Player();
+            player.AddHealth(-100);
+            player.AddHealth(healAmount);
+            Assert.Equal(player.Health, result);
+        }
+
     }
 }
