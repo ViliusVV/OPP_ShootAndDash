@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Client.Objects.Pickupables
 {
-    abstract class PowerUp : Pickupable
+    public abstract class PowerUp : Pickupable
     {
         public IPowerUpStrategy PowerUpStrategy { get; set; }
 

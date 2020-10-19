@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Client.Objects.Pickupables.Strategy
 {
-    interface IPowerUpStrategy
+    public interface IPowerUpStrategy
     {
         public void DoPowerUpLogic(Player player);
     }

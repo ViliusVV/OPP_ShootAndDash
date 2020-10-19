@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Client.Objects.Prototype
 {
-    interface IWeaponPrototype
+    public interface IWeaponPrototype
     {
         public IWeaponPrototype Clone();
     }

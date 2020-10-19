@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Client.Objects.Pickupables.Strategy
 {
-    class HealingStrategy : IPowerUpStrategy
+    public class HealingStrategy : IPowerUpStrategy
     {
         private float HealAmount { get; set; } = 30f;
 
