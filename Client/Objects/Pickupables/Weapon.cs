@@ -30,11 +30,13 @@ namespace Client.Objects
         public int SpreadAmount { get; private set; }
         public bool CanShoot { get; private set; }
         public bool Reloading { get; set; }
+        public string LaserSight { get; set; }
         public List<Projectile> Projectiles {get;set;}
         public Clock ShootTimer { get; set; } = new Clock();
         public Clock ReloadTimer { get; set; } = new Clock();
         public Clock ReloadCooldown { get; set; } = new Clock();
         public Sprite ProjectileSprite { get; private set; }
+        public Sprite LaserSprite { get; set; }
 
         public Weapon(string name, int magazineSize, float dmg, float projectileSpd,
             float attackSpd, float reloadTime, int spreadAmount)
@@ -112,6 +114,8 @@ namespace Client.Objects
                 sound.Play();
             }
         }
+
+
         public void CheckCollisions(List<Sprite> collidables)
         {
             // 2 sets of loops, because we cannot modify the list while we are iterating through it

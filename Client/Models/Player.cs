@@ -230,6 +230,11 @@ namespace Client.Models
             if(Weapon != null)
             {
                 Weapon.Position = this.Position;
+                //if (Weapon.LaserSprite != null)
+                //this.Weapon.LaserSprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X + 25, 8f);
+                //Weapon.LaserSprite.Position = this.Position;
+                //this.Position;
+                //new Vector2f(this.Weapon.Position.X, this.Weapon.Position.Y);
             }
 
             if (this.Weapon.Reloading)
