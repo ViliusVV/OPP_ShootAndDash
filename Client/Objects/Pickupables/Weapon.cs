@@ -133,11 +133,65 @@ namespace Client.Objects
                         {
                             Particle explosion = new Particle(collidables[j].Position);
                             GameState.GetInstance().NonCollidables.Add(explosion);
+
                             collidables.RemoveAt(j);
+                            Clock explosionDuration = new Clock();
+                            //while (true)
+                            //{
+                            //    if (explosionDuration.ElapsedTime.AsSeconds() > 0.5f)
+                            //    {
+                            //        GameState.GetInstance().NonCollidables.Remove(explosion);
+                            //        break;
+                            //    }
+                            //}
+                            //GameState.GetInstance().NonCollidables.Remove(explosion);
+
+
                         }
                         else if (collidables[j] is ItemCrate)
                         {
+                           
+                            Random Rnd = new Random();
+                            int num = Rnd.Next(10);
+                            Weapon spawn;
+                            switch (num)
+                            {
+                                case 0:
+                                    spawn = new Minigun("Minigun", 50, 20, 2000, 50, 5000, 50);
+                                    break;
+                                case 1:
+                                    spawn = new SniperRifle("Sniper", 50, 20, 2000, 50, 5000, 50);
+                                    break;
+                                case 2:
+                                    spawn = new Pistol("Pistol", 50, 20, 2000, 50, 5000, 50);
+                                    break;
+                                case 3:
+                                    spawn = new Flamethrower("Flamethrower", 200, 10, 500, 100, 6000, 100);
+                                    break;
+                                case 4:
+                                    spawn = new Shotgun("Shotgun", 50, 20, 2000, 50, 5000, 50);
+                                    break;
+                                    // Weapons with laser
+                                case 5:
+                                    spawn = new RedLaser("AK-47", 50, 20, 2000, 50, 5000, 50);
+                                    break;
+                                case 6:
+                                    spawn = new RedLaser("Sniper", 50, 20, 2000, 50, 5000, 50);
+                                    break;
+                                case 7:
+                                    spawn = new GreenLaser("AK-47", 50, 20, 2000, 50, 5000, 50);
+                                    break;
+                                case 8:
+                                    spawn = new GreenLaser("Sniper", 50, 20, 2000, 50, 5000, 50);
+                                    break;
+                                default:
+                                    spawn = new AssaultRifle("AK-47", 50, 20, 2000, 50, 5000, 50);
+                                    break;
+                            }
+                            spawn.Position = collidables[j].Position;
+                            GameState.GetInstance().Pickupables.Add(spawn);
                             collidables.RemoveAt(j);
+
                         }
 
                     }

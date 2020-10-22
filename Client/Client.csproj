@@ -7,12 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.8" />
-    <PackageReference Include="SFML.Net" Version="2.5.0" />
+    <Compile Remove="Objects\Adapter\**" />
+    <EmbeddedResource Remove="Objects\Adapter\**" />
+    <None Remove="Objects\Adapter\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Objects\Adapter\" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.8" />
+    <PackageReference Include="SFML.Net" Version="2.5.0" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

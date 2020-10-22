@@ -28,6 +28,7 @@ namespace Client.Config
         [ResourceAttr("Assets/Pistol.png")] Pistol,
         [ResourceAttr("Assets/Shotgun.png")] Shotgun,
         [ResourceAttr("Assets/SniperRifle.png")] SniperRifle,
+        [ResourceAttr("Assets/Flamethrower.png")] Flamethrower,
         // Laser Colors
         [ResourceAttr("Assets/RedLaser.png")] RedLaser,
         [ResourceAttr("Assets/GreenLaser.png")] GreenLaser,
