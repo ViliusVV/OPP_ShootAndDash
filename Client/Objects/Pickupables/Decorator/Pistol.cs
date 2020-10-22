@@ -16,8 +16,6 @@ reloadTime, spreadAmount)
         {
             this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.Pistol);
             this.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
-            //this.decoratedWeapon = DecoratedWeapon;
-            //this.decoratedWeapon.Texture 
         }
     }
 }

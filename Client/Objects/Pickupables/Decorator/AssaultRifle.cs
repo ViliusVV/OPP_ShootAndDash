@@ -11,13 +11,11 @@ namespace Client.Objects.Pickupables.Decorator
     class AssaultRifle : WeaponDecorator
     {
         public AssaultRifle(string name, int magazineSize, float dmg, float projectileSpd,
-    float attackSpd, float reloadTime, int spreadAmount) : base(name, magazineSize, dmg, projectileSpd, attackSpd,
+        float attackSpd, float reloadTime, int spreadAmount) : base(name, magazineSize, dmg, projectileSpd, attackSpd,
         reloadTime, spreadAmount)
         {
             this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GunAk47);
             this.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
-            //this.decoratedWeapon = DecoratedWeapon;
-            //this.decoratedWeapon.Texture 
         }
     }
 }

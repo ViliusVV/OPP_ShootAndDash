@@ -22,6 +22,7 @@ using Client.Objects.BuilderObjects;
 using System.Linq;
 using Client.Objects.Pickupables.Strategy;
 using Client.Objects.Pickupables.Decorator;
+using System.Diagnostics;
 
 namespace Client
 {
@@ -111,8 +112,12 @@ namespace Client
 
             // weapon prototype
             //weaponProtoype = new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
-            weaponProtoype = new AssaultRifle("AK-47", 50, 20, 2000, 50, 5000, 50);
-            Weapon Test1 = new Pistol("Pistol", 50, 20, 2000, 50, 5000, 50);
+            weaponProtoype = new SniperRifle("Sniper", 50, 20, 2000, 50, 5000, 50);
+            weaponProtoype = new GreenLaser(weaponProtoype.Name, weaponProtoype.MagazineSize, weaponProtoype.Damage, weaponProtoype.ProjectileSpeed,
+                weaponProtoype.AttackSpeed, weaponProtoype.ReloadDuration, weaponProtoype.SpreadAmount);
+            Weapon Test1 = new AssaultRifle("AK-47", 50, 20, 2000, 50, 5000, 50);
+            Test1 = new GreenLaser(weaponProtoype.Name, weaponProtoype.MagazineSize, weaponProtoype.Damage, weaponProtoype.ProjectileSpeed,
+                weaponProtoype.AttackSpeed, weaponProtoype.ReloadDuration, weaponProtoype.SpreadAmount);
             MainPlayer = new Player();
             MainPlayer.IsMainPlayer = true;
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
@@ -120,14 +125,15 @@ namespace Client
             MainPlayer.Weapon = (Weapon)weaponProtoype.Clone(); //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
             MainPlayer.HoldingWeapon[0] = Test1;            //for testing purposes
             MainPlayer.HoldingWeapon[1] = (Weapon)weaponProtoype.Clone();           //for testing purposes
-            MainPlayer.PreviousWeapon = "Pistol";           //for testing purposes
+            MainPlayer.PreviousWeapon = "AK-47";           //for testing purposes
             // Configure sprite
 
 
             MainPlayer.Origin = SpriteUtils.GetSpriteCenter(MainPlayer);
+            
+
 
             GameState.Players.Add(MainPlayer);
-
 
             scoreboardText = new CustomText(Fonts.Get(FontIdentifier.PixelatedSmall), 21);
             scoreboardText.DisplayedString = "Player01 - 15/2";
@@ -171,6 +177,13 @@ namespace Client
 
                     MainPlayer.Weapon.Rotation = rotation;
                     MainPlayer.Weapon.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
+                    if (MainPlayer.Weapon.LaserSprite != null)
+                    {
+                        float LaserPosition = (float)Math.Sqrt(VectorUtils.GetSquaredDistance(MainPlayer.Position, mPos));
+                        MainPlayer.Weapon.LaserSprite.Rotation = rotation;
+                        MainPlayer.Weapon.LaserSprite.Position = MainPlayer.Weapon.Position;
+                        MainPlayer.Weapon.LaserSprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(-LaserPosition/32, 1.0f) : new Vector2f(-LaserPosition/32, -1.0f);
+                    }
 
 
                     // Run player animation
@@ -264,6 +277,7 @@ namespace Client
                 GameWindow.Draw(player.PlayerBar);
                 
                 if(player.Weapon != null) GameWindow.Draw(player.Weapon);
+                if (player.Weapon.LaserSight != null) GameWindow.Draw(player.Weapon.LaserSprite);
             }
         }
 
