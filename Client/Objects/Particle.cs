@@ -10,8 +10,6 @@ namespace Client.Objects
 {
     class Particle : Sprite
     {
-        private Sprite explosion;
-
         public Particle(Vector2f position)
         {
             this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.Explosion);

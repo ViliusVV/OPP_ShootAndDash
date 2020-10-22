@@ -127,11 +127,11 @@ namespace Client.Objects
 
                         if (collidables[j] is ExplosiveBarrel)
                         {
-                            collidables.RemoveAt(j);
-                            Particle explosion = new Particle(Projectiles[i].ProjectileSprite.Position);
+                            Particle explosion = new Particle(collidables[j].Position);
                             GameState.GetInstance().NonCollidables.Add(explosion);
+                            collidables.RemoveAt(j);
                         }
-                        if (collidables[j] is ItemCrate)
+                        else if (collidables[j] is ItemCrate)
                         {
                             collidables.RemoveAt(j);
                         }

@@ -5,6 +5,7 @@ using Client.Models;
 using SFML.Graphics;
 using Client.Config;
 using Client.Utilities;
+using SFML.System;
 
 namespace Client.Objects.Destructables
 {
@@ -20,9 +21,11 @@ namespace Client.Objects.Destructables
             return this;
         }
 
-        public static Sprite Explosion()
+        public override Sprite DestroyBehavior(Vector2f position)
         {
-            return null;
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.Explosion);
+            this.Position = position;
+            return this;
         }
 
     }
