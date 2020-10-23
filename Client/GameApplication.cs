@@ -112,20 +112,18 @@ namespace Client
 
             // weapon prototype
             //weaponProtoype = new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
-            weaponProtoype = new SniperRifle("Sniper", 50, 20, 2000, 50, 5000, 50);
-            weaponProtoype = new GreenLaser(weaponProtoype.Name, weaponProtoype.MagazineSize, weaponProtoype.Damage, weaponProtoype.ProjectileSpeed,
-                weaponProtoype.AttackSpeed, weaponProtoype.ReloadDuration, weaponProtoype.SpreadAmount);
-            Weapon Test1 = new AssaultRifle("AK-47", 50, 20, 2000, 50, 5000, 50);
-            Test1 = new GreenLaser(weaponProtoype.Name, weaponProtoype.MagazineSize, weaponProtoype.Damage, weaponProtoype.ProjectileSpeed,
-                weaponProtoype.AttackSpeed, weaponProtoype.ReloadDuration, weaponProtoype.SpreadAmount);
+            //weaponProtoype = new AssaultRifle();
+            //new RedLaser(weaponProtoype);
+            //weaponProtoype = new GreenLaser(weaponProtoype);
+            Weapon Test1 = new Pistol();
             MainPlayer = new Player();
             MainPlayer.IsMainPlayer = true;
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
             MainPlayer.TextureRect = playerAnimation;
-            MainPlayer.Weapon = (Weapon)weaponProtoype.Clone(); //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
+            MainPlayer.Weapon = Test1; //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
             MainPlayer.HoldingWeapon[0] = Test1;            //for testing purposes
-            MainPlayer.HoldingWeapon[1] = (Weapon)weaponProtoype.Clone();           //for testing purposes
-            MainPlayer.PreviousWeapon = "AK-47";           //for testing purposes
+            //MainPlayer.HoldingWeapon[1] = (Weapon)weaponProtoype.Clone();           //for testing purposes
+            MainPlayer.PreviousWeapon = "";           //for testing purposes
             // Configure sprite
 
 
@@ -182,7 +180,7 @@ namespace Client
                         float LaserPosition = (float)Math.Sqrt(VectorUtils.GetSquaredDistance(MainPlayer.Position, mPos));
                         MainPlayer.Weapon.LaserSprite.Rotation = rotation;
                         MainPlayer.Weapon.LaserSprite.Position = MainPlayer.Weapon.Position;
-                        MainPlayer.Weapon.LaserSprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(-LaserPosition/32, 1.0f) : new Vector2f(-LaserPosition/32, -1.0f);
+                        MainPlayer.Weapon.LaserSprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(LaserPosition/32, 1.0f) : new Vector2f(LaserPosition/32, -1.0f);
                     }
 
 
@@ -455,6 +453,29 @@ namespace Client
             if (Keyboard.IsKeyPressed(Keyboard.Key.Q))
 			{
                 MainPlayer.execute();
+			}
+            if (Keyboard.IsKeyPressed(Keyboard.Key.G))
+			{
+                MainPlayer.DropWeapon();
+            }
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Num1))
+			{
+                if (MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[0].Name)
+                    MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
+			}
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Num2))
+			{
+                if (MainPlayer.HoldingWeapon[1] != null && MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[1].Name)
+                    MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[1]);
+			}
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Num3))
+			{
+                if (MainPlayer.HoldingWeapon[2] != null && MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[2].Name)
+                    MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[2]);
+			}
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Num4))
+			{
+                MainPlayer.PrintCurrentGuns();
 			}
         }
 

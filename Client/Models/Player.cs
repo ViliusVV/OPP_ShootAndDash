@@ -49,7 +49,6 @@ namespace Client.Models
             this.HoldingWeapon = new Weapon[3];
         }
 
-
         public Player(PlayerDTO playerDTO)
         {
             this.PlayerBar = new PlayerBar();
@@ -64,9 +63,49 @@ namespace Client.Models
 
         public void SetWeapon(Weapon wep)
         {
+            Console.WriteLine(this.Weapon.Name);
+            this.PreviousWeapon = this.Weapon.Name;
             this.Weapon = wep;
         }
 
+        public void PrintCurrentGuns()
+		{
+            for(int i = 0; i < HoldingWeapon.Length; i++)
+			{
+                if(HoldingWeapon[i] != null)
+				{
+                    Console.WriteLine(HoldingWeapon[i].Name);
+				}
+			}
+		}
+
+        public void DropWeapon()
+        {
+            if (this.Weapon != HoldingWeapon[0])
+            {
+                for (int i = 1; i < HoldingWeapon.Length; i++)
+                {
+                    if (HoldingWeapon[i] != null && HoldingWeapon[i].Name == this.Weapon.Name)
+                    {
+                        HoldingWeapon[i] = null;
+                    }
+                }
+                if (HoldingWeapon[2] != null)
+                {
+                    this.Weapon = HoldingWeapon[2];
+                }
+                else if (HoldingWeapon[1] != null)
+                {
+                    this.Weapon = HoldingWeapon[1];
+                }
+                else
+                {
+                    this.Weapon = HoldingWeapon[0];
+                }
+            }
+        }
+
+        //Q feature, to change weapon to last used weapon
         public void execute()
 		{
             if (HoldingWeapon != null)
@@ -74,7 +113,6 @@ namespace Client.Models
 			    {
                     if(HoldingWeapon[i] != null && HoldingWeapon[i].Name == PreviousWeapon)
 				    {
-                            PreviousWeapon = this.Weapon.Name;
                             SetWeapon(HoldingWeapon[i]);
                             this.Weapon.Projectiles = HoldingWeapon[i].Projectiles;
                             //HoldingWeapon[i].Projectiles.Clear();

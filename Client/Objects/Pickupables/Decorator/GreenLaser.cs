@@ -10,31 +10,31 @@ namespace Client.Objects.Pickupables.Decorator
 {
 	class GreenLaser : LaserDecorator
 	{
-        public GreenLaser(string name, int magazineSize, float dmg, float projectileSpd,
-float attackSpd, float reloadTime, int spreadAmount) : base(name, magazineSize, dmg, projectileSpd, attackSpd,
-reloadTime, spreadAmount)
+        public GreenLaser(Weapon newweapon) : base()
         {
-            this.LaserSight = new string("Green");
-            this.LaserSprite = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.GreenLaser));
-            CheckGun(name);
-            this.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
+            newweapon.LaserSight = new string("Green");
+            newweapon.LaserSprite = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.GreenLaser));
+            CheckGun(newweapon.Name, newweapon);
+            //newweapon.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
         }
-        public void CheckGun(string text)
+        public void CheckGun(string text, Weapon newweapon)
 		{
-            if(text == "Pistol")
+   //         if(text == "Pistol")
+			//{
+   //             texture.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GreenPistolLaser);
+   //             texture.LaserSprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
+   //         } 
+            if (text == "AK-47")
 			{
-                this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GreenPistolLaser);
-                this.LaserSprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
-            } 
-            else if (text == "AK-47")
-			{
-                this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GreenGunAk47Laser);
-                this.LaserSprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 8f);
+                newweapon.Name = "AK-47G";
+                newweapon.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GreenGunAk47Laser);
+                newweapon.LaserSprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 8f);
             } 
             else if (text == "Sniper")
 			{
-                this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GreenSniperLaser);
-                this.LaserSprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 10f);
+                newweapon.Name = "Sniper";
+                newweapon.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GreenSniperLaser);
+                newweapon.LaserSprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 10f);
             }
 		}
     }
