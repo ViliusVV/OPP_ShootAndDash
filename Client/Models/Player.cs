@@ -39,6 +39,7 @@ namespace Client.Models
         public Weapon Weapon { get; set; }
         public Weapon[] HoldingWeapon { get; set; }
         public string PreviousWeapon { get; set; }
+        public Clock SwapTimer { get; set; } = new Clock();
 
 
         public PlayerBar PlayerBar { get; set; }
@@ -63,21 +64,9 @@ namespace Client.Models
 
         public void SetWeapon(Weapon wep)
         {
-            Console.WriteLine(this.Weapon.Name);
             this.PreviousWeapon = this.Weapon.Name;
             this.Weapon = wep;
         }
-
-        public void PrintCurrentGuns()
-		{
-            for(int i = 0; i < HoldingWeapon.Length; i++)
-			{
-                if(HoldingWeapon[i] != null)
-				{
-                    Console.WriteLine(HoldingWeapon[i].Name);
-				}
-			}
-		}
 
         public void DropWeapon()
         {
@@ -108,17 +97,20 @@ namespace Client.Models
         //Q feature, to change weapon to last used weapon
         public void execute()
 		{
-            if (HoldingWeapon != null)
-                for(int i = 0; i < HoldingWeapon.Length; i++)
-			    {
-                    if(HoldingWeapon[i] != null && HoldingWeapon[i].Name == PreviousWeapon)
-				    {
-                            SetWeapon(HoldingWeapon[i]);
-                            this.Weapon.Projectiles = HoldingWeapon[i].Projectiles;
-                            //HoldingWeapon[i].Projectiles.Clear();
-                            break;
+            if (HoldingWeapon != null && this.SwapTimer.ElapsedTime.AsMilliseconds() > 200)
+            {
+                this.SwapTimer.Restart();
+                for (int i = 0; i < HoldingWeapon.Length; i++)
+                {
+                    if (HoldingWeapon[i] != null && HoldingWeapon[i].Name == PreviousWeapon)
+                    {
+                        SetWeapon(HoldingWeapon[i]);
+                        this.Weapon.Projectiles = HoldingWeapon[i].Projectiles;
+                        //HoldingWeapon[i].Projectiles.Clear();
+                        break;
                     }
-			    }
+                }
+            }
 		}
         public void AddHealth(float amount)
         {

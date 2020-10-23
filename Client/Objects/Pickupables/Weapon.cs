@@ -164,48 +164,38 @@ namespace Client.Objects
                             switch (num)
                             {
                                 case 0:
-                                    Console.WriteLine("Minigun");
                                     spawn = new Minigun();
                                     break;
                                 case 1:
-                                    Console.WriteLine("Sniper");
                                     spawn = new SniperRifle();
                                     break;
                                 case 2:
-                                    Console.WriteLine("Pistol");
                                     spawn = new Pistol();
                                     break;
                                 case 3:
-                                    Console.WriteLine("Flame");
                                     spawn = new Flamethrower();
                                     break;
                                 case 4:
-                                    Console.WriteLine("Shotgun");
                                     spawn = new Shotgun();
                                     break;
                                     // Weapons with laser
                                 case 5:
-                                    Console.WriteLine("RedSniper");
                                     spawn = new SniperRifle();
                                     new RedLaser(spawn);
                                     break;
                                 case 6:
-                                    Console.WriteLine("RedAssault");
                                     spawn = new AssaultRifle();
                                     new RedLaser(spawn);
                                     break;
                                 case 7:
-                                    Console.WriteLine("GreenSniper");
                                     spawn = new SniperRifle();
                                     new GreenLaser(spawn);
                                     break;
                                 case 8:
-                                    Console.WriteLine("GreenAssault");
                                     spawn = new AssaultRifle();
                                     new GreenLaser(spawn);
                                     break;
                                 default:
-                                    Console.WriteLine("Assault");
                                     spawn = new AssaultRifle();
                                     break;
                             }

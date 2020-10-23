@@ -473,10 +473,6 @@ namespace Client
                 if (MainPlayer.HoldingWeapon[2] != null && MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[2].Name)
                     MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[2]);
 			}
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Num4))
-			{
-                MainPlayer.PrintCurrentGuns();
-			}
         }
 
         private void SpawningManager(int destrCount, int indestrCount, int syringeCount)
