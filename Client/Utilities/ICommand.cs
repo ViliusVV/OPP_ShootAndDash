@@ -6,6 +6,6 @@ namespace Client.Utilities
 {
 	interface ICommand
 	{
-		void execute();
+		void Toggle();
 	}
 }

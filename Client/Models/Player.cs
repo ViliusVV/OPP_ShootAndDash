@@ -67,7 +67,7 @@ namespace Client.Models
             this.Weapon = wep;
         }
 
-        public void execute()
+        public void Toggle()
 		{
             if (HoldingWeapon != null)
                 for(int i = 0; i < HoldingWeapon.Length; i++)
@@ -99,6 +99,10 @@ namespace Client.Models
                     IsDead = true;
                     Health = 0;
                 }
+            } 
+            else if(newHealth <= 0)
+            {
+                Health = 0;
             }
             else
             {

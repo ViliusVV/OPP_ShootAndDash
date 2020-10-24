@@ -440,7 +440,7 @@ namespace Client
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.Q))
 			{
-                MainPlayer.execute();
+                MainPlayer.Toggle();
 			}
         }
 
