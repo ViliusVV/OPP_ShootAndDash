@@ -95,7 +95,7 @@ namespace Client.Models
         }
 
         //Q feature, to change weapon to last used weapon
-        public void execute()
+        public void Toggle()
 		{
             if (HoldingWeapon != null && this.SwapTimer.ElapsedTime.AsMilliseconds() > 200)
             {
@@ -121,6 +121,10 @@ namespace Client.Models
                 if(Health > 100)
                 {
                     Health = 100;
+                }
+                if(Health < 0)
+                {
+                    Health = 0;
                 }
             }
             // damage player
