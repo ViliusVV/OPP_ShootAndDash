@@ -20,7 +20,7 @@ namespace Client.Objects.Pickupables.Strategy
         public void DoPowerUpLogic(Player player)
         {
             OurLogger.Log("Executing healing powerup strategy");
-            player.Heal(HealAmount);
+            player.AddHealth(HealAmount);
         }
     }
 }

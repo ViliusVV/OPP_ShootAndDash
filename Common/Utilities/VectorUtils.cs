@@ -94,7 +94,7 @@ namespace Common.Utilities
 
         public static float GetSquaredDistance(Vector2f start, Vector2f end)
         {
-            return (float)(Math.Pow(start.X - end.X, 2) + Math.Pow(end.Y - end.Y, 2));
+            return (float)(Math.Pow(start.X - end.X, 2) + Math.Pow(start.Y - end.Y, 2));
         }
 
         public static float GetSquaredDistance(float x1, float y1, float x2, float y2)

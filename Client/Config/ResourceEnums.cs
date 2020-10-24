@@ -28,6 +28,17 @@ namespace Client.Config
         [ResourceAttr("Assets/Pistol.png")] Pistol,
         [ResourceAttr("Assets/Shotgun.png")] Shotgun,
         [ResourceAttr("Assets/SniperRifle.png")] SniperRifle,
+        [ResourceAttr("Assets/Flamethrower.png")] Flamethrower,
+        // Laser Colors
+        [ResourceAttr("Assets/RedLaser.png")] RedLaser,
+        [ResourceAttr("Assets/GreenLaser.png")] GreenLaser,
+        // Guns with lasers
+        [ResourceAttr("Assets/Pistol_RedLaser.png")] RedPistolLaser,
+        [ResourceAttr("Assets/SniperRifle_RedLaser.png")] RedSniperLaser,
+        [ResourceAttr("Assets/gunAk47_RedLaser.png")] RedGunAk47Laser,
+        [ResourceAttr("Assets/Pistol_GreenLaser.png")] GreenPistolLaser,
+        [ResourceAttr("Assets/SniperRifle_GreenLaser.png")] GreenSniperLaser,
+        [ResourceAttr("Assets/gunAk47_GreenLaser.png")] GreenGunAk47Laser,
         // HUD
         [ResourceAttr("Assets/hudPlayerBar.png")] PlayerBar,
         [ResourceAttr("Assets/hudPlayerBarMask.png")] PlayerBarMask,

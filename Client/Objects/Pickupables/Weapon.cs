@@ -20,36 +20,37 @@ namespace Client.Objects
 {
     public class Weapon : Pickupable, IWeaponPrototype
     {
-        public string Name { get; private set; }
-        public int MagazineSize { get; private set; }
-        public int Ammo { get; private set; }
-        public float Damage { get; private set; }
-        public float ProjectileSpeed { get; private set; }
-        public float AttackSpeed { get; private set; }
+        public string Name { get; set; }
+        public int MagazineSize { get; set; }
+        public int Ammo { get; set; }
+        public float Damage { get; set; }
+        public float ProjectileSpeed { get; set; }
+        public float AttackSpeed { get; set; }
         public float ReloadDuration { get; set; }
-        public int SpreadAmount { get; private set; }
-        public bool CanShoot { get; private set; }
+        public int SpreadAmount { get; set; }
+        public bool CanShoot { get; set; }
         public bool Reloading { get; set; }
-        public List<Projectile> Projectiles {get;set;}
+        public string LaserSight { get; set; }
+        public List<Projectile> Projectiles { get; set;}
         public Clock ShootTimer { get; set; } = new Clock();
         public Clock ReloadTimer { get; set; } = new Clock();
         public Clock ReloadCooldown { get; set; } = new Clock();
-        public Sprite ProjectileSprite { get; private set; }
+        public Sprite ProjectileSprite { get; set; }
+        public Sprite LaserSprite { get; set; }
 
-        public Weapon(string name, int magazineSize, float dmg, float projectileSpd,
-            float attackSpd, float reloadTime, int spreadAmount)
+        public Weapon()
         {
-            this.Name = name;
-            this.MagazineSize = magazineSize;
-            this.Ammo = magazineSize;
-            this.Damage = dmg;
-            this.ProjectileSpeed = projectileSpd;
-            this.AttackSpeed = attackSpd;
-            this.ReloadDuration = reloadTime;
-            this.Projectiles = new List<Projectile>();
-            this.SpreadAmount = spreadAmount;
-            this.CanShoot = true;
-            this.ProjectileSprite = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Bullet));
+            //this.Name = name;
+            //this.MagazineSize = magazineSize;
+            //this.Ammo = magazineSize;
+            //this.Damage = dmg;
+            //this.ProjectileSpeed = projectileSpd;
+            //this.AttackSpeed = attackSpd;
+            //this.ReloadDuration = reloadTime;
+            //this.Projectiles = new List<Projectile>();
+            //this.SpreadAmount = spreadAmount;
+            //this.CanShoot = true;
+            //this.ProjectileSprite = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Bullet));
             //this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GunAk47);
             //this.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
         }
@@ -85,7 +86,15 @@ namespace Client.Objects
         }
         public override void Pickup(Player player)
         {
-            player.SetWeapon(this);
+            for (int i = 1; i < player.HoldingWeapon.Length; i++)
+            {
+                if(player.HoldingWeapon[i] == null)
+				{
+                    player.SetWeapon(this);
+                    player.HoldingWeapon[i] = this;
+                    break;
+                }
+            }
         }
 
 
@@ -112,6 +121,8 @@ namespace Client.Objects
                 sound.Play();
             }
         }
+
+
         public void CheckCollisions(List<Sprite> collidables)
         {
             // 2 sets of loops, because we cannot modify the list while we are iterating through it
@@ -127,13 +138,71 @@ namespace Client.Objects
 
                         if (collidables[j] is ExplosiveBarrel)
                         {
-                            collidables.RemoveAt(j);
-                            Particle explosion = new Particle(Projectiles[i].ProjectileSprite.Position);
+                            Particle explosion = new Particle(collidables[j].Position);
                             GameState.GetInstance().NonCollidables.Add(explosion);
-                        }
-                        if (collidables[j] is ItemCrate)
-                        {
+
                             collidables.RemoveAt(j);
+                            Clock explosionDuration = new Clock();
+                            //while (true)
+                            //{
+                            //    if (explosionDuration.ElapsedTime.AsSeconds() > 0.5f)
+                            //    {
+                            //        GameState.GetInstance().NonCollidables.Remove(explosion);
+                            //        break;
+                            //    }
+                            //}
+                            //GameState.GetInstance().NonCollidables.Remove(explosion);
+
+
+                        }
+                        else if (collidables[j] is ItemCrate)
+                        {
+                           
+                            Random Rnd = new Random();
+                            int num = Rnd.Next(10);
+                            Weapon spawn;
+                            switch (num)
+                            {
+                                case 0:
+                                    spawn = new Minigun();
+                                    break;
+                                case 1:
+                                    spawn = new SniperRifle();
+                                    break;
+                                case 2:
+                                    spawn = new Pistol();
+                                    break;
+                                case 3:
+                                    spawn = new Flamethrower();
+                                    break;
+                                case 4:
+                                    spawn = new Shotgun();
+                                    break;
+                                    // Weapons with laser
+                                case 5:
+                                    spawn = new SniperRifle();
+                                    new RedLaser(spawn);
+                                    break;
+                                case 6:
+                                    spawn = new AssaultRifle();
+                                    new RedLaser(spawn);
+                                    break;
+                                case 7:
+                                    spawn = new SniperRifle();
+                                    new GreenLaser(spawn);
+                                    break;
+                                case 8:
+                                    spawn = new AssaultRifle();
+                                    new GreenLaser(spawn);
+                                    break;
+                                default:
+                                    spawn = new AssaultRifle();
+                                    break;
+                            }
+                            spawn.Position = collidables[j].Position;
+                            GameState.GetInstance().Pickupables.Add(spawn);
+                            collidables.RemoveAt(j);
+
                         }
 
                     }

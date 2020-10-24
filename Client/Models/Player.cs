@@ -39,6 +39,7 @@ namespace Client.Models
         public Weapon Weapon { get; set; }
         public Weapon[] HoldingWeapon { get; set; }
         public string PreviousWeapon { get; set; }
+        public Clock SwapTimer { get; set; } = new Clock();
 
 
         public PlayerBar PlayerBar { get; set; }
@@ -48,7 +49,6 @@ namespace Client.Models
             this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.MainCharacter);
             this.HoldingWeapon = new Weapon[3];
         }
-
 
         public Player(PlayerDTO playerDTO)
         {
@@ -64,69 +64,73 @@ namespace Client.Models
 
         public void SetWeapon(Weapon wep)
         {
+            this.PreviousWeapon = this.Weapon.Name;
             this.Weapon = wep;
         }
 
-        public void Toggle()
-		{
-            if (HoldingWeapon != null)
-                for(int i = 0; i < HoldingWeapon.Length; i++)
-			    {
-                    if(HoldingWeapon[i] != null && HoldingWeapon[i].Name == PreviousWeapon)
-				    {
-                            PreviousWeapon = this.Weapon.Name;
-                            SetWeapon(HoldingWeapon[i]);
-                            this.Weapon.Projectiles = HoldingWeapon[i].Projectiles;
-                            //HoldingWeapon[i].Projectiles.Clear();
-                            break;
-                    }
-			    }
-		}
-
-        public void ChangeHealth(float amount)
+        public void DropWeapon()
         {
-            if (this.IsInvincible && amount < 0)
+            if (this.Weapon != HoldingWeapon[0])
             {
-                return;
-            }
-
-            float newHealth = Health + amount;
-            if (newHealth <= 100)
-            {
-                Health += amount;
-                if (Health <= 0)
+                for (int i = 1; i < HoldingWeapon.Length; i++)
                 {
-                    IsDead = true;
-                    Health = 0;
+                    if (HoldingWeapon[i] != null && HoldingWeapon[i].Name == this.Weapon.Name)
+                    {
+                        HoldingWeapon[i] = null;
+                    }
                 }
-            } 
-            else if(newHealth <= 0)
-            {
-                Health = 0;
-            }
-            else
-            {
-                Health = 100;
+                if (HoldingWeapon[2] != null)
+                {
+                    this.Weapon = HoldingWeapon[2];
+                }
+                else if (HoldingWeapon[1] != null)
+                {
+                    this.Weapon = HoldingWeapon[1];
+                }
+                else
+                {
+                    this.Weapon = HoldingWeapon[0];
+                }
             }
         }
 
-        public void Heal(float amount)
-        {
-            if (amount > 0)
+        //Q feature, to change weapon to last used weapon
+        public void execute()
+		{
+            if (HoldingWeapon != null && this.SwapTimer.ElapsedTime.AsMilliseconds() > 200)
             {
-                float newHealth = Health + amount;
-                if(newHealth <= 100)
+                this.SwapTimer.Restart();
+                for (int i = 0; i < HoldingWeapon.Length; i++)
                 {
-                    Health += amount;
+                    if (HoldingWeapon[i] != null && HoldingWeapon[i].Name == PreviousWeapon)
+                    {
+                        SetWeapon(HoldingWeapon[i]);
+                        this.Weapon.Projectiles = HoldingWeapon[i].Projectiles;
+                        //HoldingWeapon[i].Projectiles.Clear();
+                        break;
+                    }
                 }
-                else
+            }
+		}
+        public void AddHealth(float amount)
+        {
+            // heal player
+            if(amount >= 0)
+            {
+                Health += amount;
+                if(Health > 100)
                 {
                     Health = 100;
                 }
             }
+            // damage player
             else
             {
-                throw new ArgumentException("Can not heal with negative value");
+                Health += amount;
+                if(Health <= 0)
+                {
+                    IsDead = true;
+                }
             }
         }
 
@@ -224,7 +228,7 @@ namespace Client.Models
                 {
                     if(item is BarbWire)
                     {
-                        this.ChangeHealth(-5);
+                        this.AddHealth(-5);
                     }
                     return true;
                 }
@@ -256,6 +260,11 @@ namespace Client.Models
             if(Weapon != null)
             {
                 Weapon.Position = this.Position;
+                //if (Weapon.LaserSprite != null)
+                //this.Weapon.LaserSprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X + 25, 8f);
+                //Weapon.LaserSprite.Position = this.Position;
+                //this.Position;
+                //new Vector2f(this.Weapon.Position.X, this.Weapon.Position.Y);
             }
 
             if (this.Weapon.Reloading)

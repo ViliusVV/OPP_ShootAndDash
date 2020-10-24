@@ -5,6 +5,7 @@ using Client.Objects;
 using Client.Config;
 using Client;
 using TextureIdentifierClient = Client.Config;
+using Client.Utilities;
 
 namespace XUnitTests
 {
@@ -46,14 +47,70 @@ namespace XUnitTests
                 Fonts.Load(font);
             }
         }
+        //public void UpdatePlayerFacingPosition()
+        //{
+        //    if (Math.Abs(Speed.X) < 0.01)
+        //    {
+        //        // leave this here, it fixes facing right/left
+        //    }
+        //    else if (Speed.X > 0)
+        //    {
+        //        this.Scale = new Vector2f(1, 1);
+        //    }
+        //    else if (Speed.X < 0)
+        //    {
+        //        this.Scale = new Vector2f(-1, 1);
+        //    }
+        //}
+
         [Fact]
-        public void Test1()
+        public void TestSetPlayerWeapon()
         {
             Player player = new Player();
-            Medkit medkit = new Medkit();
-            player.ApplyDamage(-80);
-            medkit.Pickup(player);
-            Assert.Equal(70, player.Health);
+            Weapon wep = new Weapon("AK-47", 10, 4, 11111, 555, 1231, 155);
+            player.SetWeapon(wep);
+            Assert.Equal(player.Weapon, wep);
         }
+        [Theory]
+        [InlineData(10, 10, 1)]
+        [InlineData(10, 0, 1)]
+        [InlineData(10, -10, 1)]
+        [InlineData(-10, 0, -1)]
+        [InlineData(-1, 10, -1)]
+        [InlineData(-5, 0, -1)]
+        [InlineData(-10, -10, -1)]
+        [InlineData(0, 0, 1)]
+        public void TestPlayerFacing(float x, float y, float direction)
+        {
+            Player player = new Player();
+            player.Speed = new SFML.System.Vector2f(x, y);
+            player.UpdatePlayerFacingPosition();
+            Assert.Equal(player.Scale.X, direction);
+        }
+        [Theory]
+        [InlineData(-10, 90)]
+        [InlineData(-100, 0)]
+        [InlineData(0, 100)]
+        [InlineData(10, 100)]
+        public void TestDealDamage(int damage, int result)
+        {
+            Player player = new Player();
+            player.AddHealth(damage);
+            Assert.Equal(player.Health, result);
+        }
+        [Theory]
+        [InlineData(-10, -10)]
+        [InlineData(0, 0)]
+        [InlineData(10, 10)]
+        [InlineData(100, 100)]
+        [InlineData(101, 100)]
+        public void TestPlayerHeal(int healAmount, int result)
+        {
+            Player player = new Player();
+            player.AddHealth(-100);
+            player.AddHealth(healAmount);
+            Assert.Equal(player.Health, result);
+        }
+
     }
 }
