@@ -120,6 +120,7 @@ namespace Client
             MainPlayer.TextureRect = playerAnimation;
             MainPlayer.Weapon = (Weapon)weaponProtoype.Clone(); //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
             MainPlayer.HoldingWeapon[0] = (Weapon)weaponProtoype.Clone(); //for testing purposes
+            MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
             MainPlayer.PreviousWeapon = "";           
 
             // Configure sprite
@@ -298,8 +299,17 @@ namespace Client
         }
         private void UpdateBullets(Time deltaTime)
         {
-            MainPlayer.Weapon.UpdateProjectiles(deltaTime.AsSeconds());
-            MainPlayer.Weapon.CheckCollisions(GameState.Collidables);
+            foreach (var item in MainPlayer.HoldingWeapon)
+            {
+                if (item != null)
+                {
+                    item.UpdateProjectiles(deltaTime.AsSeconds());
+                    item.CheckCollisions(GameState.Collidables);
+                }
+            }
+            //MainPlayer.Weapon.UpdateProjectiles(deltaTime.AsSeconds());
+            //MainPlayer.Weapon.CheckCollisions(GameState.Collidables);
+
         }
 
         private void UpdatePickupables()
@@ -317,7 +327,14 @@ namespace Client
 
         private void DrawProjectiles()
         {
-            MainPlayer.Weapon.DrawProjectiles(GameWindow);
+            foreach (var item in MainPlayer.HoldingWeapon)
+            {
+                if (item != null)
+                {
+                    item.DrawProjectiles(GameWindow);
+                }
+            }
+            //MainPlayer.Weapon.DrawProjectiles(GameWindow);
         }
         private void DrawPickupables()
         {
