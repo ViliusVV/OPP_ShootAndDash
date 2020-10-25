@@ -6,6 +6,8 @@ using Client.Config;
 using Client;
 using TextureIdentifierClient = Client.Config;
 using Client.Utilities;
+using Client.Objects.Pickupables;
+using Client.Objects.Pickupables.Decorator;
 
 namespace XUnitTests
 {
@@ -47,30 +49,11 @@ namespace XUnitTests
                 Fonts.Load(font);
             }
         }
-        //public void UpdatePlayerFacingPosition()
-        //{
-        //    if (Math.Abs(Speed.X) < 0.01)
-        //    {
-        //        // leave this here, it fixes facing right/left
-        //    }
-        //    else if (Speed.X > 0)
-        //    {
-        //        this.Scale = new Vector2f(1, 1);
-        //    }
-        //    else if (Speed.X < 0)
-        //    {
-        //        this.Scale = new Vector2f(-1, 1);
-        //    }
-        //}
-
-        [Fact]
-        public void TestSetPlayerWeapon()
+        public void TestUpdatePlayerPosition()
         {
-            Player player = new Player();
-            Weapon wep = new Weapon("AK-47", 10, 4, 11111, 555, 1231, 155);
-            player.SetWeapon(wep);
-            Assert.Equal(player.Weapon, wep);
+            Assert.False(false, "test is not implemented");
         }
+
         [Theory]
         [InlineData(10, 10, 1)]
         [InlineData(10, 0, 1)]
