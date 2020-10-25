@@ -136,24 +136,12 @@ namespace Client.Objects
                     {
                         indexesToRemove.Add(i);
 
-                        if (collidables[j] is ExplosiveBarrel)
+                        if (collidables[j] is HealthCrate)
                         {
                             Particle explosion = new Particle(collidables[j].Position);
                             GameState.GetInstance().NonCollidables.Add(explosion);
-
+                            //explosion.ExplosionCheck();
                             collidables.RemoveAt(j);
-                            Clock explosionDuration = new Clock();
-                            //while (true)
-                            //{
-                            //    if (explosionDuration.ElapsedTime.AsSeconds() > 0.5f)
-                            //    {
-                            //        GameState.GetInstance().NonCollidables.Remove(explosion);
-                            //        break;
-                            //    }
-                            //}
-                            //GameState.GetInstance().NonCollidables.Remove(explosion);
-
-
                         }
                         else if (collidables[j] is ItemCrate)
                         {

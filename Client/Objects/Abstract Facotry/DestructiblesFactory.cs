@@ -19,7 +19,7 @@ namespace Client.Objects
 
             if (destructibleObj.Equals("ExplosiveBarrel"))
             {
-                return new ExplosiveBarrel();
+                return new HealthCrate();
             }
             else if (destructibleObj.Equals("ItemCrate"))
             {

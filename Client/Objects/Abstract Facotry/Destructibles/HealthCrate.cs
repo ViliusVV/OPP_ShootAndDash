@@ -9,16 +9,17 @@ using SFML.System;
 
 namespace Client.Objects.Destructables
 {
-    class ItemCrate : Destructible
+    class HealthCrate : Destructible
     {
-        public ItemCrate()
+        public HealthCrate()
         {
-            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.Crate);
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.MedkitCrate);
         }
 
         public override Sprite SpawnObject()
         {
             return this;
         }
+
     }
 }
