@@ -6,14 +6,18 @@ using SFML.Graphics;
 using Client.Config;
 using Client.Utilities;
 using SFML.System;
+using Client.Objects.Abstract_Facotry.Destructibles.Bridge;
 
 namespace Client.Objects.Destructables
 {
     class HealthCrate : Destructible
     {
-        public HealthCrate()
+        public Pickupable Pickupable { get => ItemBridge.GetPickupable(); }
+
+        public HealthCrate(IItemBridge itemBridge)
         {
             this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.MedkitCrateBrown);
+            this.ItemBridge = itemBridge;
         }
 
         public override Sprite SpawnObject()

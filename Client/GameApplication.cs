@@ -511,7 +511,6 @@ namespace Client
             List<Sprite> destructables = new List<Sprite>();
             Sprite healthCrateObj = destrFactory.GetDestructible("ExplosiveBarrel").SpawnObject();
             Sprite itemCrateObj = destrFactory.GetDestructible("ItemCrate").SpawnObject();
-            //Sprite itemCrateObj = destrFactory.GetDestructible("ItemCrate").col.checkModel("Item", ); 
             destructables.Add(healthCrateObj);
             destructables.Add(itemCrateObj);
 
@@ -559,7 +558,7 @@ namespace Client
             {
                 objectSpawned = true;
                 //destrObj.Position = new Vector2f(64 * Rnd.Next(60), 64 * Rnd.Next(45));
-                objectSprite.Position = new Vector2f(Rnd.Next(4000), Rnd.Next(3000));
+                objectSprite.Position = new Vector2f(Rnd.Next(GameState.TileMap.Length * 64), Rnd.Next(GameState.TileMap.Width * 64));
                 foreach (Sprite collidable in GameState.Collidables.ToList())
                 {
                     if (CollisionTester.BoundingBoxTest(collidable, objectSprite))
