@@ -122,25 +122,20 @@ namespace Client
             MainPlayer.TextureRect = playerAnimation;
             MainPlayer.Weapon = Test1; //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
             MainPlayer.HoldingWeapon[0] = Test1;            //for testing purposes
-            //MainPlayer.HoldingWeapon[1] = (Weapon)weaponProtoype.Clone();           //for testing purposes
+                                                            //MainPlayer.HoldingWeapon[1] = (Weapon)weaponProtoype.Clone();           //for testing purposes
             MainPlayer.PreviousWeapon = "";           //for testing purposes
-            // Configure sprite
-
-
+                                                      // Configure sprite
             MainPlayer.Origin = SpriteUtils.GetSpriteCenter(MainPlayer);
             
 
-
-            GameState.Players.Add(MainPlayer);
-
             scoreboardText = new CustomText(Fonts.Get(FontIdentifier.PixelatedSmall), 21);
             scoreboardText.DisplayedString = "Player01 - 15/2";
-
-
-
-
-            
-
+            bool isPlayerSpawned = ObjectSpawnCollisionCheck(MainPlayer);
+            if (isPlayerSpawned)
+            {
+                GameState.Players.Add(MainPlayer);
+            }
+           
             var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
             while (GameWindow.IsOpen)
             {
