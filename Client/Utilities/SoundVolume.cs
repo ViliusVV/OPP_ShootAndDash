@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Client.Utilities
 {
-    class SoundVolume
+    public class SoundVolume
     {
         private static SoundVolume _instance = new SoundVolume();
         private static float Volume = 50;
