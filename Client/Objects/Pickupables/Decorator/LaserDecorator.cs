@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Client.Objects.Pickupables.Decorator
 {
-	abstract class LaserDecorator : WeaponDecorator
+	public abstract class LaserDecorator : WeaponDecorator
 	{
 		public LaserDecorator() : base()
 		{
