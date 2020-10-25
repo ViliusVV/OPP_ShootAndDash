@@ -10,8 +10,8 @@ namespace Client.Objects.Destructables
 {
     abstract class Destructible : Sprite
     {
+        public IItemBridge ItemBridge;
         public abstract Sprite SpawnObject();
-        public IColorSelection col;
         
     }
 }

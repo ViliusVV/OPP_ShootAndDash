@@ -2,6 +2,7 @@
 using Client.Config;
 using Client.Managers;
 using Client.Models;
+using Client.Objects.Abstract_Facotry.Destructibles.Bridge;
 using Client.Objects.Destructables;
 using Client.Objects.Pickupables;
 using Client.Objects.Pickupables.Decorator;
@@ -152,19 +153,7 @@ namespace Client.Objects
 
                         if (collidables[j] is HealthCrate)
                         {
-                            Random Rnd = new Random();
-                            int num = Rnd.Next(2);
-                            PowerupFactory pickFactory = new PowerupFactory();
-                            Pickupable health;
-                            switch (num)
-                            {
-                                case 0:
-                                    health = pickFactory.GetPowerup("HealingSyringe");
-                                    break;
-                                default:
-                                    health = pickFactory.GetPowerup("Medkit");
-                                    break;
-                            }
+                            Pickupable health = ((HealthCrate)collidables[j]).Pickupable;
                             //explosion.ExplosionCheck();
                             health.Position = collidables[j].Position;
                             GameState.GetInstance().Pickupables.Add(health);
@@ -172,49 +161,9 @@ namespace Client.Objects
                         }
                         else if (collidables[j] is ItemCrate)
                         {
-                            Random Rnd = new Random();
-                            int num = Rnd.Next(10);
-                            Weapon spawn;
-                            switch (num)
-                            {
-                                case 0:
-                                    spawn = new Minigun();
-                                    break;
-                                case 1:
-                                    spawn = new SniperRifle();
-                                    break;
-                                case 2:
-                                    spawn = new Pistol();
-                                    break;
-                                case 3:
-                                    spawn = new Flamethrower();
-                                    break;
-                                case 4:
-                                    spawn = new Shotgun();
-                                    break;
-                                    // Weapons with laser
-                                case 5:
-                                    spawn = new SniperRifle();
-                                    new RedLaser(spawn);
-                                    break;
-                                case 6:
-                                    spawn = new AssaultRifle();
-                                    new RedLaser(spawn);
-                                    break;
-                                case 7:
-                                    spawn = new SniperRifle();
-                                    new GreenLaser(spawn);
-                                    break;
-                                case 8:
-                                    spawn = new AssaultRifle();
-                                    new GreenLaser(spawn);
-                                    break;
-                                default:
-                                    spawn = new AssaultRifle();
-                                    break;
-                            }
-                            spawn.Position = collidables[j].Position;
-                            GameState.GetInstance().Pickupables.Add(spawn);
+                            Pickupable gun = ((ItemCrate)collidables[j]).Pickupable;
+                            gun.Position = collidables[j].Position;
+                            GameState.GetInstance().Pickupables.Add(gun);
                             collidables.RemoveAt(j);
 
                         }
