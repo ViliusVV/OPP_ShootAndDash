@@ -3,6 +3,7 @@ using Client.Config;
 using Client.Managers;
 using Client.Models;
 using Client.Objects.Destructables;
+using Client.Objects.Pickupables;
 using Client.Objects.Pickupables.Decorator;
 using Client.Objects.Prototype;
 using Client.UI;
@@ -151,8 +152,19 @@ namespace Client.Objects
 
                         if (collidables[j] is HealthCrate)
                         {
-                            Particle explosion = new Particle(collidables[j].Position);
-                            GameState.GetInstance().NonCollidables.Add(explosion);
+                            Random Rnd = new Random();
+                            int num = Rnd.Next(3);
+                            PowerupFactory pickFactory = new PowerupFactory();
+                            Pickupable health;
+                            switch (num)
+                            {
+                                case 0:
+                                    health = pickFactory.GetPowerup("HealingSyringe");
+                                    break;
+                                default:
+                                    health = pickFactory.GetPowerup("Medkit");
+                                    break;
+                            }
                             //explosion.ExplosionCheck();
                             collidables.RemoveAt(j);
                         }
