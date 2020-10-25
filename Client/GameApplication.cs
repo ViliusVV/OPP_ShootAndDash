@@ -45,10 +45,11 @@ namespace Client
 
 
         // Resources
-        private TextureHolder Textures { get; set; } = TextureHolder.GetInstance();
-        private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
-        private FontHolder Fonts { get; set; } = FontHolder.GetInstance();
-        private SoundVolume CurrentVolume { get; set; } = SoundVolume.GetInstance();
+        //private TextureHolder Textures { get; set; } = TextureHolder.GetInstance();
+        //private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
+        //private FontHolder Fonts { get; set; } = FontHolder.GetInstance();
+        //private SoundVolume CurrentVolume { get; set; } = SoundVolume.GetInstance();
+        private ResourceHolderFacade ResourceFacade = new ResourceHolderFacade();
 
         MapBuilder builder = new MapBuilder();
         Director director;
@@ -91,9 +92,9 @@ namespace Client
             Vector2f winSize = GameWindow.GetView().Size;
 
             // Load resources
-            LoadTextures();
-            LoadSounds();
-            LoadFonts();
+            //LoadTextures();
+            //LoadSounds();
+            //LoadFonts();
             CreateSprites();
 
             builder = new MapBuilder();
@@ -129,7 +130,7 @@ namespace Client
             MainPlayer.Origin = SpriteUtils.GetSpriteCenter(MainPlayer);
             
 
-            scoreboardText = new CustomText(Fonts.Get(FontIdentifier.PixelatedSmall), 21);
+            scoreboardText = new CustomText(ResourceFacade.Fonts.Get(FontIdentifier.PixelatedSmall), 21);
             scoreboardText.DisplayedString = "Player01 - 15/2";
             bool isPlayerSpawned = ObjectSpawnCollisionCheck(MainPlayer);
             if (isPlayerSpawned)
@@ -611,13 +612,13 @@ namespace Client
 
         public void Toggle()
         {
-            if(CurrentVolume.GetVolume() > 0)
+            if (ResourceFacade.CurrentVolume.GetVolume() > 0)
             {
-                CurrentVolume.SetVolume(0);
+                ResourceFacade.CurrentVolume.SetVolume(0);
             }
             else
             {
-                CurrentVolume.SetVolume(50);
+                ResourceFacade.CurrentVolume.SetVolume(50);
             }
         }
 
@@ -647,7 +648,7 @@ namespace Client
             OurLogger.Log("Loading sprites...");
             IntRect rect = new IntRect(0, 0, 1280, 720);
 //            bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
-            AimCursor.SetTexture(new Texture(Textures.Get(TextureIdentifier.AimCursor)));
+            AimCursor.SetTexture(new Texture(ResourceFacade.Textures.Get(TextureIdentifier.AimCursor)));
             //crate = new Sprite(Textures.Get(TextureIdentifier.Crate));
             //crate2 = new Sprite(Textures.Get(TextureIdentifier.Crate));
             //bushSprite = new Sprite(Textures.Get(TextureIdentifier.Bush));
@@ -655,45 +656,45 @@ namespace Client
 
 
         // Load all game textures
-        public void LoadTextures()
-        {
-            OurLogger.Log("Loading textures...");
+        //public void LoadTextures()
+        //{
+        //    OurLogger.Log("Loading textures...");
 
-            // Iterate over all textures and load
-            var allTextures = Enum.GetValues(typeof(TextureIdentifier));
-            foreach(TextureIdentifier texture in allTextures)
-            {
-                Textures.Load(texture);
-            }
+        //    // Iterate over all textures and load
+        //    var allTextures = Enum.GetValues(typeof(TextureIdentifier));
+        //    foreach(TextureIdentifier texture in allTextures)
+        //    {
+        //        Textures.Load(texture);
+        //    }
 
-            // Set special properties for some textures
-            Textures.Get(TextureIdentifier.Background).Repeated = true;
-        }
+        //    // Set special properties for some textures
+        //    Textures.Get(TextureIdentifier.Background).Repeated = true;
+        //}
 
 
         // Load all music and sound efects
-        public void LoadSounds()
-        {
-            OurLogger.Log("Loading sounds...");
+        //public void LoadSounds()
+        //{
+        //    OurLogger.Log("Loading sounds...");
 
-            var allSounds = Enum.GetValues(typeof(SoundIdentifier));
-            foreach (SoundIdentifier sound in allSounds)
-            {
-                Sounds.Load(sound);
-            }
-        }
+        //    var allSounds = Enum.GetValues(typeof(SoundIdentifier));
+        //    foreach (SoundIdentifier sound in allSounds)
+        //    {
+        //        Sounds.Load(sound);
+        //    }
+        //}
 
 
         // Load all custom fonts
-        public void LoadFonts()
-        {
-            OurLogger.Log("Loading fonts...");
+        //public void LoadFonts()
+        //{
+        //    OurLogger.Log("Loading fonts...");
 
-            var allFonts = Enum.GetValues(typeof(FontIdentifier));
-            foreach (FontIdentifier font in allFonts)
-            {
-                Fonts.Load(font);
-            }
-        }
+        //    var allFonts = Enum.GetValues(typeof(FontIdentifier));
+        //    foreach (FontIdentifier font in allFonts)
+        //    {
+        //        Fonts.Load(font);
+        //    }
+        //}
     }
 }
