@@ -5,7 +5,8 @@ using System.Text;
 
 namespace Client.Objects.Abstract_Facotry.Destructibles.Bridge
 {
-    abstract class Color : Destructible
+    interface IColorSelection
     {
+        IColorSelection checkModel(string text, Destructible destr);
     }
 }

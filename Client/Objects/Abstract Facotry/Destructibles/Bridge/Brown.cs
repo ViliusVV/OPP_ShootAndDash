@@ -5,25 +5,25 @@ using SFML.Graphics;
 using Client.Config;
 using Client.Utilities;
 using SFML.System;
+using Client.Objects.Destructables;
 
 namespace Client.Objects.Abstract_Facotry.Destructibles.Bridge
 {
-    class Brown : Color
+    class Brown : IColorSelection
     {
-        public override Sprite SpawnObject()
-        {
-            return this;
-        }
-        public void checkModel(string text)
+        public IColorSelection checkModel(string text, Destructible destr)
         {
             if (text == "Medkit")
             {
-                this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.MedkitCrateBrown);
+                destr.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.MedkitCrateBrown);
+                return this;
             }
             else if (text == "Item")
             {
-                this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.CrateBrown);
+                destr.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.CrateBrown);
+                return this;
             }
+            return null;
         }
     }
 }
