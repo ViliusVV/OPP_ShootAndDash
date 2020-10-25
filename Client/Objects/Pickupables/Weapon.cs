@@ -130,8 +130,8 @@ namespace Client.Objects
                 Projectiles.Add(bullet);
                 ChangeAmmo(-1);
 
-                Sound sound = SoundHolder.GetInstance().Get(SoundIdentifier.GenericGun);
-                sound.Volume = SoundVolume.GetInstance().GetVolume();
+                Sound sound = ResourceHolderFacade.GetInstance().Sounds.Get(SoundIdentifier.GenericGun);
+                sound.Volume = ResourceHolderFacade.GetInstance().CurrentVolume.GetVolume();
                 sound.Play();
             }
         }

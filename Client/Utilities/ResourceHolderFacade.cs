@@ -9,19 +9,23 @@ namespace Client.Utilities
 {
     public class ResourceHolderFacade
     {
+        private static readonly ResourceHolderFacade _instance = new ResourceHolderFacade();
         public TextureHolder Textures { get; private set; } = TextureHolder.GetInstance();
         public SoundHolder Sounds { get; private set; } = SoundHolder.GetInstance();
         public FontHolder Fonts { get; private set; } = FontHolder.GetInstance();
         public SoundVolume CurrentVolume { get; private set; } = SoundVolume.GetInstance();
 
-        public ResourceHolderFacade()
+        private ResourceHolderFacade()
         {
             LoadTextures();
             LoadSounds();
             LoadFonts();
         }
 
-
+        public static ResourceHolderFacade GetInstance()
+        {
+            return _instance;
+        }
         // Load all game textures
         void LoadTextures()
         {

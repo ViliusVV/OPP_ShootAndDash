@@ -49,7 +49,7 @@ namespace Client
         //private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
         //private FontHolder Fonts { get; set; } = FontHolder.GetInstance();
         //private SoundVolume CurrentVolume { get; set; } = SoundVolume.GetInstance();
-        private ResourceHolderFacade ResourceFacade = new ResourceHolderFacade();
+        private ResourceHolderFacade ResourceFacade = ResourceHolderFacade.GetInstance();
 
         MapBuilder builder = new MapBuilder();
         Director director;
