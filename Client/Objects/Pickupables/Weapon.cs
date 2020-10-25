@@ -37,6 +37,7 @@ namespace Client.Objects
         public Clock ReloadCooldown { get; set; } = new Clock();
         public Sprite ProjectileSprite { get; set; }
         public Sprite LaserSprite { get; set; }
+        
 
         public Weapon()
         {
@@ -86,13 +87,24 @@ namespace Client.Objects
         }
         public override void Pickup(Player player)
         {
-            for (int i = 1; i < player.HoldingWeapon.Length; i++)
+            bool check = false;
+            for (int i = 0; i < 3; i++)
             {
-                if(player.HoldingWeapon[i] == null)
-				{
-                    player.SetWeapon(this);
-                    player.HoldingWeapon[i] = this;
-                    break;
+                if (player.HoldingWeapon[i] != null && player.HoldingWeapon[i].Name == this.Name)
+                {
+                    check = true;
+                }
+            }
+            if (check == false)
+            {
+                for (int i = 1; i < player.HoldingWeapon.Length; i++)
+                {
+                    if (player.HoldingWeapon[i] == null)
+                    {
+                        player.SetWeapon(this);
+                        player.HoldingWeapon[i] = this;
+                        break;
+                    }
                 }
             }
         }
@@ -118,6 +130,7 @@ namespace Client.Objects
                 ChangeAmmo(-1);
 
                 Sound sound = SoundHolder.GetInstance().Get(SoundIdentifier.GenericGun);
+                sound.Volume = SoundVolume.GetInstance().GetVolume();
                 sound.Play();
             }
         }
@@ -136,24 +149,12 @@ namespace Client.Objects
                     {
                         indexesToRemove.Add(i);
 
-                        if (collidables[j] is ExplosiveBarrel)
+                        if (collidables[j] is HealthCrate)
                         {
                             Particle explosion = new Particle(collidables[j].Position);
                             GameState.GetInstance().NonCollidables.Add(explosion);
-
+                            //explosion.ExplosionCheck();
                             collidables.RemoveAt(j);
-                            Clock explosionDuration = new Clock();
-                            //while (true)
-                            //{
-                            //    if (explosionDuration.ElapsedTime.AsSeconds() > 0.5f)
-                            //    {
-                            //        GameState.GetInstance().NonCollidables.Remove(explosion);
-                            //        break;
-                            //    }
-                            //}
-                            //GameState.GetInstance().NonCollidables.Remove(explosion);
-
-
                         }
                         else if (collidables[j] is ItemCrate)
                         {
@@ -227,6 +228,7 @@ namespace Client.Objects
             if (this.Ammo != this.MagazineSize && this.Reloading != true)
             {
                 Sound sound = SoundHolder.GetInstance().Get(SoundIdentifier.Reload);
+                sound.Volume = SoundVolume.GetInstance().GetVolume();
                 sound.Play();
 
                 this.ChangeAmmo(-this.Ammo);

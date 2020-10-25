@@ -19,6 +19,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Client.Models
 {
@@ -40,6 +41,7 @@ namespace Client.Models
         public Weapon[] HoldingWeapon { get; set; }
         public string PreviousWeapon { get; set; }
         public Clock SwapTimer { get; set; } = new Clock();
+        public Clock DropTimer { get; set; } = new Clock();
 
 
         public PlayerBar PlayerBar { get; set; }
@@ -70,26 +72,30 @@ namespace Client.Models
 
         public void DropWeapon()
         {
-            if (this.Weapon != HoldingWeapon[0])
+            if (this.DropTimer.ElapsedTime.AsMilliseconds() > 200)
             {
-                for (int i = 1; i < HoldingWeapon.Length; i++)
+                this.DropTimer.Restart();
+                if (this.Weapon != HoldingWeapon[0])
                 {
-                    if (HoldingWeapon[i] != null && HoldingWeapon[i].Name == this.Weapon.Name)
+                    for (int i = 1; i < HoldingWeapon.Length; i++)
                     {
-                        HoldingWeapon[i] = null;
+                        if (HoldingWeapon[i] != null && HoldingWeapon[i].Name == this.Weapon.Name)
+                        {
+                            HoldingWeapon[i] = null;
+                        }
                     }
-                }
-                if (HoldingWeapon[2] != null)
-                {
-                    this.Weapon = HoldingWeapon[2];
-                }
-                else if (HoldingWeapon[1] != null)
-                {
-                    this.Weapon = HoldingWeapon[1];
-                }
-                else
-                {
-                    this.Weapon = HoldingWeapon[0];
+                    if (HoldingWeapon[2] != null)
+                    {
+                        this.Weapon = HoldingWeapon[2];
+                    }
+                    else if (HoldingWeapon[1] != null)
+                    {
+                        this.Weapon = HoldingWeapon[1];
+                    }
+                    else
+                    {
+                        this.Weapon = HoldingWeapon[0];
+                    }
                 }
             }
         }
@@ -122,10 +128,10 @@ namespace Client.Models
                 {
                     Health = 100;
                 }
-                if(Health < 0)
-                {
-                    Health = 0;
-                }
+            }
+            if (Health < 0)
+            {
+                Health = 0;
             }
             // damage player
             else
