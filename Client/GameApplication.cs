@@ -26,7 +26,7 @@ using System.Diagnostics;
 
 namespace Client
 {
-    class GameApplication
+    class GameApplication : ICommand
     {
         // Singleton instance
         private static readonly GameApplication _instance = new GameApplication();
@@ -48,6 +48,7 @@ namespace Client
         private TextureHolder Textures { get; set; } = TextureHolder.GetInstance();
         private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
         private FontHolder Fonts { get; set; } = FontHolder.GetInstance();
+        private SoundVolume CurrentVolume { get; set; } = SoundVolume.GetInstance();
 
         MapBuilder builder = new MapBuilder();
         Director director;
@@ -468,6 +469,10 @@ namespace Client
                 if (MainPlayer.HoldingWeapon[2] != null && MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[2].Name)
                     MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[2]);
 			}
+            if (Keyboard.IsKeyPressed(Keyboard.Key.M))
+            {
+                Toggle();
+            }
         }
 
         private void SpawningManager(int destrCount, int indestrCount, int syringeCount)
@@ -603,6 +608,19 @@ namespace Client
             BindEvents();
             CreatePlayer();
         }
+
+        public void Toggle()
+        {
+            if(CurrentVolume.GetVolume() > 0)
+            {
+                CurrentVolume.SetVolume(0);
+            }
+            else
+            {
+                CurrentVolume.SetVolume(50);
+            }
+        }
+
 
         public void BindEvents()
         {
