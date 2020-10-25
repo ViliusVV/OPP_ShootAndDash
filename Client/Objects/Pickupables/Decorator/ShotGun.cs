@@ -8,7 +8,7 @@ using SFML.System;
 
 namespace Client.Objects.Pickupables.Decorator
 {
-    class Shotgun : WeaponDecorator
+    public class Shotgun : WeaponDecorator
     {
         public Shotgun() : base()
         {
