@@ -494,6 +494,7 @@ namespace Client
             List<Sprite> destructables = new List<Sprite>();
             Sprite healthCrateObj = destrFactory.GetDestructible("ExplosiveBarrel").SpawnObject();
             Sprite itemCrateObj = destrFactory.GetDestructible("ItemCrate").SpawnObject();
+            //Sprite itemCrateObj = destrFactory.GetDestructible("ItemCrate").col.checkModel("Item", ); 
             destructables.Add(healthCrateObj);
             destructables.Add(itemCrateObj);
 
