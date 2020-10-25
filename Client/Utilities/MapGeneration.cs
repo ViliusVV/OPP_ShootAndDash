@@ -26,8 +26,8 @@ namespace Client.Utilities
         //Choose textures for collidables
         public void LoadTextures()
         {
-            crate = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Crate));
-            crate2 = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Crate));
+            crate = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.CrateBrown));
+            crate2 = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.CrateBrown));
             bushSprite = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Bush));
         }
 

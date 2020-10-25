@@ -113,20 +113,16 @@ namespace Client
 
 
             // weapon prototype
-            //weaponProtoype = new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
-            //weaponProtoype = new AssaultRifle();
-            //new RedLaser(weaponProtoype);
-            //weaponProtoype = new GreenLaser(weaponProtoype);
-            Weapon Test1 = new Pistol();
+            weaponProtoype = new Pistol();
             MainPlayer = new Player();
             MainPlayer.IsMainPlayer = true;
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
             MainPlayer.TextureRect = playerAnimation;
-            MainPlayer.Weapon = Test1; //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
-            MainPlayer.HoldingWeapon[0] = Test1;            //for testing purposes
-                                                            //MainPlayer.HoldingWeapon[1] = (Weapon)weaponProtoype.Clone();           //for testing purposes
-            MainPlayer.PreviousWeapon = "";           //for testing purposes
-                                                      // Configure sprite
+            MainPlayer.Weapon = (Weapon)weaponProtoype.Clone(); //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
+            MainPlayer.HoldingWeapon[0] = (Weapon)weaponProtoype.Clone(); //for testing purposes
+            MainPlayer.PreviousWeapon = "";           
+
+            // Configure sprite
             MainPlayer.Origin = SpriteUtils.GetSpriteCenter(MainPlayer);
             
 
@@ -496,9 +492,9 @@ namespace Client
         {
             AbstractFactory destrFactory = FactoryProducer.GetFactory("Destructible");
             List<Sprite> destructables = new List<Sprite>();
-            Sprite explosiveBarrelObj = destrFactory.GetDestructible("ExplosiveBarrel").SpawnObject();
+            Sprite healthCrateObj = destrFactory.GetDestructible("ExplosiveBarrel").SpawnObject();
             Sprite itemCrateObj = destrFactory.GetDestructible("ItemCrate").SpawnObject();
-            destructables.Add(explosiveBarrelObj);
+            destructables.Add(healthCrateObj);
             destructables.Add(itemCrateObj);
 
             foreach (Sprite destructable in destructables)
@@ -521,6 +517,7 @@ namespace Client
             indestructables.Add(barbWireObj);
             indestructables.Add(wallObj);
             indestructables.Add(bushObj);
+            
 
             foreach (Sprite indestructable in indestructables)
             {

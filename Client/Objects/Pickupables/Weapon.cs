@@ -153,7 +153,7 @@ namespace Client.Objects
                         if (collidables[j] is HealthCrate)
                         {
                             Random Rnd = new Random();
-                            int num = Rnd.Next(3);
+                            int num = Rnd.Next(2);
                             PowerupFactory pickFactory = new PowerupFactory();
                             Pickupable health;
                             switch (num)
@@ -166,11 +166,12 @@ namespace Client.Objects
                                     break;
                             }
                             //explosion.ExplosionCheck();
+                            health.Position = collidables[j].Position;
+                            GameState.GetInstance().Pickupables.Add(health);
                             collidables.RemoveAt(j);
                         }
                         else if (collidables[j] is ItemCrate)
                         {
-                           
                             Random Rnd = new Random();
                             int num = Rnd.Next(10);
                             Weapon spawn;
