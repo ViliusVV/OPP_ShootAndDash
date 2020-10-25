@@ -44,8 +44,10 @@ namespace Client.Config
         [ResourceAttr("Assets/hudPlayerBarMask.png")] PlayerBarMask,
         [ResourceAttr("Assets/hudPlayerBarAmmoMask.png")] PlayerBarAmmoMask,
         // Destructible Objects
-        [ResourceAttr("Assets/MedkitBox.png")] MedkitCrate,
-        [ResourceAttr("Assets/Box.png")] Crate,
+        [ResourceAttr("Assets/MedkitBoxBrown.png")] MedkitCrateBrown,
+        [ResourceAttr("Assets/MedkitBoxYellow.png")] MedkitCrateYellow,
+        [ResourceAttr("Assets/BoxBrown.png")] CrateBrown,
+        [ResourceAttr("Assets/BoxYellow.png")] CrateYellow,
         // Indestructible Objects
         [ResourceAttr("Assets/BushLong.png")] Bush,
         [ResourceAttr("Assets/Wall.png")] Wall,

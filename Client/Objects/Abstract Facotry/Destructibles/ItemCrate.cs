@@ -13,7 +13,7 @@ namespace Client.Objects.Destructables
     {
         public ItemCrate()
         {
-            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.Crate);
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.CrateBrown);
         }
 
         public override Sprite SpawnObject()

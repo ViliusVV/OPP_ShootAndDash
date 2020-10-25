@@ -495,9 +495,9 @@ namespace Client
         {
             AbstractFactory destrFactory = FactoryProducer.GetFactory("Destructible");
             List<Sprite> destructables = new List<Sprite>();
-            Sprite explosiveBarrelObj = destrFactory.GetDestructible("ExplosiveBarrel").SpawnObject();
+            Sprite healthCrateObj = destrFactory.GetDestructible("ExplosiveBarrel").SpawnObject();
             Sprite itemCrateObj = destrFactory.GetDestructible("ItemCrate").SpawnObject();
-            destructables.Add(explosiveBarrelObj);
+            destructables.Add(healthCrateObj);
             destructables.Add(itemCrateObj);
 
             foreach (Sprite destructable in destructables)
@@ -520,6 +520,7 @@ namespace Client
             indestructables.Add(barbWireObj);
             indestructables.Add(wallObj);
             indestructables.Add(bushObj);
+            
 
             foreach (Sprite indestructable in indestructables)
             {
