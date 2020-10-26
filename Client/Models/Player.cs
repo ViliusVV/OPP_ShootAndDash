@@ -128,17 +128,15 @@ namespace Client.Models
                 {
                     Health = 100;
                 }
-            }
-            if (Health < 0)
-            {
-                Health = 0;
+                Console.WriteLine("HP: " + Health.ToString());
             }
             // damage player
             else
             {
                 Health += amount;
-                if(Health <= 0)
+                if (Health <= 0)
                 {
+                    Health = 0;
                     IsDead = true;
                 }
             }
