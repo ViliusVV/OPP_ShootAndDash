@@ -83,6 +83,8 @@ namespace Client.Objects.BuilderObjects
         public IBuilder Reset()
         {
             GameState.Collidables = new List<Sprite>();
+            GameState.Pickupables = new List<Pickupable>();
+            GameState.NonCollidables = new List<Sprite>();
             return this;
         }
         public TileMap GetResult()
