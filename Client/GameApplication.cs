@@ -55,16 +55,12 @@ namespace Client
         Director director;
 
         GameState GameState { get; set; } = GameState.GetInstance();
-        private ConnectionManager ConnectionManager { get; set; } = new ConnectionManager("https://shoot-and-dash.azurewebsites.net/sd-server");
+        private ConnectionManager ConnectionManager { get; set; } = new ConnectionManager("http://localhost:5000/sd-server");
 
 
         Player MainPlayer { get; set; }
 
         Clock FrameClock { get; set; } = new Clock();
-
-        IntRect playerAnimation = new IntRect(36, 0, 36, 64);
-        IntRect playerIdle = new IntRect(0, 0, 36, 64);
-        Clock animationSpeed = new Clock();
 
         CustomText scoreboardText;
 
@@ -92,9 +88,6 @@ namespace Client
             Vector2f winSize = GameWindow.GetView().Size;
 
             // Load resources
-            //LoadTextures();
-            //LoadSounds();
-            //LoadFonts();
             CreateSprites();
 
             builder = new MapBuilder();
@@ -114,21 +107,21 @@ namespace Client
 
             // weapon prototype
             weaponProtoype = new Pistol();
+
+            // Player init
             MainPlayer = new Player();
             MainPlayer.IsMainPlayer = true;
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
-            MainPlayer.TextureRect = playerAnimation;
             MainPlayer.Weapon = (Weapon)weaponProtoype.Clone(); //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
             MainPlayer.HoldingWeapon[0] = (Weapon)weaponProtoype.Clone(); //for testing purposes
             MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
             MainPlayer.PreviousWeapon = "";           
 
-            // Configure sprite
-            MainPlayer.Origin = SpriteUtils.GetSpriteCenter(MainPlayer);
             
 
             scoreboardText = new CustomText(ResourceFacade.Fonts.Get(FontIdentifier.PixelatedSmall), 21);
             scoreboardText.DisplayedString = "Player01 - 15/2";
+
             bool isPlayerSpawned = ObjectSpawnCollisionCheck(MainPlayer);
             if (isPlayerSpawned)
             {
@@ -138,81 +131,50 @@ namespace Client
             var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
             while (GameWindow.IsOpen)
             {
-                if (true)
+                GameWindow.Clear();
+                GameWindow.DispatchEvents();
+
+                if (this.HasFocus)
                 {
-
-                    Time deltaTime = FrameClock.Restart();
-                    if (ConnectionManager.ActivityClock.ElapsedTime.AsSeconds() > (1f / 60f) && ConnectionManager.Connected)
-                    {
-                        ConnectionManager.ActivityClock.Restart();
-                        SendPos(ConnectionManager.Connection);
-                    }
-
-                    GameWindow.Clear();
-                    GameWindow.DispatchEvents();
-
-                   
-                    if (this.HasFocus)
-                    {
-                        this.ProccesKeyboardInput();
-                        mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
-                    }
-
-                    var middlePoint = VectorUtils.GetMiddlePoint(MainPlayer.Position, mPos);
-                    middlePoint.X += 0.375f;
-
-                    float rotation = VectorUtils.GetAngleBetweenVectors(MainPlayer.Position, mPos);
-
-                    Vector2f scoreboardTextPos = new Vector2f(0, 0);
-
-                    scoreboardText.Position = scoreboardTextPos;
-
-                    MainPlayer.Weapon.Rotation = rotation;
-                    MainPlayer.Weapon.Scale = rotation < -90 || rotation > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
-                    if (MainPlayer.Weapon.LaserSprite != null)
-                    {
-                        float LaserPosition = (float)Math.Sqrt(VectorUtils.GetSquaredDistance(MainPlayer.Position, mPos));
-                        MainPlayer.Weapon.LaserSprite.Rotation = rotation;
-                        MainPlayer.Weapon.LaserSprite.Position = MainPlayer.Weapon.Position;
-                        MainPlayer.Weapon.LaserSprite.Scale = rotation < -90 || rotation > 90 ? new Vector2f(LaserPosition/32, 1.0f) : new Vector2f(LaserPosition/32, -1.0f);
-                    }
-
-
-                    // Run player animation
-                    if (animationSpeed.ElapsedTime.AsSeconds() > 0.05f && MainPlayer.Running)
-                    {
-                        if (playerAnimation.Left == 144)
-                        {
-                            playerAnimation.Left = 36;
-                        }
-                        else
-                            playerAnimation.Left += 36;
-                        MainPlayer.TextureRect = playerAnimation;
-                        animationSpeed.Restart();
-                    }
-                    else if (!MainPlayer.Running)
-                    {
-                        MainPlayer.TextureRect = playerIdle;
-                    }
-
-
-                    UpdateLoop(deltaTime, mPos);
-                    DrawLoop();
-
-                    GameWindow.SetView(MainView);
-                    GameWindow.Draw(scoreboardText);
-
-                    ZoomedView.Center = middlePoint;
-
-                    ZoomedView.Zoom(zoomView);
-                    zoomView = 1.0f;
-                    GameWindow.SetView(ZoomedView);
-
-                    GameWindow.Display();
+                    this.ProccesKeyboardInput();
+                    mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
                 }
 
-            }
+                Time deltaTime = FrameClock.Restart();
+                if (ConnectionManager.ActivityClock.ElapsedTime.AsSeconds() > (1f / 60f) && ConnectionManager.Connected)
+                {
+                    ConnectionManager.ActivityClock.Restart();
+                    SendPos(ConnectionManager.Connection);
+                }
 
+
+                  
+
+                var middlePoint = VectorUtils.GetMiddlePoint(MainPlayer.Position, mPos);
+                middlePoint.X += 0.375f;
+
+                MainPlayer.Heading = VectorUtils.GetAngleBetweenVectors(MainPlayer.Position, mPos);
+                MainPlayer.LookingAtPoint = mPos;
+
+                Vector2f scoreboardTextPos = new Vector2f(0, 0);
+
+                scoreboardText.Position = scoreboardTextPos;
+
+
+                UpdateLoop(deltaTime, mPos);
+                DrawLoop();
+
+                GameWindow.SetView(MainView);
+                GameWindow.Draw(scoreboardText);
+
+                ZoomedView.Center = middlePoint;
+
+                ZoomedView.Zoom(zoomView);
+                zoomView = 1.0f;
+                GameWindow.SetView(ZoomedView);
+
+                GameWindow.Display();
+            }
         }
 
         private void DrawCollidables()
@@ -231,19 +193,7 @@ namespace Client
             }
         }
 
-        private void CreatePlayers(GameStateDTO stateDto)
-        {
-            foreach (var playerDto in stateDto.Players)
-            {
-                if (GameState.Players.FindIndex(player => player.Name.Equals(playerDto.Name)) < 0)
-                {
-                    Player tmpPlayer = new Player(playerDto);
-                    GameState.Players.Add(tmpPlayer);
-                }
-            }
-        }
-
-        private void UpdatePlayers(GameStateDTO stateDTO)
+        private void UpdatePlayers(ServerGameState stateDTO)
         {
             foreach (var dto in stateDTO.Players)
             {
@@ -251,6 +201,12 @@ namespace Client
                 if (player != null && !MainPlayer.Equals(player))
                 {
                     player.RefreshData(dto);
+                }
+
+                if(player == null)
+                {
+                    Player tmpPlayer = new Player(dto);
+                    GameState.Players.Add(tmpPlayer);
                 }
             }
         }
@@ -267,9 +223,13 @@ namespace Client
                 player.TranslateFromSpeed();
                 player.Update();
                 GameWindow.Draw(player.PlayerBar);
-                
-                if(player.Weapon != null) GameWindow.Draw(player.Weapon);
-                if (player.Weapon.LaserSight != null) GameWindow.Draw(player.Weapon.LaserSprite);
+
+                if (player.Weapon != null)
+                {
+                    GameWindow.Draw(player.Weapon);
+                    if (player.Weapon.LaserSight != null) GameWindow.Draw(player.Weapon.LaserSprite);
+                }
+
             }
         }
 
@@ -639,12 +599,8 @@ namespace Client
 
         public void BindEvents()
         {
-            ConnectionManager.Connection.On<GameStateDTO>("CreatePlayer", (stateDto) =>
-            {
-                CreatePlayers(stateDto);
-            });
 
-            ConnectionManager.Connection.On<GameStateDTO>("UpdateState", (stateDto) =>
+            ConnectionManager.Connection.On<ServerGameState>("UpdateState", (stateDto) =>
             {
                 UpdatePlayers(stateDto);
             });

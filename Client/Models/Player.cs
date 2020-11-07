@@ -28,14 +28,16 @@ namespace Client.Models
         private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
         public string Name { get; set; } = new Random().Next(1, 888).ToString();
         public float Health { get; set; } = 100;
+        public bool IsDead { get; set; } = false;
 
         private Vector2f _speed = new Vector2f(0.0f, 0.0f);
         public Vector2f Speed { get => _speed; set => _speed = value; }
+        public Vector2f LookingAtPoint { get; set; }
+        public float Heading { get; set; }
 
-        public bool IsDead { get; set; } = false;
         public float SpeedMultiplier { get; set; } = 1;
         public bool Running { get => Math.Abs(Speed.X) > 0.1 || Math.Abs(Speed.Y) > 0.1; }
-        public bool IsMainPlayer { get; set; }
+        public bool IsMainPlayer { get; set; } = false;
         public bool IsInvincible { get; set; } = false;
         public Weapon Weapon { get; set; }
         public Weapon[] HoldingWeapon { get; set; }
@@ -43,20 +45,24 @@ namespace Client.Models
         public Clock SwapTimer { get; set; } = new Clock();
         public Clock DropTimer { get; set; } = new Clock();
 
+        private PlayerAnimation PlayerAnimation { get; set; }
+
 
         public PlayerBar PlayerBar { get; set; }
         public Player()
         {
             this.PlayerBar = new PlayerBar();
             this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.MainCharacter);
+            this.PlayerAnimation = new PlayerAnimation(this);
+            this.Origin = SpriteUtils.GetSpriteCenter(this);
             this.HoldingWeapon = new Weapon[3];
         }
 
-        public Player(PlayerDTO playerDTO)
+        public Player(ServerPlayer playerDTO)
         {
             this.PlayerBar = new PlayerBar();
             this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.MainCharacter);
-            this.TextureRect = new IntRect(0, 0, 36, 64);
+            this.PlayerAnimation = new PlayerAnimation(this);
             this.Origin = SpriteUtils.GetSpriteCenter(this);
             this.Name = playerDTO.Name;
             this.Health = playerDTO.Health;
@@ -244,9 +250,9 @@ namespace Client.Models
             return false;
         }
 
-        public PlayerDTO ToDTO()
+        public ServerPlayer ToDTO()
         {
-            var tmpDto = new PlayerDTO();
+            var tmpDto = new ServerPlayer();
 
             tmpDto.Name = Name;
             tmpDto.Health = Health;
@@ -258,6 +264,7 @@ namespace Client.Models
 
         public void Update()
         {
+            this.PlayerAnimation.Update();
             UpdateWeapon();
             UpdatePlayerBar();
 
@@ -268,16 +275,22 @@ namespace Client.Models
             if(Weapon != null)
             {
                 Weapon.Position = this.Position;
-                //if (Weapon.LaserSprite != null)
-                //this.Weapon.LaserSprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X + 25, 8f);
-                //Weapon.LaserSprite.Position = this.Position;
-                //this.Position;
-                //new Vector2f(this.Weapon.Position.X, this.Weapon.Position.Y);
-            }
 
-            if (this.Weapon.Reloading)
-            {
-                this.Weapon.ReloadGunAnimation();
+                Weapon.Rotation = this.Heading;
+                Weapon.Scale = this.Heading < -90 || this.Heading > 90 ? new Vector2f(1.0f, -1.0f) : new Vector2f(1.0f, 1.0f);
+
+                if (this.Weapon.Reloading)
+                {
+                    this.Weapon.ReloadGunAnimation();
+                }
+
+                if (Weapon.LaserSprite != null)
+                {
+                    float LaserPosition = (float)Math.Sqrt(VectorUtils.GetSquaredDistance(this.Position, this.LookingAtPoint));
+                    this.Weapon.LaserSprite.Rotation = this.Heading;
+                    this.Weapon.LaserSprite.Position = this.Weapon.Position;
+                    this.Weapon.LaserSprite.Scale = this.Heading < -90 || this.Heading > 90 ? new Vector2f(LaserPosition / 32, 1.0f) : new Vector2f(LaserPosition / 32, -1.0f);
+                }
             }
         }
 
@@ -293,11 +306,11 @@ namespace Client.Models
         }
 
 
-        public void RefreshData(PlayerDTO playerDto)
+        public void RefreshData(ServerPlayer playerDto)
         {
             Health = playerDto.Health;
             Position = playerDto.Position;
-            //Speed = playerDto.Speed;
+            Speed = playerDto.Speed;
         }
     }
 }
