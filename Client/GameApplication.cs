@@ -119,7 +119,7 @@ namespace Client
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
             MainPlayer.TextureRect = playerAnimation;
             MainPlayer.Weapon = (Weapon)weaponProtoype.Clone(); //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
-            MainPlayer.HoldingWeapon[0] = (Weapon)weaponProtoype.Clone(); //for testing purposes
+            MainPlayer.HoldingWeapon[0] = MainPlayer.Weapon;
             MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
             MainPlayer.PreviousWeapon = "";           
 
