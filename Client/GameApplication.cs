@@ -24,6 +24,7 @@ using Client.Objects.Pickupables.Strategy;
 using Client.Objects.Pickupables.Decorator;
 using System.Diagnostics;
 using Common.Enums;
+using Client.Observer;
 
 namespace Client
 {
@@ -38,8 +39,8 @@ namespace Client
 
 
         // Screen 
-        RenderWindow GameWindow { get; set; }
-        private View MainView { get; set; }
+        public RenderWindow GameWindow { get; set; }
+        public View MainView { get; set; }
         private View ZoomedView { get; set; }
         private bool FullScreen { get; set; }
         private bool PrevFullScreen { get; set; }
@@ -53,6 +54,7 @@ namespace Client
         Director director;
 
         GameState GameState { get; set; } = GameState.GetInstance();
+        PlayerEventManager PlayerEventManager { get; } = PlayerEventManager.GetInstance();
        
 
 
@@ -121,6 +123,7 @@ namespace Client
             scoreboardText.DisplayedString = "Player01 - 15/2";
             Vector2f scoreboardTextPos = new Vector2f(0, 0);
 
+            GameplayUI.Scoreboard = new Scoreboard();
             GameplayUI.RespawnMesage = new CustomText(7 * 5);
 
 
@@ -132,6 +135,10 @@ namespace Client
             {
                 GameState.Players.Add(MainPlayer);
             }
+
+
+            PlayerEventManager.Subscribe(PlayerEventType.KilledPlayer, GameplayUI.Scoreboard);
+            PlayerEventManager.Subscribe(PlayerEventType.KilledPlayer, GameplayUI.KillNotifier);
            
             var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
             while (GameWindow.IsOpen)
@@ -168,6 +175,7 @@ namespace Client
                 GameWindow.SetView(MainView);
                 GameWindow.Draw(scoreboardText);
                 GameWindow.Draw(GameplayUI.RespawnMesage);
+                GameWindow.Draw(GameplayUI.KillNotifier);
 
                 ZoomedView.Center = middlePoint;
 
@@ -404,6 +412,13 @@ namespace Client
                     OurLogger.Log($"{killerServ.Name} killed ---> {victimServ.Name}");
                     killer.Kills = killerServ.Kills;
                     victim.Deaths = victimServ.Deaths;
+
+                    var evtData = new PlayerEventData()
+                    {
+                        Shooter = killer,
+                        Victim = victim
+                    };
+                    PlayerEventManager.Notify(PlayerEventType.KilledPlayer, evtData);
                 }
                 else
                 {

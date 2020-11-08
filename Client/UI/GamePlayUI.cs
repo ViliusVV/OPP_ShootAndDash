@@ -8,6 +8,7 @@ namespace Client.UI
     {
         public Scoreboard Scoreboard { get; set; }
         public CustomText RespawnMesage { get; set; }
+        public KillNotifier KillNotifier { get; set; } = new KillNotifier();
         // public KillMessages {get;set}
     }
 }
