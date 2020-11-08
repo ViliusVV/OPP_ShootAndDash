@@ -59,10 +59,12 @@ namespace Client
         Player MainPlayer { get; set; }
 
         Clock FrameClock { get; set; } = new Clock();
+        Clock RespawnTimer { get; set; } = new Clock();
 
         CustomText scoreboardText;
 
         AimCursor AimCursor = new AimCursor();
+        GamePlayUI GameplayUI = new GamePlayUI();
 
         Weapon weaponProtoype;
 
@@ -113,14 +115,19 @@ namespace Client
             GameState.ConnectionManager = new ConnectionManager("http://localhost:5000/sd-server");
 
 
+            // UI
+
             scoreboardText = new CustomText(ResourceFacade.Fonts.Get(FontIdentifier.PixelatedSmall), 21);
             scoreboardText.DisplayedString = "Player01 - 15/2";
-
             Vector2f scoreboardTextPos = new Vector2f(0, 0);
+
+            GameplayUI.RespawnMesage = new CustomText(7 * 5);
+
 
             scoreboardText.Position = scoreboardTextPos;
 
-            bool isPlayerSpawned = ObjectSpawnCollisionCheck(MainPlayer);
+
+            bool isPlayerSpawned = ForceSpawnObject(MainPlayer);
             if (isPlayerSpawned)
             {
                 GameState.Players.Add(MainPlayer);
@@ -146,7 +153,7 @@ namespace Client
                     SendPos(GameState.ConnectionManager.Connection);
                 }
 
-
+                HandleDeath();
                   
 
                 var middlePoint = VectorUtils.GetMiddlePoint(MainPlayer.Position, mPos);
@@ -160,6 +167,7 @@ namespace Client
 
                 GameWindow.SetView(MainView);
                 GameWindow.Draw(scoreboardText);
+                GameWindow.Draw(GameplayUI.RespawnMesage);
 
                 ZoomedView.Center = middlePoint;
 
@@ -237,6 +245,33 @@ namespace Client
         {
             UpdateBullets(deltaTime);
             AimCursor.Update(mPos);
+        }
+
+        public void HandleDeath()
+        {
+
+            if (MainPlayer.IsDead)
+            {
+                float elapsedDeath = RespawnTimer.ElapsedTime.AsSeconds();
+                var text = GameplayUI.RespawnMesage;
+
+                if (elapsedDeath > deathTimeout)
+                {
+                    ForceSpawnObject(MainPlayer);
+                    MainPlayer.Health = 100;
+                    text.DisplayedString = "";
+                }
+                else
+                {
+                    text.DisplayedString = "You're dead. Respawning in " + (deathTimeout - elapsedDeath).ToString("N2");
+                    text.Origin = new Vector2f(text.GetLocalBounds().Left / 2f, text.GetLocalBounds().Top / 2f);
+                    text.Position = new Vector2f(GameWindow.GetViewport(MainView).Height / 2f, GameWindow.GetViewport(MainView).Width / 2f);
+                }
+            }
+            else
+            {
+                RespawnTimer.Restart();
+            }
         }
 
 
@@ -523,7 +558,7 @@ namespace Client
 
             foreach (Sprite destructable in destructables)
             {
-                bool isSpawned = ObjectSpawnCollisionCheck(destructable);
+                bool isSpawned = ForceSpawnObject(destructable);
                 if (isSpawned)
                 {
                     GameState.Collidables.Add(destructable);
@@ -546,7 +581,7 @@ namespace Client
 
             foreach (Sprite indestructable in indestructables)
             {
-                bool isSpawned = ObjectSpawnCollisionCheck(indestructable);
+                bool isSpawned = ForceSpawnObject(indestructable);
                 if (isSpawned)
                 {
                     if (indestructable != bushObj)
@@ -560,7 +595,7 @@ namespace Client
         }
 
 
-        private bool ObjectSpawnCollisionCheck(Sprite objectSprite)
+        private bool ForceSpawnObject(Sprite objectSprite)
         {
             bool objectSpawned = false;
             while (!objectSpawned)
@@ -602,7 +637,7 @@ namespace Client
                     break;
             }
 
-            bool isSpawned = ObjectSpawnCollisionCheck(syringe);
+            bool isSpawned = ForceSpawnObject(syringe);
             if (isSpawned)
             {
                 GameState.Pickupables.Add(syringe);
@@ -616,7 +651,7 @@ namespace Client
         {
             PowerupFactory pickFactory = new PowerupFactory();
             Pickupable medkit = pickFactory.GetPowerup("Medkit");
-            bool isSpawned = ObjectSpawnCollisionCheck(medkit);
+            bool isSpawned = ForceSpawnObject(medkit);
             if (isSpawned)
             {
                 GameState.Pickupables.Add(medkit);

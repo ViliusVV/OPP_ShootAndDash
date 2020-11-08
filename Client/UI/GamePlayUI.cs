@@ -7,6 +7,7 @@ namespace Client.UI
     class GamePlayUI
     {
         public Scoreboard Scoreboard { get; set; }
+        public CustomText RespawnMesage { get; set; }
         // public KillMessages {get;set}
     }
 }
