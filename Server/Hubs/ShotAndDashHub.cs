@@ -33,14 +33,14 @@ namespace Server.Hubs
             await Clients.All.SendAsync("UpdateGameStateClient", _gameManager.GetGameStateDTO());
         }
 
-        public async Task UpdateScoresServer(ServerPlayer victim)
+        public async Task UpdateScoresServer(ServerPlayer shooterOrg, ServerPlayer victim)
         {
-            var shooter = _gameManager.Players[Context.ConnectionId];
+            var shooter = _gameManager.Players.Where(p => p.Value.Name.Equals(shooterOrg.Name)).First().Value;
             var deadMan = _gameManager.Players.Where(p => p.Value.Name.Equals(victim.Name)).First().Value;
 
             deadMan.Health = victim.Health;
 
-            if (deadMan.IsDead)
+            if (victim.IsDead)
             {
                 shooter.Kills += 1;
                 deadMan.Deaths += 1;

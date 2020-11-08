@@ -21,12 +21,15 @@ namespace Client.Objects.Pickupables.Strategy
 
         public void DoPowerUpLogic(Player player)
         {
-            OurLogger.Log("Executing reload speed powerup strategy");
+            if(player.Weapon != null)
+            {
+                OurLogger.Log("Executing reload speed powerup strategy");
 
-            float oldRelaodTime = player.Weapon.ReloadDuration;
-            player.Weapon.ReloadDuration = oldRelaodTime / ReloadReduction;
+                float oldRelaodTime = player.Weapon.ReloadDuration;
+                player.Weapon.ReloadDuration = oldRelaodTime / ReloadReduction;
 
-            Task.Delay((int)Duration).ContinueWith(o => player.Weapon.ReloadDuration = oldRelaodTime);
+                Task.Delay((int)Duration).ContinueWith(o => player.Weapon.ReloadDuration = oldRelaodTime);
+            }
         }
     }
 }

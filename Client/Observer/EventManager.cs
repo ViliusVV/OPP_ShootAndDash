@@ -13,6 +13,8 @@ namespace Client.Observer
 
         private Dictionary<PlayerEventType, List<IPlayerEventListener>> _listeners = new Dictionary<PlayerEventType, List<IPlayerEventListener>>();
 
+        private Object lockObj = new Object();
+
         private PlayerEventManager()
         {
             foreach(PlayerEventType type in Enum.GetValues(typeof(PlayerEventType)))
@@ -40,9 +42,10 @@ namespace Client.Observer
             _listeners[type].Remove(listener);
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Notify(PlayerEventType type, PlayerEventData eventData)
         {
-            foreach(var listener in _listeners[type])
+            foreach (var listener in _listeners[type])
             {
                 listener.Update(eventData);
             }

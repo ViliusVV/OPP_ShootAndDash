@@ -337,6 +337,8 @@ namespace Client.Models
                 Heading = Heading,
                 IsDead = IsDead,
                 Appearance = Appearance,
+                Kills = Kills,
+                Deaths = Deaths,
                 ServerWeapon = new ServerWeaponAdapter(Weapon)
             };
 
@@ -349,6 +351,9 @@ namespace Client.Models
             this.Position = playerDto.Position;
             this.Speed = playerDto.Speed;
             this.Heading = playerDto.Heading;
+
+            this.Kills = Kills;
+            this.Deaths = Deaths;
 
 
             if(this.Weapon == null)
@@ -370,5 +375,15 @@ namespace Client.Models
 
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is Player player &&
+                   Name == player.Name;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Name);
+        }
     }
 }

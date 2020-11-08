@@ -63,8 +63,6 @@ namespace Client
         Clock FrameClock { get; set; } = new Clock();
         Clock RespawnTimer { get; set; } = new Clock();
 
-        CustomText scoreboardText;
-
         AimCursor AimCursor = new AimCursor();
         GamePlayUI GameplayUI = new GamePlayUI();
 
@@ -117,28 +115,16 @@ namespace Client
             GameState.ConnectionManager = new ConnectionManager("http://localhost:5000/sd-server");
 
 
-            // UI
-
-            scoreboardText = new CustomText(ResourceFacade.Fonts.Get(FontIdentifier.PixelatedSmall), 21);
-            scoreboardText.DisplayedString = "Player01 - 15/2";
-            Vector2f scoreboardTextPos = new Vector2f(0, 0);
-
-            GameplayUI.Scoreboard = new Scoreboard();
-            GameplayUI.RespawnMesage = new CustomText(7 * 5);
-
-
-            scoreboardText.Position = scoreboardTextPos;
-
 
             bool isPlayerSpawned = ForceSpawnObject(MainPlayer);
+
             if (isPlayerSpawned)
             {
                 GameState.Players.Add(MainPlayer);
             }
 
-
-            PlayerEventManager.Subscribe(PlayerEventType.KilledPlayer, GameplayUI.Scoreboard);
             PlayerEventManager.Subscribe(PlayerEventType.KilledPlayer, GameplayUI.KillNotifier);
+            PlayerEventManager.Subscribe(PlayerEventType.KilledPlayer, GameplayUI.Scoreboard);
            
             var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
             while (GameWindow.IsOpen)
@@ -173,7 +159,7 @@ namespace Client
                 DrawLoop();
 
                 GameWindow.SetView(MainView);
-                GameWindow.Draw(scoreboardText);
+                GameWindow.Draw(GameplayUI.Scoreboard);
                 GameWindow.Draw(GameplayUI.RespawnMesage);
                 GameWindow.Draw(GameplayUI.KillNotifier);
 
@@ -397,7 +383,7 @@ namespace Client
                 OurLogger.Log(shootData.ToString());
 
             });
-
+            
             GameState.ConnectionManager.Connection.On<ServerPlayer, ServerPlayer>("UpdateScoresClient", (killerServ, victimServ) =>
             {
                 Player killer = GameState.Players.Find(p => p.Name.Equals(killerServ.Name));

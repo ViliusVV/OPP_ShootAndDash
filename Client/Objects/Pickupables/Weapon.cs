@@ -181,7 +181,7 @@ namespace Client.Objects
 
                         if (shooter.IsMainPlayer) {
                             players[j].AddHealth(-this.Damage);
-                            GameState.GetInstance().ConnectionManager.Connection.SendAsync("UpdateScoresServer", players[j]);
+                            GameState.GetInstance().ConnectionManager.Connection.SendAsync("UpdateScoresServer", shooter.ToDTO(), players[j].ToDTO());
                         }
 
                     }
