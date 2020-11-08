@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Client.Managers;
 using Client.Objects.Pickupables.Decorator;
 
 namespace Client.Objects.Abstract_Facotry.Destructibles.Bridge
@@ -9,8 +10,7 @@ namespace Client.Objects.Abstract_Facotry.Destructibles.Bridge
     {
         public Pickupable GetPickupable()
         {
-            Random Rnd = new Random();
-            int num = Rnd.Next(8);
+            int num = GameState.GetInstance().Random.Next(8);
             Weapon spawn;
             switch (num)
             {

@@ -51,6 +51,7 @@ namespace Client.Models
         public Clock DropTimer { get; set; } = new Clock();
 
         private PlayerAnimation PlayerAnimation { get; set; }
+        private PlayerSkinType Appearance { get; set; } = Utils.RandomEnum<PlayerSkinType>();
 
 
         public PlayerBar PlayerBar { get; set; }
@@ -58,36 +59,35 @@ namespace Client.Models
 
         public Player()
         {
-            this.Name = String.Format("Player-{0}", new Random().Next(111, 999).ToString());
-            this.PlayerBar = new PlayerBar();
-            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.ProfoundAsianChar);
-            this.PlayerAnimation = new PlayerAnimation(this);
-            this.Origin = SpriteUtils.GetSpriteCenter(this);
-            this.HoldingWeapon = new Weapon[3];
+            InitPlayer(this.Appearance);
         }
 
         public Player(PlayerSkinType skinType)
         {
-            this.Name = String.Format("Player-{0}", new Random().Next(111, 999).ToString());
-            this.PlayerBar = new PlayerBar();
-            this.Texture = GetTexture(skinType);
-            this.PlayerAnimation = new PlayerAnimation(this);
-            this.Origin = SpriteUtils.GetSpriteCenter(this);
-            this.HoldingWeapon = new Weapon[3];
+            InitPlayer(skinType);
         }
 
         public Player(ServerPlayer playerDTO)
         {
-            this.Name = String.Format("Player-{0}", new Random().Next(111, 999).ToString());
-            this.PlayerBar = new PlayerBar();
-            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.ProfoundAsianChar);
-            this.PlayerAnimation = new PlayerAnimation(this);
-            this.Origin = SpriteUtils.GetSpriteCenter(this);
-            this.HoldingWeapon = new Weapon[3];
+            InitPlayer(playerDTO.Appearance);
+
             this.Name = playerDTO.Name;
             this.Health = playerDTO.Health;
             this.Speed = playerDTO.Speed;
             this.Position = playerDTO.Position;
+        }
+
+        public void InitPlayer(PlayerSkinType appearance)
+        {
+            this.Name = String.Format("Player-{0}", new Random().Next(111, 999).ToString());
+            this.Appearance = appearance;
+            this.Texture = GetTexture(this.Appearance);
+            this.PlayerAnimation = new PlayerAnimation(this);
+            this.Origin = SpriteUtils.GetSpriteCenter(this);
+
+            this.HoldingWeapon = new Weapon[3];
+
+            this.PlayerBar = new PlayerBar();
         }
 
         public void SetWeapon(Weapon wep)
@@ -336,6 +336,9 @@ namespace Client.Models
                 Speed = Speed,
                 Heading = Heading,
                 IsDead = IsDead,
+                Appearance = Appearance,
+                Kills = Kills,
+                Deaths = Deaths,
                 ServerWeapon = new ServerWeaponAdapter(Weapon)
             };
 
@@ -348,6 +351,9 @@ namespace Client.Models
             this.Position = playerDto.Position;
             this.Speed = playerDto.Speed;
             this.Heading = playerDto.Heading;
+
+            this.Kills = Kills;
+            this.Deaths = Deaths;
 
 
             if(this.Weapon == null)
@@ -369,5 +375,15 @@ namespace Client.Models
 
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is Player player &&
+                   Name == player.Name;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Name);
+        }
     }
 }

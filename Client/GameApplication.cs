@@ -24,6 +24,7 @@ using Client.Objects.Pickupables.Strategy;
 using Client.Objects.Pickupables.Decorator;
 using System.Diagnostics;
 using Common.Enums;
+using Client.Observer;
 
 namespace Client
 {
@@ -34,11 +35,12 @@ namespace Client
 
         // Settings
         private readonly int multiplayerSendRate = 30;
+        private readonly int deathTimeout = 3;
 
 
         // Screen 
-        RenderWindow GameWindow { get; set; }
-        private View MainView { get; set; }
+        public RenderWindow GameWindow { get; set; }
+        public View MainView { get; set; }
         private View ZoomedView { get; set; }
         private bool FullScreen { get; set; }
         private bool PrevFullScreen { get; set; }
@@ -46,22 +48,25 @@ namespace Client
         float zoomView = 1.0f;
         float previousZoom = 1.0f;
 
+        public Object SFMLLock = new Object();
+
         private ResourceHolderFacade ResourceFacade = ResourceHolderFacade.GetInstance();
 
         MapBuilder builder = new MapBuilder();
         Director director;
 
         GameState GameState { get; set; } = GameState.GetInstance();
+        PlayerEventManager PlayerEventManager { get; } = PlayerEventManager.GetInstance();
        
 
 
         Player MainPlayer { get; set; }
 
         Clock FrameClock { get; set; } = new Clock();
-
-        CustomText scoreboardText;
+        Clock RespawnTimer { get; set; } = new Clock();
 
         AimCursor AimCursor = new AimCursor();
+        GamePlayUI GameplayUI = new GamePlayUI();
 
         Weapon weaponProtoype;
 
@@ -87,6 +92,7 @@ namespace Client
             // Load resources
             CreateSprites();
 
+            GameState.InitRandom(5);
             builder = new MapBuilder();
             builder.LoadSprites();
             director = new Director(builder);
@@ -111,18 +117,16 @@ namespace Client
             GameState.ConnectionManager = new ConnectionManager("http://localhost:5000/sd-server");
 
 
-            scoreboardText = new CustomText(ResourceFacade.Fonts.Get(FontIdentifier.PixelatedSmall), 21);
-            scoreboardText.DisplayedString = "Player01 - 15/2";
 
-            Vector2f scoreboardTextPos = new Vector2f(0, 0);
+            bool isPlayerSpawned = ForceSpawnObject(MainPlayer);
 
-            scoreboardText.Position = scoreboardTextPos;
-
-            bool isPlayerSpawned = ObjectSpawnCollisionCheck(MainPlayer);
             if (isPlayerSpawned)
             {
                 GameState.Players.Add(MainPlayer);
             }
+
+            PlayerEventManager.Subscribe(PlayerEventType.KilledPlayer, GameplayUI.KillNotifier);
+            PlayerEventManager.Subscribe(PlayerEventType.KilledPlayer, GameplayUI.Scoreboard);
            
             var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
             while (GameWindow.IsOpen)
@@ -144,7 +148,7 @@ namespace Client
                     SendPos(GameState.ConnectionManager.Connection);
                 }
 
-
+               
                   
 
                 var middlePoint = VectorUtils.GetMiddlePoint(MainPlayer.Position, mPos);
@@ -154,18 +158,25 @@ namespace Client
 
 
                 UpdateLoop(deltaTime, mPos);
-                DrawLoop();
 
-                GameWindow.SetView(MainView);
-                GameWindow.Draw(scoreboardText);
+                
+                lock (SFMLLock)
+                {
+                    HandleDeath();
+                    DrawLoop();
+                    GameWindow.SetView(MainView);
+                    GameWindow.Draw(GameplayUI.Scoreboard);
+                    GameWindow.Draw(GameplayUI.RespawnMesage);
+                    GameWindow.Draw(GameplayUI.KillNotifier);
 
-                ZoomedView.Center = middlePoint;
+                    ZoomedView.Center = middlePoint;
 
-                ZoomedView.Zoom(zoomView);
-                zoomView = 1.0f;
-                GameWindow.SetView(ZoomedView);
+                    ZoomedView.Zoom(zoomView);
+                    zoomView = 1.0f;
+                    GameWindow.SetView(ZoomedView);
 
-                GameWindow.Display();
+                    GameWindow.Display();
+                }
             }
         }
 
@@ -179,23 +190,26 @@ namespace Client
             for (int i = 0; i < GameState.Players.Count; i++)
             {
                 var player = GameState.Players[i];
-                Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
-                player.PlayerBar.Position = playerBarPos;
-                player.UpdateSpeed();
-                player.TranslateFromSpeed();
-                player.Update();
-
-                GameWindow.Draw(player);
-                GameWindow.Draw(player.PlayerBar);
-
-                if (player.Weapon != null)
+                if (!player.IsDead)
                 {
-                    GameWindow.Draw(player.Weapon);
-                    DrawProjectiles(player);
-                    if (player.Weapon.LaserSight != null) GameWindow.Draw(player.Weapon.LaserSprite);
+                    Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
+                    player.PlayerBar.Position = playerBarPos;
+                    player.UpdateSpeed();
+                    player.TranslateFromSpeed();
+                    player.Update();
+
+                    UpdatePickupables(player);
+
+                    GameWindow.Draw(player);
+                    GameWindow.Draw(player.PlayerBar);
+
+                    if (player.Weapon != null)
+                    {
+                        GameWindow.Draw(player.Weapon);
+                        DrawProjectiles(player);
+                        if (player.Weapon.LaserSight != null) GameWindow.Draw(player.Weapon.LaserSprite);
+                    }
                 }
-
-
             }
         }
 
@@ -215,14 +229,14 @@ namespace Client
             }
         }
 
-        private void UpdatePickupables()
+        private void UpdatePickupables(Player player)
         {
             for (int i = 0; i < GameState.Pickupables.Count; i++)
             {
                 Pickupable pickup = GameState.Pickupables[i];
-                if (CollisionTester.BoundingBoxTest(MainPlayer, pickup))
+                if (CollisionTester.BoundingBoxTest(player, pickup))
                 {
-                    pickup.Pickup(MainPlayer);
+                    pickup.Pickup(player);
                     GameState.Pickupables.RemoveAt(i);
                 }
             }
@@ -230,9 +244,39 @@ namespace Client
 
         public void UpdateLoop(Time deltaTime, Vector2f mPos)
         {
-            UpdatePickupables();
             UpdateBullets(deltaTime);
             AimCursor.Update(mPos);
+        }
+
+        public void HandleDeath()
+        {
+
+            if (MainPlayer.IsDead)
+            {
+                float elapsedDeath = RespawnTimer.ElapsedTime.AsSeconds();
+                var text = GameplayUI.RespawnMesage;
+
+                if (elapsedDeath > deathTimeout)
+                {
+                    ForceSpawnObject(MainPlayer);
+                    MainPlayer.Health = 100;
+                    text.DisplayedString = "";
+                }
+                else
+                {
+                    try
+                    {
+                        text.DisplayedString = "You're dead. Respawning in " + (deathTimeout - elapsedDeath).ToString("N2");
+                        text.Origin = new Vector2f(text.GetLocalBounds().Left / 2f, text.GetLocalBounds().Top / 2f);
+                        text.Position = new Vector2f(GameWindow.GetViewport(MainView).Height / 2f, GameWindow.GetViewport(MainView).Width / 2f);
+                    }
+                    catch { }
+                }
+            }
+            else
+            {
+                RespawnTimer.Restart();
+            }
         }
 
 
@@ -350,7 +394,7 @@ namespace Client
                 OurLogger.Log(shootData.ToString());
 
             });
-
+            
             GameState.ConnectionManager.Connection.On<ServerPlayer, ServerPlayer>("UpdateScoresClient", (killerServ, victimServ) =>
             {
                 Player killer = GameState.Players.Find(p => p.Name.Equals(killerServ.Name));
@@ -365,6 +409,13 @@ namespace Client
                     OurLogger.Log($"{killerServ.Name} killed ---> {victimServ.Name}");
                     killer.Kills = killerServ.Kills;
                     victim.Deaths = victimServ.Deaths;
+
+                    var evtData = new PlayerEventData()
+                    {
+                        Shooter = killer,
+                        Victim = victim
+                    };
+                    PlayerEventManager.Notify(PlayerEventType.KilledPlayer, evtData);
                 }
                 else
                 {
@@ -519,7 +570,7 @@ namespace Client
 
             foreach (Sprite destructable in destructables)
             {
-                bool isSpawned = ObjectSpawnCollisionCheck(destructable);
+                bool isSpawned = ForceSpawnObject(destructable);
                 if (isSpawned)
                 {
                     GameState.Collidables.Add(destructable);
@@ -542,7 +593,7 @@ namespace Client
 
             foreach (Sprite indestructable in indestructables)
             {
-                bool isSpawned = ObjectSpawnCollisionCheck(indestructable);
+                bool isSpawned = ForceSpawnObject(indestructable);
                 if (isSpawned)
                 {
                     if (indestructable != bushObj)
@@ -556,7 +607,7 @@ namespace Client
         }
 
 
-        private bool ObjectSpawnCollisionCheck(Sprite objectSprite)
+        private bool ForceSpawnObject(Sprite objectSprite)
         {
             bool objectSpawned = false;
             while (!objectSpawned)
@@ -598,7 +649,7 @@ namespace Client
                     break;
             }
 
-            bool isSpawned = ObjectSpawnCollisionCheck(syringe);
+            bool isSpawned = ForceSpawnObject(syringe);
             if (isSpawned)
             {
                 GameState.Pickupables.Add(syringe);
@@ -612,7 +663,7 @@ namespace Client
         {
             PowerupFactory pickFactory = new PowerupFactory();
             Pickupable medkit = pickFactory.GetPowerup("Medkit");
-            bool isSpawned = ObjectSpawnCollisionCheck(medkit);
+            bool isSpawned = ForceSpawnObject(medkit);
             if (isSpawned)
             {
                 GameState.Pickupables.Add(medkit);
@@ -634,7 +685,7 @@ namespace Client
 
         private void CreateMainPlayer()
         {
-            MainPlayer = new Player(PlayerSkinType.TriggerHappyHipster);
+            MainPlayer = new Player();
             MainPlayer.IsMainPlayer = true;
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
 
