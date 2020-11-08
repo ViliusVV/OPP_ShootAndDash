@@ -20,13 +20,15 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using Common.Enums;
+using Client.Adapters;
 
 namespace Client.Models
 {
     public class Player: Sprite, ICommand
     {
         private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
-        public string Name { get; set; } = new Random().Next(1, 888).ToString();
+        public string Name { get; set; }
         public float Health { get; set; } = 100;
         public bool IsDead { get; set; } = false;
 
@@ -49,10 +51,23 @@ namespace Client.Models
 
 
         public PlayerBar PlayerBar { get; set; }
+
+
         public Player()
         {
+            this.Name = String.Format("Player-{0}", new Random().Next(111, 999).ToString());
             this.PlayerBar = new PlayerBar();
-            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.MainCharacter);
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.ProfoundAsianChar);
+            this.PlayerAnimation = new PlayerAnimation(this);
+            this.Origin = SpriteUtils.GetSpriteCenter(this);
+            this.HoldingWeapon = new Weapon[3];
+        }
+
+        public Player(PlayerSkinType skinType)
+        {
+            this.Name = String.Format("Player-{0}", new Random().Next(111, 999).ToString());
+            this.PlayerBar = new PlayerBar();
+            this.Texture = GetTexture(skinType);
             this.PlayerAnimation = new PlayerAnimation(this);
             this.Origin = SpriteUtils.GetSpriteCenter(this);
             this.HoldingWeapon = new Weapon[3];
@@ -60,10 +75,12 @@ namespace Client.Models
 
         public Player(ServerPlayer playerDTO)
         {
+            this.Name = String.Format("Player-{0}", new Random().Next(111, 999).ToString());
             this.PlayerBar = new PlayerBar();
-            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.MainCharacter);
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.ProfoundAsianChar);
             this.PlayerAnimation = new PlayerAnimation(this);
             this.Origin = SpriteUtils.GetSpriteCenter(this);
+            this.HoldingWeapon = new Weapon[3];
             this.Name = playerDTO.Name;
             this.Health = playerDTO.Health;
             this.Speed = playerDTO.Speed;
@@ -74,6 +91,20 @@ namespace Client.Models
         {
             this.PreviousWeapon = this.Weapon.Name;
             this.Weapon = wep;
+        }
+
+        private Texture GetTexture(PlayerSkinType skinType)
+        {
+            TextureHolder textures = ResourceHolderFacade.GetInstance().Textures;
+
+            return skinType switch
+            {
+                PlayerSkinType.CheerfulAssasin => textures.Get(TextureIdentifier.CheerfulAssasinChar),
+                PlayerSkinType.TriggerHappyHipster => textures.Get(TextureIdentifier.TriggerHappyHipsterChar),
+                PlayerSkinType.HawaiianManiac => textures.Get(TextureIdentifier.HawaiianManiacChar),
+                PlayerSkinType.ProfoundAsian => textures.Get(TextureIdentifier.ProfoundAsianChar),
+                /* default */ _ => textures.Get(TextureIdentifier.CheerfulAssasinChar),
+            };
         }
 
         public void DropWeapon()
@@ -250,18 +281,6 @@ namespace Client.Models
             return false;
         }
 
-        public ServerPlayer ToDTO()
-        {
-            var tmpDto = new ServerPlayer();
-
-            tmpDto.Name = Name;
-            tmpDto.Health = Health;
-            tmpDto.Position = Position;
-            tmpDto.Speed = Speed;
-
-            return tmpDto;
-        }
-
         public void Update()
         {
             this.PlayerAnimation.Update();
@@ -306,11 +325,49 @@ namespace Client.Models
         }
 
 
+        public ServerPlayer ToDTO()
+        {
+            var tmpDto = new ServerPlayer
+            {
+                Name = Name,
+                Health = Health,
+                Position = Position,
+                Speed = Speed,
+                Heading = Heading,
+                IsDead = IsDead,
+                ServerWeapon = new ServerWeaponAdapter(Weapon)
+            };
+
+            return tmpDto;
+        }
+
         public void RefreshData(ServerPlayer playerDto)
         {
-            Health = playerDto.Health;
-            Position = playerDto.Position;
-            Speed = playerDto.Speed;
+            this.Health = playerDto.Health;
+            this.Position = playerDto.Position;
+            this.Speed = playerDto.Speed;
+            this.Heading = playerDto.Heading;
+            this.IsDead = playerDto.IsDead;
+
+
+            if(this.Weapon == null)
+            {
+                this.Weapon = Weapon.CreateWeapon(playerDto.ServerWeapon.WeaponType);
+                this.HoldingWeapon[0] = this.Weapon;
+            }
+            else if(ServerWeaponAdapter.GetType(Weapon) != playerDto.ServerWeapon.WeaponType)
+            {
+                Weapon newWeapon = Weapon.CreateWeapon(playerDto.ServerWeapon.WeaponType);
+                newWeapon.Projectiles.AddRange(this.Weapon.Projectiles); // not pretty, but good enough
+
+                this.Weapon = newWeapon;
+                this.HoldingWeapon[0] = this.Weapon;
+            }
+
+            this.Weapon.Ammo = playerDto.ServerWeapon.Ammo;
+
+
         }
+
     }
 }

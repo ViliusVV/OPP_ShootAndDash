@@ -11,19 +11,19 @@ namespace Server
     {
         private static readonly GameManager _instance = new GameManager();
 
-        public Dictionary<string, PlayerDTO> Players { get; set; }
+        public Dictionary<string, ServerPlayer> Players { get; set; }
 
         public GameManager() {
-            Players = new Dictionary<string, PlayerDTO>();
+            Players = new Dictionary<string, ServerPlayer>();
         }
         public static GameManager GetInstance()
         {
             return _instance;
         }
 
-        public GameStateDTO GetGameStateDTO()
+        public ServerGameState GetGameStateDTO()
         {
-            GameStateDTO dto = new GameStateDTO();
+            ServerGameState dto = new ServerGameState();
             for (int i = 0; i < Players.Values.Count; i++)
             {
                 dto.Players.Add(Players.Values.ToList()[i]);

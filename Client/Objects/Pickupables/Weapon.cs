@@ -9,7 +9,10 @@ using Client.Objects.Pickupables.Decorator;
 using Client.Objects.Prototype;
 using Client.UI;
 using Client.Utilities;
+using Common.DTO;
+using Common.Enums;
 using Common.Utilities;
+using Microsoft.AspNetCore.SignalR.Client;
 using SFML.Audio;
 using SFML.Graphics;
 using SFML.System;
@@ -116,7 +119,19 @@ namespace Client.Objects
         /// 
         /// </summary>
         /// <param name="target">cursor position - player position</param>
-        public void Shoot(Vector2f target)
+        public void Shoot(Vector2f target, Player player)
+        {
+            this.Shoot(target, this.Position, this.Rotation, player, true);
+        }
+
+
+        /// <summary>
+        /// Shoot method with starting conditions to compensate for network delay
+        /// </summary>
+        /// <param name="target">Where is bulet traveling to</param>
+        /// <param name="shootOrgin">Where shot was fired</param>
+        /// <param name="shootRotation">How was weapon rotated during shoot</param>
+        public void Shoot(Vector2f target, Vector2f shootOrgin, float shootRotation, Player player, bool sendToServer)
         {
             if (Ammo != 0 && Reloading != true && ShootTimer.ElapsedTime.AsMilliseconds() > AttackSpeed )
             {
@@ -127,13 +142,20 @@ namespace Client.Objects
                 Vector2 normalizedTarget = new Vector2(target.X, target.Y);
                 normalizedTarget = Vector2.Normalize(normalizedTarget);
                 Vector2f myTarget = new Vector2f(normalizedTarget.X, normalizedTarget.Y);
-                Projectile bullet = new Projectile(myTarget * projectileSpeed, ProjectileSprite, this.Position, this.Rotation);
+                Projectile bullet = new Projectile(myTarget * projectileSpeed, ProjectileSprite, shootOrgin, shootRotation);
                 Projectiles.Add(bullet);
                 ChangeAmmo(-1);
+
 
                 Sound sound = ResourceHolderFacade.GetInstance().Sounds.Get(SoundIdentifier.GenericGun);
                 sound.Volume = ResourceHolderFacade.GetInstance().CurrentVolume.GetVolume();
                 sound.Play();
+
+                if (sendToServer)
+                {
+                    var shootEventData = new ShootEventData(player.ToDTO(), target, this.Position, this.Rotation);
+                    GameState.GetInstance().ConnectionManager.Connection.SendAsync("ShootEventServer", shootEventData);
+                }
             }
         }
 
@@ -238,6 +260,20 @@ namespace Client.Objects
             copy.ShootTimer = new Clock();
             copy.ReloadCooldown = new Clock();
             return copy;
+        }
+
+        public static Weapon CreateWeapon(WeaponType wepType)
+        {
+            return wepType switch
+            {
+                WeaponType.AssaultRifle => new AssaultRifle(),
+                WeaponType.Pistol => new Pistol(),
+                WeaponType.FlameThrower => new Flamethrower(),
+                WeaponType.Minigun => new Minigun(),
+                WeaponType.SniperRifle => new SniperRifle(),
+                WeaponType.Shootgun => new Shotgun(),
+                /* Default */ _ => new Pistol(),
+            };
         }
     }
 }

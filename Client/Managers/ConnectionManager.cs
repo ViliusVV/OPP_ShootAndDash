@@ -11,10 +11,10 @@ namespace Client.Utilities
     class ConnectionManager
     {
         public string ServerUrl { get; set; }
-        public HubConnection Connection { get; set; }
-        public Clock ActivityClock { get; set; } = new Clock();
         public bool Connected { get => Connection.State == HubConnectionState.Connected; }
 
+        public HubConnection Connection { get; set; }
+        public Clock ActivityClock { get; set; } = new Clock();
 
         public ConnectionManager(string url)
         {

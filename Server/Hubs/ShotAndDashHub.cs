@@ -1,5 +1,8 @@
-﻿using Common;
+﻿
+using Common;
 using Common.DTO;
+using Common.Utilities;
+using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
 using SFML.System;
 using System;
@@ -15,19 +18,38 @@ namespace Server.Hubs
     {
         public readonly GameManager _gameManager = GameManager.GetInstance();
 
-        public async Task ReceivePos(PlayerDTO dto)
-        {
-            _gameManager.Players[Context.ConnectionId] = dto;
-            await Clients.All.SendAsync("UpdateState", _gameManager.GetGameStateDTO());
-        }
 
-        public async Task SpawnPlayer(PlayerDTO playerDTO)
+        // Hub server callbacks
+
+        public void LoginPlayerServerEvent(ServerPlayer playerDTO)
         {
             Console.WriteLine("Player {0} connected", playerDTO);
             _gameManager.Players.Add(Context.ConnectionId, playerDTO);
-            //await Clients.AllExcept(Context.ConnectionId).SendAsync("CreatePlayer", playerDTO);
-            await Clients.All.SendAsync("CreatePlayer", _gameManager.GetGameStateDTO());
         }
+
+        public async Task UpdateGameStateServer(ServerPlayer dto)
+        {
+            _gameManager.Players[Context.ConnectionId] = dto;
+            await Clients.All.SendAsync("UpdateGameStateClient", _gameManager.GetGameStateDTO());
+        }
+
+        public async Task UpdateKillsServer(ServerPlayer victim)
+        {
+            _gameManager.Players[Context.ConnectionId].Kills += 1;
+            _gameManager.Players.Where(p => p.Value.Name.Equals(victim.Name)).First().Value.Deaths += 1;
+
+            await Clients.All.SendAsync("UpdateGameStateClient", _gameManager.GetGameStateDTO());
+        }
+
+        public void ShootEventServer(ShootEventData shootData)
+        {
+            OurLogger.Log(shootData.ToString());
+            Clients.AllExcept(Context.ConnectionId).SendAsync("ShootEventClient", shootData);
+        }
+
+
+
+        // Hub native events
 
         public async override Task OnConnectedAsync()
         {

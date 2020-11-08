@@ -16,7 +16,10 @@ namespace Client.Config
         // Tiles
         [ResourceAttr("Assets/tileGrass.png")] Background,
         // Characters
-        [ResourceAttr("Assets/Char4Spritesheet.png")] MainCharacter,
+        [ResourceAttr("Assets/Char1Spritesheet.png")] CheerfulAssasinChar,
+        [ResourceAttr("Assets/Char2Spritesheet.png")] TriggerHappyHipsterChar,
+        [ResourceAttr("Assets/Char3Spritesheet.png")] HawaiianManiacChar,
+        [ResourceAttr("Assets/Char4Spritesheet.png")] ProfoundAsianChar,
         // UI
         [ResourceAttr("Assets/cursor.png")] AimCursor,
         //[ResourceAttr("Assets/ScoreboardBox.png")] ScoreboardBox,

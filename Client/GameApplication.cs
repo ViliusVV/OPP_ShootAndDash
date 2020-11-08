@@ -23,6 +23,7 @@ using System.Linq;
 using Client.Objects.Pickupables.Strategy;
 using Client.Objects.Pickupables.Decorator;
 using System.Diagnostics;
+using Common.Enums;
 
 namespace Client
 {
@@ -30,7 +31,9 @@ namespace Client
     {
         // Singleton instance
         private static readonly GameApplication _instance = new GameApplication();
-        public static Random Rnd { get; set; } = new Random();
+
+        // Settings
+        private readonly int multiplayerSendRate = 30;
 
 
         // Screen 
@@ -43,19 +46,13 @@ namespace Client
         float zoomView = 1.0f;
         float previousZoom = 1.0f;
 
-
-        // Resources
-        //private TextureHolder Textures { get; set; } = TextureHolder.GetInstance();
-        //private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
-        //private FontHolder Fonts { get; set; } = FontHolder.GetInstance();
-        //private SoundVolume CurrentVolume { get; set; } = SoundVolume.GetInstance();
         private ResourceHolderFacade ResourceFacade = ResourceHolderFacade.GetInstance();
 
         MapBuilder builder = new MapBuilder();
         Director director;
 
         GameState GameState { get; set; } = GameState.GetInstance();
-        private ConnectionManager ConnectionManager { get; set; } = new ConnectionManager("http://localhost:5000/sd-server");
+       
 
 
         Player MainPlayer { get; set; }
@@ -109,18 +106,17 @@ namespace Client
             weaponProtoype = new Pistol();
 
             // Player init
-            MainPlayer = new Player();
-            MainPlayer.IsMainPlayer = true;
-            MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
-            MainPlayer.Weapon = (Weapon)weaponProtoype.Clone(); //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
-            MainPlayer.HoldingWeapon[0] = (Weapon)weaponProtoype.Clone(); //for testing purposes
-            MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
-            MainPlayer.PreviousWeapon = "";           
+            CreateMainPlayer();
 
-            
+            GameState.ConnectionManager = new ConnectionManager("http://localhost:5000/sd-server");
+
 
             scoreboardText = new CustomText(ResourceFacade.Fonts.Get(FontIdentifier.PixelatedSmall), 21);
             scoreboardText.DisplayedString = "Player01 - 15/2";
+
+            Vector2f scoreboardTextPos = new Vector2f(0, 0);
+
+            scoreboardText.Position = scoreboardTextPos;
 
             bool isPlayerSpawned = ObjectSpawnCollisionCheck(MainPlayer);
             if (isPlayerSpawned)
@@ -141,24 +137,20 @@ namespace Client
                 }
 
                 Time deltaTime = FrameClock.Restart();
-                if (ConnectionManager.ActivityClock.ElapsedTime.AsSeconds() > (1f / 60f) && ConnectionManager.Connected)
+                if (GameState.ConnectionManager.ActivityClock.ElapsedTime.AsSeconds() > (1f / multiplayerSendRate) 
+                    && GameState.ConnectionManager.Connected)
                 {
-                    ConnectionManager.ActivityClock.Restart();
-                    SendPos(ConnectionManager.Connection);
+                    GameState.ConnectionManager.ActivityClock.Restart();
+                    SendPos(GameState.ConnectionManager.Connection);
                 }
 
 
                   
 
                 var middlePoint = VectorUtils.GetMiddlePoint(MainPlayer.Position, mPos);
-                middlePoint.X += 0.375f;
 
                 MainPlayer.Heading = VectorUtils.GetAngleBetweenVectors(MainPlayer.Position, mPos);
                 MainPlayer.LookingAtPoint = mPos;
-
-                Vector2f scoreboardTextPos = new Vector2f(0, 0);
-
-                scoreboardText.Position = scoreboardTextPos;
 
 
                 UpdateLoop(deltaTime, mPos);
@@ -177,99 +169,50 @@ namespace Client
             }
         }
 
-        private void DrawCollidables()
-        {
-            foreach (var item in GameState.Collidables)
-            {
-                GameWindow.Draw(item);
-            }
-        }
 
-        private void DrawNonCollidables()
-        {
-            foreach (var item in GameState.NonCollidables)
-            {
-                GameWindow.Draw(item);
-            }
-        }
-
-        private void UpdatePlayers(ServerGameState stateDTO)
-        {
-            foreach (var dto in stateDTO.Players)
-            {
-                Player player = GameState.Players.Find(p => p.Name.Equals(dto.Name));
-                if (player != null && !MainPlayer.Equals(player))
-                {
-                    player.RefreshData(dto);
-                }
-
-                if(player == null)
-                {
-                    Player tmpPlayer = new Player(dto);
-                    GameState.Players.Add(tmpPlayer);
-                }
-            }
-        }
+        // ========================================================================
+        // =============================== UPDATES ================================
+        // ========================================================================
 
         private void RenderPlayers()
         {
             for (int i = 0; i < GameState.Players.Count; i++)
             {
                 var player = GameState.Players[i];
-                GameWindow.Draw(player);
                 Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
                 player.PlayerBar.Position = playerBarPos;
                 player.UpdateSpeed();
                 player.TranslateFromSpeed();
                 player.Update();
+
+                GameWindow.Draw(player);
                 GameWindow.Draw(player.PlayerBar);
 
                 if (player.Weapon != null)
                 {
                     GameWindow.Draw(player.Weapon);
+                    DrawProjectiles(player);
                     if (player.Weapon.LaserSight != null) GameWindow.Draw(player.Weapon.LaserSprite);
                 }
 
+
             }
         }
 
 
-        public void SendPos(HubConnection connection)
-        {
-            var tmpPlayer = MainPlayer.ToDTO();
-            connection.SendAsync("ReceivePos", tmpPlayer);
-        }
-
-
-        public void CreatePlayer()
-        {
-
-            ConnectionManager.Connection.SendAsync("SpawnPlayer", MainPlayer.ToDTO()).Wait();
-        }
-
-        private void ToogleScreen()
-        {
-            if(FullScreen != PrevFullScreen)
-            {
-                PrevFullScreen = FullScreen;
-                var windowStyle = FullScreen ? Styles.Fullscreen : Styles.Close;
-                GameWindow.Close();
-                GameWindow = CreateRenderWindow(windowStyle);
-            }
-        }
         private void UpdateBullets(Time deltaTime)
         {
-            foreach (var item in MainPlayer.HoldingWeapon)
+            foreach (var player in GameState.Players)
             {
-                if (item != null)
+                foreach (var item in player.HoldingWeapon)
                 {
-                    item.UpdateProjectiles(deltaTime.AsSeconds());
-                    item.CheckCollisions(GameState.Collidables);
+                    if (item != null)
+                    {
+                        item.UpdateProjectiles(deltaTime.AsSeconds());
+                        item.CheckCollisions(GameState.Collidables);
+                    }
                 }
             }
-            //MainPlayer.Weapon.UpdateProjectiles(deltaTime.AsSeconds());
-            //MainPlayer.Weapon.CheckCollisions(GameState.Collidables);
-
         }
 
         private void UpdatePickupables()
@@ -285,9 +228,76 @@ namespace Client
             }
         }
 
-        private void DrawProjectiles()
+        public void UpdateLoop(Time deltaTime, Vector2f mPos)
         {
-            foreach (var item in MainPlayer.HoldingWeapon)
+            UpdatePickupables();
+            UpdateBullets(deltaTime);
+            AimCursor.Update(mPos);
+        }
+
+
+
+        // ========================================================================
+        // =========================== UPDATES (MULTIPLAYER) ======================
+        // ========================================================================
+
+        private void UpdatePlayers(ServerGameState stateDTO)
+        {
+            foreach (var dto in stateDTO.Players)
+            {
+                Player player = GameState.Players.Find(p => p.Name.Equals(dto.Name));
+                if (player != null && !MainPlayer.Equals(player))
+                {
+                    player.RefreshData(dto);
+                }
+
+                if (player == null)
+                {
+                    Player tmpPlayer = new Player(dto);
+                    GameState.Players.Add(tmpPlayer);
+                }
+            }
+        }
+
+
+        public void SendPos(HubConnection connection)
+        {
+            var tmpPlayer = MainPlayer.ToDTO();
+            connection.SendAsync("UpdateGameStateServer", tmpPlayer);
+        }
+
+
+        public void CreatePlayer()
+        {
+
+            GameState.ConnectionManager.Connection.SendAsync("LoginPlayerServerEvent", MainPlayer.ToDTO()).Wait();
+        }
+
+        // ========================================================================
+        // =============================== DRAWING ================================
+        // ========================================================================
+
+        private void DrawCollidables()
+        {
+            foreach (var item in GameState.Collidables)
+            {
+                GameWindow.Draw(item);
+            }
+        }
+
+
+        private void DrawNonCollidables()
+        {
+            foreach (var item in GameState.NonCollidables)
+            {
+                GameWindow.Draw(item);
+            }
+        }
+
+
+        private void DrawProjectiles(Player player)
+        {
+            foreach (var item in player.HoldingWeapon)
             {
                 if (item != null)
                 {
@@ -296,6 +306,8 @@ namespace Client
             }
             //MainPlayer.Weapon.DrawProjectiles(GameWindow);
         }
+
+
         private void DrawPickupables()
         {
             for (int i = 0; i < GameState.Pickupables.Count; i++)
@@ -303,45 +315,49 @@ namespace Client
                 GameWindow.Draw(GameState.Pickupables[i]);
             }
         }
+
+
         public void DrawLoop()
         {
             GameWindow.Draw(GameState.TileMap);
             RenderPlayers();
             DrawCollidables();
             DrawNonCollidables();
-            //GameWindow.Draw(bushSprite);
             DrawPickupables();
-            DrawProjectiles();
             GameWindow.Draw(AimCursor);
         }
 
-        public void UpdateLoop(Time deltaTime, Vector2f mPos)
-        {
-            UpdatePickupables();
-            UpdateBullets(deltaTime);
-            AimCursor.Update(mPos);
-        }
-        public void GameLoop()
+        // ========================================================================
+        // ============================  EVENTS AND INPUTS ========================
+        // ========================================================================
+
+        public void BindEvents()
         {
 
-        }
-        public RenderWindow CreateRenderWindow(Styles windowStyle)
-        {
-            VideoMode videoMode = new VideoMode(1280, 720);
-            RenderWindow window = new RenderWindow(videoMode, "ShootN'Dash v0.011", windowStyle);
-            window.SetMouseCursorVisible(false);
-            window.SetFramerateLimit(120);
+            GameState.ConnectionManager.Connection.On<ServerGameState>("UpdateGameStateClient", (stateDto) =>
+            {
+                UpdatePlayers(stateDto);
+            });
 
-            BindWindowEvents(window);
+            GameState.ConnectionManager.Connection.On<ShootEventData>("ShootEventClient", (shootData) =>
+            {
+                Player player = GameState.Players.Find(p => p.Name.Equals(shootData.Shooter.Name));
+                if(player != null)
+                {
+                    player.Weapon.Shoot(shootData.Target, shootData.Orgin, shootData.Rotation, player, false);
+                }
 
-            return window;
+                OurLogger.Log(shootData.ToString());
+
+            });
         }
+
 
         public void BindWindowEvents(RenderWindow window)
         {
             window.Closed += (obj, e) => {
-                ConnectionManager.Connection.StopAsync().Wait();
-                window.Close(); 
+                GameState.ConnectionManager.Connection.StopAsync().Wait();
+                window.Close();
             };
 
             // Catch key event. E
@@ -369,17 +385,17 @@ namespace Client
                     zoomView += -e.Delta / 10.0f;
                     zoomView = (zoomView < 0.3f || zoomView > 2.0f) ? previousZoom : zoomView;
                     previousZoom = zoomView;
-                    
+
                 }
             };
 
             window.GainedFocus += (sender, e) => {
                 OurLogger.Log("Window gained focus");
-                this.HasFocus = true; 
+                this.HasFocus = true;
             };
             window.LostFocus += (sender, e) => {
                 OurLogger.Log("Window lost focus");
-                this.HasFocus = false; 
+                this.HasFocus = false;
             };
         }
 
@@ -392,7 +408,7 @@ namespace Client
             {
                 SpawnRandomSyringe();
             }
-            if(Keyboard.IsKeyPressed(Keyboard.Key.Z))
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Z))
             {
                 MainPlayer.AddHealth(-1);
             }
@@ -404,7 +420,7 @@ namespace Client
             if (Mouse.IsButtonPressed(Mouse.Button.Left))
             {
                 var target = AimCursor.Position - MainPlayer.Position;
-                MainPlayer.Weapon.Shoot(target);
+                MainPlayer.Weapon.Shoot(target, MainPlayer);
             }
 
             // Testing abstract factory
@@ -421,33 +437,38 @@ namespace Client
                 GameState.TileMap = builder.GetResult();
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.Q))
-			{
+            {
                 MainPlayer.Toggle();
-			}
+            }
             if (Keyboard.IsKeyPressed(Keyboard.Key.G))
-			{
+            {
                 MainPlayer.DropWeapon();
             }
             if (Keyboard.IsKeyPressed(Keyboard.Key.Num1))
-			{
+            {
                 if (MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[0].Name)
                     MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
-			}
+            }
             if (Keyboard.IsKeyPressed(Keyboard.Key.Num2))
-			{
+            {
                 if (MainPlayer.HoldingWeapon[1] != null && MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[1].Name)
                     MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[1]);
-			}
+            }
             if (Keyboard.IsKeyPressed(Keyboard.Key.Num3))
-			{
+            {
                 if (MainPlayer.HoldingWeapon[2] != null && MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[2].Name)
                     MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[2]);
-			}
+            }
             if (Keyboard.IsKeyPressed(Keyboard.Key.M))
             {
                 Toggle();
             }
         }
+
+
+        // ========================================================================
+        // ============================== SPAWNING ================================
+        // ========================================================================
 
         private void SpawningManager(int destrCount, int indestrCount, int syringeCount)
         {
@@ -464,6 +485,7 @@ namespace Client
                 SpawnRandomSyringe();
             }
         }
+
 
         private void SpawnDestructible()
         {
@@ -484,6 +506,7 @@ namespace Client
             }
         }
 
+
         private void SpawnIndestructible()
         {
             AbstractFactory indestrFactory = FactoryProducer.GetFactory("Indestructible");
@@ -494,7 +517,7 @@ namespace Client
             indestructables.Add(barbWireObj);
             indestructables.Add(wallObj);
             indestructables.Add(bushObj);
-            
+
 
             foreach (Sprite indestructable in indestructables)
             {
@@ -511,6 +534,7 @@ namespace Client
             }
         }
 
+
         private bool ObjectSpawnCollisionCheck(Sprite objectSprite)
         {
             bool objectSpawned = false;
@@ -518,7 +542,7 @@ namespace Client
             {
                 objectSpawned = true;
                 //destrObj.Position = new Vector2f(64 * Rnd.Next(60), 64 * Rnd.Next(45));
-                objectSprite.Position = new Vector2f(Rnd.Next(GameState.TileMap.Length * 64), Rnd.Next(GameState.TileMap.Width * 64));
+                objectSprite.Position = new Vector2f(GameState.Random.Next(GameState.TileMap.Length * 64), GameState.Random.Next(GameState.TileMap.Width * 64));
                 foreach (Sprite collidable in GameState.Collidables.ToList())
                 {
                     if (CollisionTester.BoundingBoxTest(collidable, objectSprite))
@@ -531,11 +555,10 @@ namespace Client
             return objectSpawned;
         }
 
-        //
 
         private void SpawnRandomSyringe()
         {
-            int num = Rnd.Next(5);
+            int num = GameState.Random.Next(5);
             PowerupFactory pickFactory = new PowerupFactory();
             Pickupable syringe;
             switch (num)
@@ -559,7 +582,7 @@ namespace Client
             {
                 GameState.Pickupables.Add(syringe);
             }
-            
+
 
         }
 
@@ -576,13 +599,44 @@ namespace Client
         }
 
 
+
+        // ========================================================================
+        // ======================== INITIALIZATION METHODS ========================
+        // ========================================================================
+
+        private void CreateSprites()
+        {
+            OurLogger.Log("Loading sprites...");
+            IntRect rect = new IntRect(0, 0, 1280, 720);
+            AimCursor.SetTexture(new Texture(ResourceFacade.Textures.Get(TextureIdentifier.AimCursor)));
+        }
+
+        private void CreateMainPlayer()
+        {
+            MainPlayer = new Player(PlayerSkinType.TriggerHappyHipster);
+            MainPlayer.IsMainPlayer = true;
+            MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
+
+            //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
+            MainPlayer.HoldingWeapon[0] = (Weapon)weaponProtoype.Clone(); //for testing purposes
+            MainPlayer.Weapon = MainPlayer.HoldingWeapon[0];
+            MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
+            MainPlayer.PreviousWeapon = "";
+        }
+
+
+        // ========================================================================
+        // ================================ META ==================================
+        // ========================================================================
+
         public void ConntectToServer()
         {
-            ConnectionManager.ConnectToHub();
+            GameState.ConnectionManager.ConnectToHub();
 
             BindEvents();
             CreatePlayer();
         }
+
 
         public void Toggle()
         {
@@ -597,74 +651,27 @@ namespace Client
         }
 
 
-        public void BindEvents()
+        public RenderWindow CreateRenderWindow(Styles windowStyle)
         {
+            VideoMode videoMode = new VideoMode(1280, 720);
+            RenderWindow window = new RenderWindow(videoMode, "ShootN'Dash v0.011", windowStyle);
+            window.SetMouseCursorVisible(false);
+            window.SetFramerateLimit(120);
 
-            ConnectionManager.Connection.On<ServerGameState>("UpdateState", (stateDto) =>
+            BindWindowEvents(window);
+
+            return window;
+        }
+
+        private void ToogleScreen()
+        {
+            if (FullScreen != PrevFullScreen)
             {
-                UpdatePlayers(stateDto);
-            });
+                PrevFullScreen = FullScreen;
+                var windowStyle = FullScreen ? Styles.Fullscreen : Styles.Close;
+                GameWindow.Close();
+                GameWindow = CreateRenderWindow(windowStyle);
+            }
         }
-
-
-        // ========================================================================
-        // ======================== INITIALIZATION METHODS ========================
-        // ========================================================================
-
-        // Create sprites and some game objects
-        // TODO: Make it better
-        private void CreateSprites()
-        {
-            OurLogger.Log("Loading sprites...");
-            IntRect rect = new IntRect(0, 0, 1280, 720);
-//            bgSprite = new Sprite(Textures.Get(TextureIdentifier.Background), rect);
-            AimCursor.SetTexture(new Texture(ResourceFacade.Textures.Get(TextureIdentifier.AimCursor)));
-            //crate = new Sprite(Textures.Get(TextureIdentifier.Crate));
-            //crate2 = new Sprite(Textures.Get(TextureIdentifier.Crate));
-            //bushSprite = new Sprite(Textures.Get(TextureIdentifier.Bush));
-        }
-
-
-        // Load all game textures
-        //public void LoadTextures()
-        //{
-        //    OurLogger.Log("Loading textures...");
-
-        //    // Iterate over all textures and load
-        //    var allTextures = Enum.GetValues(typeof(TextureIdentifier));
-        //    foreach(TextureIdentifier texture in allTextures)
-        //    {
-        //        Textures.Load(texture);
-        //    }
-
-        //    // Set special properties for some textures
-        //    Textures.Get(TextureIdentifier.Background).Repeated = true;
-        //}
-
-
-        // Load all music and sound efects
-        //public void LoadSounds()
-        //{
-        //    OurLogger.Log("Loading sounds...");
-
-        //    var allSounds = Enum.GetValues(typeof(SoundIdentifier));
-        //    foreach (SoundIdentifier sound in allSounds)
-        //    {
-        //        Sounds.Load(sound);
-        //    }
-        //}
-
-
-        // Load all custom fonts
-        //public void LoadFonts()
-        //{
-        //    OurLogger.Log("Loading fonts...");
-
-        //    var allFonts = Enum.GetValues(typeof(FontIdentifier));
-        //    foreach (FontIdentifier font in allFonts)
-        //    {
-        //        Fonts.Load(font);
-        //    }
-        //}
     }
 }

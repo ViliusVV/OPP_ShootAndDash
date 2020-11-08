@@ -9,14 +9,16 @@
     <Import_RootNamespace>Common</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)DTO\PlayerDTO.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DTO\ServerPlayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DTO\ServerWeapon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DTO\ShootEventData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\PlayerSkinType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModelInterfaces\IProjectile.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Enums\WeaponId.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ModelInterfaces\IWeapon.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\WeaponType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModelInterfaces\IPlayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\OurLogger.cs" />
     <Compile Include="..\Common\DTO\Vector2fS.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DTO\GameStateDTO.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DTO\ServerGameState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\VectorUtils.cs" />
   </ItemGroup>
 </Project>

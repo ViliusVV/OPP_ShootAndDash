@@ -15,11 +15,17 @@ namespace Client.Managers
     class GameState
     {
         private static readonly GameState _instance = new GameState();
+
+        public Random Random { get; private set; }
+
         public List<Player> Players { get; set; }
         public List<Pickupable> Pickupables { get; set; }
         public List<Sprite> Collidables { get; set; }
         public TileMap TileMap { get; set; }
         public List<Sprite> NonCollidables { get; set; }
+
+        public ConnectionManager ConnectionManager { get; set; }
+
 
         private GameState()
         {
@@ -27,24 +33,32 @@ namespace Client.Managers
             this.Pickupables = new List<Pickupable>();
             this.Collidables = new List<Sprite>();
             this.NonCollidables = new List<Sprite>();
+            this.Random = new Random();
         }
+
         public static GameState GetInstance()
         {
             return _instance;
         }
 
+        public void InitRandom(int seed)
+        {
+            this.Random = new Random(seed);
+        }
+
+
         public void ToDTO()
         {
-            GameStateDTO dto = new GameStateDTO();
+            ServerGameState dto = new ServerGameState();
             foreach(Player player in Players)
             {
                 dto.Players.Add(player.ToDTO());
             }
         }
         
-        public void FromDTO(GameStateDTO dto)
+        public void FromDTO(ServerGameState dto)
         {
-            foreach(PlayerDTO playerDto in dto.Players)
+            foreach(ServerPlayer playerDto in dto.Players)
             {
                 Player player = Players.Find(p => p.Name.Equals(playerDto.Name));
 

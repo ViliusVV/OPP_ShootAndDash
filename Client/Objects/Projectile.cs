@@ -26,10 +26,12 @@ namespace Client.Objects
             ProjectileSprite.Position = position;
             ProjectileSprite.Rotation = rotation;
         }
+
         public void Translate()
         {
             ProjectileSprite.Position += new Vector2f(Velocity.X * SpeedMultiplier, Velocity.Y * SpeedMultiplier);
         }
+
         /// <summary>
         /// 
         /// </summary>
