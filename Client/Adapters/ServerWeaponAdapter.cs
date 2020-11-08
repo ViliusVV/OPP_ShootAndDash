@@ -37,7 +37,7 @@ namespace Client.Adapters
                 case SniperRifle _:
                     return WeaponType.SniperRifle;
                 case Flamethrower _:
-                    return WeaponType.Pistol;
+                    return WeaponType.FlameThrower;
                 default:
                     return WeaponType.Pistol;
             }
