@@ -30,7 +30,10 @@ namespace Client.Models
         private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
         public string Name { get; set; }
         public float Health { get; set; } = 100;
-        public bool IsDead { get; set; } = false;
+        public bool IsDead { get => Health <= 0; }
+
+        public int Kills { get; set; }
+        public int Deaths { get; set; }
 
         private Vector2f _speed = new Vector2f(0.0f, 0.0f);
         public Vector2f Speed { get => _speed; set => _speed = value; }
@@ -165,7 +168,6 @@ namespace Client.Models
                 {
                     Health = 100;
                 }
-                Console.WriteLine("HP: " + Health.ToString());
             }
             // damage player
             else
@@ -174,7 +176,6 @@ namespace Client.Models
                 if (Health <= 0)
                 {
                     Health = 0;
-                    IsDead = true;
                 }
             }
         }
@@ -347,7 +348,6 @@ namespace Client.Models
             this.Position = playerDto.Position;
             this.Speed = playerDto.Speed;
             this.Heading = playerDto.Heading;
-            this.IsDead = playerDto.IsDead;
 
 
             if(this.Weapon == null)

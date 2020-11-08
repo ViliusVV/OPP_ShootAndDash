@@ -204,12 +204,12 @@ namespace Client
         {
             foreach (var player in GameState.Players)
             {
-                foreach (var item in player.HoldingWeapon)
+                foreach (var wep in player.HoldingWeapon)
                 {
-                    if (item != null)
+                    if (wep != null)
                     {
-                        item.UpdateProjectiles(deltaTime.AsSeconds());
-                        item.CheckCollisions(GameState.Collidables);
+                        wep.UpdateProjectiles(deltaTime.AsSeconds());
+                        wep.CheckCollisions(player);
                     }
                 }
             }
@@ -349,6 +349,27 @@ namespace Client
 
                 OurLogger.Log(shootData.ToString());
 
+            });
+
+            GameState.ConnectionManager.Connection.On<ServerPlayer, ServerPlayer>("UpdateScoresClient", (killerServ, victimServ) =>
+            {
+                Player killer = GameState.Players.Find(p => p.Name.Equals(killerServ.Name));
+                Player victim = GameState.Players.Find(p => p.Name.Equals(victimServ.Name));
+
+                OurLogger.Log($"{victimServ.Name} got shot. Before {victim.Health} after {victimServ.Health} ");
+
+                victim.Health = victimServ.Health;
+
+                if (victim.IsDead)
+                {
+                    OurLogger.Log($"{killerServ.Name} killed ---> {victimServ.Name}");
+                    killer.Kills = killerServ.Kills;
+                    victim.Deaths = victimServ.Deaths;
+                }
+                else
+                {
+                    OurLogger.Log($"{victimServ.Name} got shot. Befor ");
+                }
             });
         }
 

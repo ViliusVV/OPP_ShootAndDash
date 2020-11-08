@@ -160,13 +160,30 @@ namespace Client.Objects
         }
 
 
-        public void CheckCollisions(List<Sprite> collidables)
+        public void CheckCollisions(Player shooter)
         {
             // 2 sets of loops, because we cannot modify the list while we are iterating through it
             List<int> indexesToRemove = new List<int>();
 
+            var collidables = GameState.GetInstance().Collidables;
+            var players = GameState.GetInstance().Players;
+
+
             for (int i = 0; i < Projectiles.Count; i++)
             {
+                for(int j = 0; j < players.Count; j++)
+                {
+                    if (!players[j].Name.Equals(shooter.Name) && CollisionTester.BoundingBoxTest(players[j], Projectiles[i].ProjectileSprite))
+                    {
+                        indexesToRemove.Add(i);
+
+                        players[j].AddHealth(- this.Damage);
+
+                        GameState.GetInstance().ConnectionManager.Connection.SendAsync("UpdateScoresServer", players[j]);
+ 
+                    }
+                }
+
                 for (int j = 0; j < collidables.Count; j++)
                 {
                     if (CollisionTester.BoundingBoxTest(collidables[j], Projectiles[i].ProjectileSprite))
