@@ -114,7 +114,7 @@ namespace Client
             // Player init
             CreateMainPlayer();
 
-            GameState.ConnectionManager = new ConnectionManager("http://localhost:5000/sd-server");
+            GameState.ConnectionManager = new ConnectionManager("http://10.147.17.57:4300/sd-server");
 
 
 
@@ -259,6 +259,11 @@ namespace Client
                 if (elapsedDeath > deathTimeout)
                 {
                     ForceSpawnObject(MainPlayer);
+                    MainPlayer.HoldingWeapon = new Weapon[3];
+                    MainPlayer.HoldingWeapon[0] = new Pistol(); //for testing purposes
+                    MainPlayer.Weapon = MainPlayer.HoldingWeapon[0];
+                    MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
+                    MainPlayer.PreviousWeapon = "";
                     MainPlayer.Health = 100;
                     text.DisplayedString = "";
                 }
