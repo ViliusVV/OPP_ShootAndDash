@@ -19,8 +19,12 @@ namespace Client.UI
         {
             if (Monitor.TryEnter(message))
             {
-                if(timemoutTimer.ElapsedTime.AsSeconds() < messageTimeout) 
-                    target.Draw(message);
+                try
+                {
+                    if (timemoutTimer.ElapsedTime.AsSeconds() < messageTimeout)
+                        target.Draw(message);
+                }
+                catch { }
             }
         }
 

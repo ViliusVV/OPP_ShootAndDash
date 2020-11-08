@@ -46,7 +46,6 @@ namespace Client.UI
         public void Update(PlayerEventData eventData)
         {
             OurLogger.Log($"Got event {eventData}");
-            OurLogger.Log($"Inside lock");
             if (!scores.ContainsKey(eventData.Shooter))
             {
                 scores.Add(eventData.Shooter, new CustomText(2 * 7));

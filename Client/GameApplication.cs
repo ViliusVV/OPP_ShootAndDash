@@ -257,9 +257,13 @@ namespace Client
                 }
                 else
                 {
-                    text.DisplayedString = "You're dead. Respawning in " + (deathTimeout - elapsedDeath).ToString("N2");
-                    text.Origin = new Vector2f(text.GetLocalBounds().Left / 2f, text.GetLocalBounds().Top / 2f);
-                    text.Position = new Vector2f(GameWindow.GetViewport(MainView).Height / 2f, GameWindow.GetViewport(MainView).Width / 2f);
+                    try
+                    {
+                        text.DisplayedString = "You're dead. Respawning in " + (deathTimeout - elapsedDeath).ToString("N2");
+                        text.Origin = new Vector2f(text.GetLocalBounds().Left / 2f, text.GetLocalBounds().Top / 2f);
+                        text.Position = new Vector2f(GameWindow.GetViewport(MainView).Height / 2f, GameWindow.GetViewport(MainView).Width / 2f);
+                    }
+                    catch { }
                 }
             }
             else
