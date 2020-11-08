@@ -45,19 +45,22 @@ namespace Client.UI
 
         public void Update(PlayerEventData eventData)
         {
-            OurLogger.Log($"Got event {eventData}");
-            if (!scores.ContainsKey(eventData.Shooter))
+            lock (GameApplication.GetInstance().SFMLLock)
             {
-                scores.Add(eventData.Shooter, new CustomText(2 * 7));
-            }
+                OurLogger.Log($"Got event {eventData}");
+                if (!scores.ContainsKey(eventData.Shooter))
+                {
+                    scores.Add(eventData.Shooter, new CustomText(2 * 7));
+                }
 
-            if (!scores.ContainsKey(eventData.Victim))
-            {
-                scores.Add(eventData.Victim, new CustomText(2 * 7));
-            }
+                if (!scores.ContainsKey(eventData.Victim))
+                {
+                    scores.Add(eventData.Victim, new CustomText(2 * 7));
+                }
 
-            scores[eventData.Victim].DisplayedString = $"{eventData.Victim.Name} {eventData.Victim.Kills}/{eventData.Victim.Deaths}";
-            scores[eventData.Shooter].DisplayedString = $"{eventData.Shooter.Name} {eventData.Shooter.Kills}/{eventData.Shooter.Deaths}";
+                scores[eventData.Victim].DisplayedString = $"{eventData.Victim.Name} {eventData.Victim.Kills}/{eventData.Victim.Deaths}";
+                scores[eventData.Shooter].DisplayedString = $"{eventData.Shooter.Name} {eventData.Shooter.Kills}/{eventData.Shooter.Deaths}";
+            }
         }
 
         

@@ -48,6 +48,8 @@ namespace Client
         float zoomView = 1.0f;
         float previousZoom = 1.0f;
 
+        public Object SFMLLock = new Object();
+
         private ResourceHolderFacade ResourceFacade = ResourceHolderFacade.GetInstance();
 
         MapBuilder builder = new MapBuilder();
@@ -146,7 +148,7 @@ namespace Client
                     SendPos(GameState.ConnectionManager.Connection);
                 }
 
-                HandleDeath();
+               
                   
 
                 var middlePoint = VectorUtils.GetMiddlePoint(MainPlayer.Position, mPos);
@@ -156,20 +158,25 @@ namespace Client
 
 
                 UpdateLoop(deltaTime, mPos);
-                DrawLoop();
 
-                GameWindow.SetView(MainView);
-                GameWindow.Draw(GameplayUI.Scoreboard);
-                GameWindow.Draw(GameplayUI.RespawnMesage);
-                GameWindow.Draw(GameplayUI.KillNotifier);
+                
+                lock (SFMLLock)
+                {
+                    HandleDeath();
+                    DrawLoop();
+                    GameWindow.SetView(MainView);
+                    GameWindow.Draw(GameplayUI.Scoreboard);
+                    GameWindow.Draw(GameplayUI.RespawnMesage);
+                    GameWindow.Draw(GameplayUI.KillNotifier);
 
-                ZoomedView.Center = middlePoint;
+                    ZoomedView.Center = middlePoint;
 
-                ZoomedView.Zoom(zoomView);
-                zoomView = 1.0f;
-                GameWindow.SetView(ZoomedView);
+                    ZoomedView.Zoom(zoomView);
+                    zoomView = 1.0f;
+                    GameWindow.SetView(ZoomedView);
 
-                GameWindow.Display();
+                    GameWindow.Display();
+                }
             }
         }
 
