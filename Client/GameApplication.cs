@@ -491,7 +491,7 @@ namespace Client
         {
             AbstractFactory destrFactory = FactoryProducer.GetFactory("Destructible");
             List<Sprite> destructables = new List<Sprite>();
-            Sprite healthCrateObj = destrFactory.GetDestructible("ExplosiveBarrel").SpawnObject();
+            Sprite healthCrateObj = destrFactory.GetDestructible("HealthCrate").SpawnObject();
             Sprite itemCrateObj = destrFactory.GetDestructible("ItemCrate").SpawnObject();
             destructables.Add(healthCrateObj);
             destructables.Add(itemCrateObj);

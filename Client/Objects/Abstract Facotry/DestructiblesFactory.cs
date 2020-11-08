@@ -18,7 +18,7 @@ namespace Client.Objects
             if (destructibleObj == null)
                 return null;
 
-            if (destructibleObj.Equals("ExplosiveBarrel"))
+            if (destructibleObj.Equals("HealthCrate"))
             {
                 bool randomChoice = new Random().NextDouble() >= 0.5;
                 IItemBridge ItemBridge;
