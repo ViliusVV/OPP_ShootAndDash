@@ -189,6 +189,8 @@ namespace Client
                     player.TranslateFromSpeed();
                     player.Update();
 
+                    UpdatePickupables(player);
+
                     GameWindow.Draw(player);
                     GameWindow.Draw(player.PlayerBar);
 
@@ -218,14 +220,14 @@ namespace Client
             }
         }
 
-        private void UpdatePickupables()
+        private void UpdatePickupables(Player player)
         {
             for (int i = 0; i < GameState.Pickupables.Count; i++)
             {
                 Pickupable pickup = GameState.Pickupables[i];
-                if (CollisionTester.BoundingBoxTest(MainPlayer, pickup))
+                if (CollisionTester.BoundingBoxTest(player, pickup))
                 {
-                    pickup.Pickup(MainPlayer);
+                    pickup.Pickup(player);
                     GameState.Pickupables.RemoveAt(i);
                 }
             }
@@ -233,7 +235,6 @@ namespace Client
 
         public void UpdateLoop(Time deltaTime, Vector2f mPos)
         {
-            UpdatePickupables();
             UpdateBullets(deltaTime);
             AimCursor.Update(mPos);
         }
