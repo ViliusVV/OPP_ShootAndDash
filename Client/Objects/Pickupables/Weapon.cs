@@ -173,14 +173,17 @@ namespace Client.Objects
             {
                 for(int j = 0; j < players.Count; j++)
                 {
-                    if (!players[j].Name.Equals(shooter.Name) && CollisionTester.BoundingBoxTest(players[j], Projectiles[i].ProjectileSprite))
+                    if (    !players[j].Name.Equals(shooter.Name) 
+                        &&  !players[j].IsDead 
+                        &&  CollisionTester.BoundingBoxTest(players[j], Projectiles[i].ProjectileSprite))
                     {
                         indexesToRemove.Add(i);
 
-                        players[j].AddHealth(- this.Damage);
+                        if (shooter.IsMainPlayer) {
+                            players[j].AddHealth(-this.Damage);
+                            GameState.GetInstance().ConnectionManager.Connection.SendAsync("UpdateScoresServer", players[j]);
+                        }
 
-                        GameState.GetInstance().ConnectionManager.Connection.SendAsync("UpdateScoresServer", players[j]);
- 
                     }
                 }
 

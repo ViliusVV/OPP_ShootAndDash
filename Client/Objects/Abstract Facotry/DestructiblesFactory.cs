@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Client.Managers;
 using Client.Objects.Abstract_Facotry.Destructibles.Bridge;
 using Client.Objects.Destructables;
 using Client.Objects.Indestructables;
@@ -20,7 +21,7 @@ namespace Client.Objects
 
             if (destructibleObj.Equals("HealthCrate"))
             {
-                bool randomChoice = new Random().NextDouble() >= 0.5;
+                bool randomChoice = GameState.GetInstance().Random.NextDouble() >= 0.5;
                 IItemBridge ItemBridge;
                 if (randomChoice)
                     ItemBridge = new MedkitBridge();

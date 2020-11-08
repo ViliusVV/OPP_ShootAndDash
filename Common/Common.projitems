@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Enums\WeaponType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModelInterfaces\IPlayer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\OurLogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\Utils.cs" />
     <Compile Include="..\Common\DTO\Vector2fS.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DTO\ServerGameState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\VectorUtils.cs" />

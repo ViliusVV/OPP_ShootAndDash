@@ -34,6 +34,7 @@ namespace Client
 
         // Settings
         private readonly int multiplayerSendRate = 30;
+        private readonly int deathTimeout = 3;
 
 
         // Screen 
@@ -87,6 +88,7 @@ namespace Client
             // Load resources
             CreateSprites();
 
+            GameState.InitRandom(5);
             builder = new MapBuilder();
             builder.LoadSprites();
             director = new Director(builder);
@@ -179,23 +181,24 @@ namespace Client
             for (int i = 0; i < GameState.Players.Count; i++)
             {
                 var player = GameState.Players[i];
-                Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
-                player.PlayerBar.Position = playerBarPos;
-                player.UpdateSpeed();
-                player.TranslateFromSpeed();
-                player.Update();
-
-                GameWindow.Draw(player);
-                GameWindow.Draw(player.PlayerBar);
-
-                if (player.Weapon != null)
+                if (!player.IsDead)
                 {
-                    GameWindow.Draw(player.Weapon);
-                    DrawProjectiles(player);
-                    if (player.Weapon.LaserSight != null) GameWindow.Draw(player.Weapon.LaserSprite);
+                    Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
+                    player.PlayerBar.Position = playerBarPos;
+                    player.UpdateSpeed();
+                    player.TranslateFromSpeed();
+                    player.Update();
+
+                    GameWindow.Draw(player);
+                    GameWindow.Draw(player.PlayerBar);
+
+                    if (player.Weapon != null)
+                    {
+                        GameWindow.Draw(player.Weapon);
+                        DrawProjectiles(player);
+                        if (player.Weapon.LaserSight != null) GameWindow.Draw(player.Weapon.LaserSprite);
+                    }
                 }
-
-
             }
         }
 
@@ -634,7 +637,7 @@ namespace Client
 
         private void CreateMainPlayer()
         {
-            MainPlayer = new Player(PlayerSkinType.TriggerHappyHipster);
+            MainPlayer = new Player();
             MainPlayer.IsMainPlayer = true;
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
 
