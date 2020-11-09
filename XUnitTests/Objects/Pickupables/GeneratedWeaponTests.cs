@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Client.Objects.Tests
 {
-    public class WeaponTests
+    public class GeneratedWeaponTests
     {
         [Fact()]
         public void DrawProjectilesTest()

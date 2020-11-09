@@ -302,5 +302,11 @@ namespace XUnitTests
 
             Assert.True(closeEnough);
         }
+
+	    [Fact]  
+	    public void TestGameApplicationRun()
+	    {  
+             Assert.True(false, "test is not implemented");  
+        }
     }
 }
