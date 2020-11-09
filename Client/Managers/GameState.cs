@@ -12,22 +12,22 @@ using System.Text;
 
 namespace Client.Managers
 {
-    class GameState
+    public class GameState
     {
-        private static readonly GameState _instance = new GameState();
+        private static GameState _instance = new GameState();
 
         public Random Random { get; private set; }
 
         public List<Player> Players { get; set; }
         public List<Pickupable> Pickupables { get; set; }
-        public List<Sprite> Collidables { get; set; }
+        public virtual List<Sprite> Collidables { get; set; }
         public TileMap TileMap { get; set; }
         public List<Sprite> NonCollidables { get; set; }
 
         public ConnectionManager ConnectionManager { get; set; }
 
 
-        private GameState()
+        public GameState()
         {
             this.Players = new List<Player>();
             this.Pickupables = new List<Pickupable>();
@@ -39,6 +39,11 @@ namespace Client.Managers
         public static GameState GetInstance()
         {
             return _instance;
+        }
+
+        public static void SetTestingInstance(GameState instance)
+        {
+            _instance = instance;
         }
 
         public void InitRandom(int seed)

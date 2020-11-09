@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Client.UI
 {
-    class KillNotifier : IPlayerEventListener, Drawable
+    public class KillNotifier : IPlayerEventListener, Drawable
     {
         public CustomText message = new CustomText(4 * 7);
         private readonly int messageTimeout = 2;
@@ -17,15 +17,12 @@ namespace Client.UI
 
         public void Draw(RenderTarget target, RenderStates states)
         {
-            if (Monitor.TryEnter(message))
+            try
             {
-                try
-                {
-                    if (timemoutTimer.ElapsedTime.AsSeconds() < messageTimeout)
-                        target.Draw(message);
-                }
-                catch { }
+                if (timemoutTimer.ElapsedTime.AsSeconds() < messageTimeout)
+                    target.Draw(message);
             }
+            catch { }
         }
 
         public void Update(PlayerEventData eventData)
@@ -35,10 +32,10 @@ namespace Client.UI
                 OurLogger.Log("Kill notifier notified");
                 message.DisplayedString = $"Player {eventData.Shooter.Name} killed {eventData.Victim.Name}";
 
-                var viewPort = GameApplication.GetInstance().GameWindow.GetViewport(GameApplication.GetInstance().MainView);
-                var newOrgin = new Vector2f(message.GetLocalBounds().Width / 2f, message.GetLocalBounds().Height / 2f);
-                message.Origin = newOrgin;
-                message.Position = new Vector2f(viewPort.Width / 2f, viewPort.Height / 1.05f);
+                //var viewPort = GameApplication.GetInstance().GameWindow.GetViewport(GameApplication.GetInstance().MainView);
+                //var newOrgin = new Vector2f(message.GetLocalBounds().Width / 2f, message.GetLocalBounds().Height / 2f);
+                //message.Origin = newOrgin;
+                //message.Position = new Vector2f(viewPort.Width / 2f, viewPort.Height / 1.05f);
                 timemoutTimer.Restart();
             }
         }

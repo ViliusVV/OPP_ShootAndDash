@@ -40,7 +40,7 @@ namespace Client.Models
         public Vector2f LookingAtPoint { get; set; }
         public float Heading { get; set; }
 
-        public float SpeedMultiplier { get; set; } = 1;
+        public virtual float SpeedMultiplier { get; set; } = 1;
         public bool Running { get => Math.Abs(Speed.X) > 0.1 || Math.Abs(Speed.Y) > 0.1; }
         public bool IsMainPlayer { get; set; } = false;
         public bool IsInvincible { get; set; } = false;

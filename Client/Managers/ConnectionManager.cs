@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Client.Utilities
 {
-    class ConnectionManager
+    public class ConnectionManager
     {
         public string ServerUrl { get; set; }
         public bool Connected { get => Connection.State == HubConnectionState.Connected; }

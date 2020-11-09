@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Client.Observer
 {
-    interface IPlayerEventListener
+    public interface IPlayerEventListener
     {
         public void Update(PlayerEventData eventData);
     }

@@ -19,7 +19,8 @@
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "http://10.147.17.57:4300"
     },
     "Docker": {
       "commandName": "Docker",
