@@ -7,11 +7,11 @@ using System.Text;
 
 namespace Client.Observer
 {
-    class PlayerEventManager
+    public class PlayerEventManager
     {
         private static readonly PlayerEventManager _instance = new PlayerEventManager();
 
-        private Dictionary<PlayerEventType, List<IPlayerEventListener>> _listeners = new Dictionary<PlayerEventType, List<IPlayerEventListener>>();
+        public Dictionary<PlayerEventType, List<IPlayerEventListener>> _listeners = new Dictionary<PlayerEventType, List<IPlayerEventListener>>();
 
         private Object lockObj = new Object();
 

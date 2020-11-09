@@ -11,7 +11,7 @@ using System.Threading;
 
 namespace Client.UI
 {
-    class Scoreboard: IPlayerEventListener, Drawable
+    public class Scoreboard: IPlayerEventListener, Drawable
     {
         private Dictionary<Player, CustomText> scores = new Dictionary<Player, CustomText>();
 
@@ -58,8 +58,12 @@ namespace Client.UI
                     scores.Add(eventData.Victim, new CustomText(2 * 7));
                 }
 
-                scores[eventData.Victim].DisplayedString = $"{eventData.Victim.Name} {eventData.Victim.Kills}/{eventData.Victim.Deaths}";
-                scores[eventData.Shooter].DisplayedString = $"{eventData.Shooter.Name} {eventData.Shooter.Kills}/{eventData.Shooter.Deaths}";
+                try
+                {
+                    scores[eventData.Victim].DisplayedString = $"{eventData.Victim.Name} {eventData.Victim.Kills}/{eventData.Victim.Deaths}";
+                    scores[eventData.Shooter].DisplayedString = $"{eventData.Shooter.Name} {eventData.Shooter.Kills}/{eventData.Shooter.Deaths}";
+                }
+                catch { }
             }
         }
 

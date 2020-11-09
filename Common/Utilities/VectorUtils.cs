@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Common.Utilities
 {
-    static class VectorUtils
+    public static class VectorUtils
     {
         // Calculate and return rotation between two vectors
         public static float GetAngleBetweenVectors(Vector2f center, Vector2f target)
@@ -79,12 +79,17 @@ namespace Common.Utilities
 
         public static Vector2f AngleDegToUnitVector(float degrees)
         {
-            return AngleRadToUnitVector(RadToDeg(degrees));
+            return AngleRadToUnitVector(DegToRad(degrees));
         }
 
         public static Vector2f AngleRadToUnitVector(float radians)
         {
             return new Vector2f(MathF.Cos(radians), MathF.Sin(radians));
+        }
+
+        public static float DegToRad(float degress)
+        {
+            return degress * (MathF.PI / 180f);
         }
 
         public static float RadToDeg(float radians)

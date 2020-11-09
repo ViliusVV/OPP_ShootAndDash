@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Client.Utilities
 {
-	class TileMap : Drawable
+	public class TileMap : Drawable
 	{
         public int[] level;
         public int Length;

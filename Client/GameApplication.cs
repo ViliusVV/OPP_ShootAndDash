@@ -114,7 +114,7 @@ namespace Client
             // Player init
             CreateMainPlayer();
 
-            GameState.ConnectionManager = new ConnectionManager("http://localhost:5000/sd-server");
+            GameState.ConnectionManager = new ConnectionManager("http://10.147.17.57:4300/sd-server");
 
 
 

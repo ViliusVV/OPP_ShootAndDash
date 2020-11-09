@@ -8,7 +8,7 @@ using SFML.System;
 
 namespace Client.UI
 {
-    class CustomText : Text
+    public class CustomText : Text
     {
         public CustomText(Font font, uint textSize)
         {
