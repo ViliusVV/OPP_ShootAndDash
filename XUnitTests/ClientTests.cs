@@ -50,7 +50,7 @@ namespace XUnitTests
             }
         }
         [Fact]
-        public void TestUpdatePlayerPosition()
+        public void TestGameApplicationRun()
         {
             Assert.False(true, "test is not implemented");
         }
