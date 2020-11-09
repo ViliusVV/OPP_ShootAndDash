@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+
 namespace Client.Objects
 {
     public class Weapon : Pickupable, IWeaponPrototype
@@ -275,10 +276,16 @@ namespace Client.Objects
         public IWeaponPrototype Clone()
         {
             Weapon copy = (Weapon) this.MemberwiseClone();
+            //Weapon copy = this.DeepClone<Weapon>();
             copy.Projectiles = new List<Projectile>();
             copy.ReloadTimer = new Clock();
             copy.ShootTimer = new Clock();
             copy.ReloadCooldown = new Clock();
+            //copy.ProjectileSprite = new Sprite(this.ProjectileSprite);
+            //if(this.LaserSprite != null)
+            //{
+            //    copy.LaserSprite = new Sprite(this.LaserSprite);
+            //}
             return copy;
         }
 
@@ -295,5 +302,6 @@ namespace Client.Objects
                 /* Default */ _ => new Pistol(),
             };
         }
+
     }
 }

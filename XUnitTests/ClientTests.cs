@@ -139,9 +139,6 @@ namespace XUnitTests
         [InlineData(0, 0, 1)]
         public void TestPlayerFacing(float x, float y, float direction)
         {
-            LoadTextures();
-            LoadSounds();
-            LoadFonts();
             Player player = new Player();
             player.Speed = new SFML.System.Vector2f(x, y);
             player.UpdatePlayerFacingPosition();
@@ -153,9 +150,6 @@ namespace XUnitTests
         [InlineData(0, 100)]
         public void TestDealDamageToPlayer(int damage, int result)
         {
-            LoadTextures();
-            LoadSounds();
-            LoadFonts();
             Player player = new Player();
             player.AddHealth(damage);
             Assert.Equal(player.Health, result);
@@ -168,9 +162,6 @@ namespace XUnitTests
         [InlineData(101, 100)]
         public void TestPlayerHeal(int healAmount, int result)
         {
-            LoadTextures();
-            LoadSounds();
-            LoadFonts();
             Player player = new Player();
             player.AddHealth(-100);
             player.AddHealth(healAmount);
