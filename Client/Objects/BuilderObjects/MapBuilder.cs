@@ -86,7 +86,8 @@ namespace Client.Objects.BuilderObjects
             GameState.Collidables = new List<Sprite>();
             //GameState.Pickupables = new List<Pickupable>();
             GameState.PickupableRep = new PickupableRepository();
-            GameState.NonCollidables = new List<Sprite>();
+            //GameState.NonCollidables = new List<Sprite>();
+            GameState.NonCollidableRep = new NonCollidableRepository();
             return this;
         }
         public TileMap GetResult()

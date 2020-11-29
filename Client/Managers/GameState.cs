@@ -25,7 +25,9 @@ namespace Client.Managers
         public PickupableRepository PickupableRep { get; set; }
         public PlayerRepository PlayerRep { get; set; }
         public TileMap TileMap { get; set; }
-        public List<Sprite> NonCollidables { get; set; }
+        //public List<Sprite> NonCollidables { get; set; }
+        public NonCollidableRepository NonCollidableRep { get; set; }
+
 
         public ConnectionManager ConnectionManager { get; set; }
 
@@ -37,7 +39,8 @@ namespace Client.Managers
             //this.Pickupables = new List<Pickupable>();
             this.PickupableRep = new PickupableRepository();
             this.Collidables = new List<Sprite>();
-            this.NonCollidables = new List<Sprite>();
+            //this.NonCollidables = new List<Sprite>();
+            this.NonCollidableRep = new NonCollidableRepository();
             this.Random = new Random();
         }
 

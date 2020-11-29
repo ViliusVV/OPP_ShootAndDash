@@ -392,14 +392,21 @@ namespace Client
         }
 
 
+        //private void DrawNonCollidables()
+        //{
+        //    foreach (var item in GameState.NonCollidables)
+        //    {
+        //        GameWindow.Draw(item);
+        //    }
+        //}
         private void DrawNonCollidables()
         {
-            foreach (var item in GameState.NonCollidables)
+            var iter = GameState.NonCollidableRep.GetIterator();
+            while(iter.HasNext())
             {
-                GameWindow.Draw(item);
+                GameWindow.Draw((Sprite)iter.Next());
             }
         }
-
 
         private void DrawProjectiles(Player player)
         {
@@ -670,7 +677,8 @@ namespace Client
                         GameState.Collidables.Add(indestructable);
                     }
                     else
-                        GameState.NonCollidables.Add(indestructable);
+                        GameState.NonCollidableRep.GetIterator().Add(indestructable);
+                        //GameState.NonCollidables.Add(indestructable);
                 }
             }
         }
