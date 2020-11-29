@@ -25,6 +25,7 @@ using Client.Objects.Pickupables.Decorator;
 using System.Diagnostics;
 using Common.Enums;
 using Client.Observer;
+using Client.Objects.Template;
 
 namespace Client
 {
@@ -101,7 +102,7 @@ namespace Client
 
             // Generate additional objects (destructibles, indestructibles, pickupables)
             SpawningManager(20, 15, 60);
-
+            
             // View
             MainView = GameWindow.DefaultView;
             ZoomedView = new View(MainView);
@@ -134,7 +135,6 @@ namespace Client
             {
                 GameWindow.Clear();
                 GameWindow.DispatchEvents();
-
                 if (this.HasFocus)
                 {
                     this.ProccesKeyboardInput();
@@ -574,8 +574,9 @@ namespace Client
             // Testing abstract factory
             if (Keyboard.IsKeyPressed(Keyboard.Key.O))
             {
-                SpawnDestructible();
-                SpawnIndestructible();
+                //SpawnDestructible();
+                //SpawnIndestructible();
+                SpawnTurrets();
             }
             // testing builder
             if (Keyboard.IsKeyPressed(Keyboard.Key.H))
@@ -704,6 +705,12 @@ namespace Client
             return objectSpawned;
         }
 
+        private void SpawnTurrets()
+        {
+            TrapSpawner turretone = new SpikeTrapBuilder();
+            turretone.BuildTrap();
+            GameState.Collidables.Add(turretone);
+        }
 
         private void SpawnRandomSyringe()
         {
