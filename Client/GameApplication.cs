@@ -229,19 +229,31 @@ namespace Client
             }
         }
 
+        //private void UpdatePickupables(Player player)
+        //{
+        //    for (int i = 0; i < GameState.Pickupables.Count; i++)
+        //    {
+        //        Pickupable pickup = GameState.Pickupables[i];
+        //        if (CollisionTester.BoundingBoxTest(player, pickup))
+        //        {
+        //            pickup.Pickup(player);
+        //            GameState.Pickupables.RemoveAt(i);
+        //        }
+        //    }
+        //}
         private void UpdatePickupables(Player player)
         {
-            for (int i = 0; i < GameState.Pickupables.Count; i++)
+            var iter = GameState.PickupableRep.GetIterator();
+            while(iter.HasNext())
             {
-                Pickupable pickup = GameState.Pickupables[i];
-                if (CollisionTester.BoundingBoxTest(player, pickup))
+                Pickupable pickup = (Pickupable)iter.Next();
+                if(CollisionTester.BoundingBoxTest(player, pickup))
                 {
                     pickup.Pickup(player);
-                    GameState.Pickupables.RemoveAt(i);
+                    iter.Remove();
                 }
             }
         }
-
         public void UpdateLoop(Time deltaTime, Vector2f mPos)
         {
             UpdateBullets(deltaTime);
@@ -357,14 +369,21 @@ namespace Client
         }
 
 
+        //private void DrawPickupables()
+        //{
+        //    for (int i = 0; i < GameState.Pickupables.Count; i++)
+        //    {
+        //        GameWindow.Draw(GameState.Pickupables[i]);
+        //    }
+        //}
         private void DrawPickupables()
         {
-            for (int i = 0; i < GameState.Pickupables.Count; i++)
+            var iter = GameState.PickupableRep.GetIterator();
+            while(iter.HasNext())
             {
-                GameWindow.Draw(GameState.Pickupables[i]);
+                GameWindow.Draw((Pickupable)iter.Next());
             }
         }
-
 
         public void DrawLoop()
         {
@@ -657,7 +676,8 @@ namespace Client
             bool isSpawned = ForceSpawnObject(syringe);
             if (isSpawned)
             {
-                GameState.Pickupables.Add(syringe);
+                GameState.PickupableRep.GetIterator().Add(syringe);
+                //GameState.Pickupables.Add(syringe);
             }
 
 
@@ -671,7 +691,8 @@ namespace Client
             bool isSpawned = ForceSpawnObject(medkit);
             if (isSpawned)
             {
-                GameState.Pickupables.Add(medkit);
+                GameState.PickupableRep.GetIterator().Add(medkit);
+                //GameState.Pickupables.Add(medkit);
             }
         }
 

@@ -199,14 +199,16 @@ namespace Client.Objects
                             Pickupable health = ((HealthCrate)collidables[j]).Pickupable;
                             //explosion.ExplosionCheck();
                             health.Position = collidables[j].Position;
-                            GameState.GetInstance().Pickupables.Add(health);
+                            //GameState.GetInstance().Pickupables.Add(health);
+                            GameState.GetInstance().PickupableRep.GetIterator().Add(health);
                             collidables.RemoveAt(j);
                         }
                         else if (collidables[j] is ItemCrate)
                         {
                             Pickupable gun = ((ItemCrate)collidables[j]).Pickupable;
                             gun.Position = collidables[j].Position;
-                            GameState.GetInstance().Pickupables.Add(gun);
+                            //GameState.GetInstance().Pickupables.Add(gun);
+                            GameState.GetInstance().PickupableRep.GetIterator().Add(gun);
                             collidables.RemoveAt(j);
 
                         }
