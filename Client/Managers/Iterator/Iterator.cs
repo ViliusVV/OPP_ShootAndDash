@@ -10,6 +10,7 @@ namespace Client.Managers.Iterator
         public Object Next();
         public void First();
         public void Remove();
+        public void RemoveAt(int index);
         public void Add(Object obj);
     }
 }

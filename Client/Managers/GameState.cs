@@ -23,6 +23,7 @@ namespace Client.Managers
         //public List<Pickupable> Pickupables { get; set; }
         public virtual List<Sprite> Collidables { get; set; }
         public PickupableRepository PickupableRep { get; set; }
+        public PlayerRepository PlayerRep { get; set; }
         public TileMap TileMap { get; set; }
         public List<Sprite> NonCollidables { get; set; }
 
@@ -32,6 +33,7 @@ namespace Client.Managers
         public GameState()
         {
             this.Players = new List<Player>();
+            this.PlayerRep = new PlayerRepository();
             //this.Pickupables = new List<Pickupable>();
             this.PickupableRep = new PickupableRepository();
             this.Collidables = new List<Sprite>();

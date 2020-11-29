@@ -52,6 +52,11 @@ namespace Client.Managers.Iterator.Repositories
                     Pickupables.RemoveAt(--index);
                 }
             }
+
+            public void RemoveAt(int index)
+            {
+                Pickupables.RemoveAt(index);
+            }
         }
     }
 }
