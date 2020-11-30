@@ -1,5 +1,6 @@
 ﻿using Client.Config;
 using Client.Managers;
+using Client.Managers.Iterator.Repositories;
 using Client.Utilities;
 using SFML.Graphics;
 using SFML.System;
@@ -83,8 +84,10 @@ namespace Client.Objects.BuilderObjects
         public IBuilder Reset()
         {
             GameState.Collidables = new List<Sprite>();
-            GameState.Pickupables = new List<Pickupable>();
-            GameState.NonCollidables = new List<Sprite>();
+            //GameState.Pickupables = new List<Pickupable>();
+            GameState.PickupableRep = new PickupableRepository();
+            //GameState.NonCollidables = new List<Sprite>();
+            GameState.NonCollidableRep = new NonCollidableRepository();
             return this;
         }
         public TileMap GetResult()

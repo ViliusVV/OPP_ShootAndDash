@@ -1,4 +1,5 @@
-﻿using Client.Models;
+﻿using Client.Managers.Iterator.Repositories;
+using Client.Models;
 using Client.Objects;
 using Client.Objects.Destructables;
 using Client.Objects.Indestructables;
@@ -19,10 +20,14 @@ namespace Client.Managers
         public Random Random { get; private set; }
 
         public List<Player> Players { get; set; }
-        public List<Pickupable> Pickupables { get; set; }
+        //public List<Pickupable> Pickupables { get; set; }
         public virtual List<Sprite> Collidables { get; set; }
+        public PickupableRepository PickupableRep { get; set; }
+        public PlayerRepository PlayerRep { get; set; }
         public TileMap TileMap { get; set; }
-        public List<Sprite> NonCollidables { get; set; }
+        //public List<Sprite> NonCollidables { get; set; }
+        public NonCollidableRepository NonCollidableRep { get; set; }
+
 
         public ConnectionManager ConnectionManager { get; set; }
 
@@ -30,9 +35,12 @@ namespace Client.Managers
         public GameState()
         {
             this.Players = new List<Player>();
-            this.Pickupables = new List<Pickupable>();
+            this.PlayerRep = new PlayerRepository();
+            //this.Pickupables = new List<Pickupable>();
+            this.PickupableRep = new PickupableRepository();
             this.Collidables = new List<Sprite>();
-            this.NonCollidables = new List<Sprite>();
+            //this.NonCollidables = new List<Sprite>();
+            this.NonCollidableRep = new NonCollidableRepository();
             this.Random = new Random();
         }
 

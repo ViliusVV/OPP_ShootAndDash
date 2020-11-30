@@ -199,20 +199,36 @@ namespace Client.Objects
                             Pickupable health = ((HealthCrate)collidables[j]).Pickupable;
                             //explosion.ExplosionCheck();
                             health.Position = collidables[j].Position;
-                            GameState.GetInstance().Pickupables.Add(health);
+                            //GameState.GetInstance().Pickupables.Add(health);
+                            GameState.GetInstance().PickupableRep.GetIterator().Add(health);
                             collidables.RemoveAt(j);
                         }
                         else if (collidables[j] is ItemCrate)
                         {
                             Pickupable gun = ((ItemCrate)collidables[j]).Pickupable;
                             gun.Position = collidables[j].Position;
-                            GameState.GetInstance().Pickupables.Add(gun);
+                            //GameState.GetInstance().Pickupables.Add(gun);
+                            GameState.GetInstance().PickupableRep.GetIterator().Add(gun);
                             collidables.RemoveAt(j);
 
                         }
 
                     }
                 }
+            }
+
+            bool OptimisedCollisionBullet(Sprite sprite, Sprite bullet) 
+            {
+                Vector2f colidablePos = new Vector2f(sprite.Position.X + 32, sprite.Position.Y + 32);
+
+                double squaredDist = VectorUtils.GetSquaredDistance(colidablePos, bullet.Position);
+
+                if(squaredDist < 4096)
+                {
+                    return CollisionTester.BoundingBoxTest(sprite, bullet);
+                }
+
+                return false;
             }
 
             // Edge case: remove duplicate collisions

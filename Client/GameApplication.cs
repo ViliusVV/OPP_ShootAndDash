@@ -115,7 +115,7 @@ namespace Client
             // Player init
             CreateMainPlayer();
 
-            GameState.ConnectionManager = new ConnectionManager("http://10.147.17.57:4300/sd-server");
+            GameState.ConnectionManager = new ConnectionManager("http://192.168.0.106:51230/sd-server");
 
 
 
@@ -124,6 +124,7 @@ namespace Client
             if (isPlayerSpawned)
             {
                 GameState.Players.Add(MainPlayer);
+                GameState.PlayerRep.GetIterator().Add(MainPlayer);
             }
 
             PlayerEventManager.Subscribe(PlayerEventType.KilledPlayer, GameplayUI.KillNotifier);
@@ -185,12 +186,40 @@ namespace Client
         // =============================== UPDATES ================================
         // ========================================================================
 
+        //private void RenderPlayers()
+        //{
+        //    for (int i = 0; i < GameState.Players.Count; i++)
+        //    {
+        //        var player = GameState.Players[i];
+        //        if (!player.IsDead)
+        //        {
+        //            Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
+        //            player.PlayerBar.Position = playerBarPos;
+        //            player.UpdateSpeed();
+        //            player.TranslateFromSpeed();
+        //            player.Update();
+
+        //            UpdatePickupables(player);
+
+        //            GameWindow.Draw(player);
+        //            GameWindow.Draw(player.PlayerBar);
+
+        //            if (player.Weapon != null)
+        //            {
+        //                GameWindow.Draw(player.Weapon);
+        //                DrawProjectiles(player);
+        //                if (player.Weapon.LaserSight != null) GameWindow.Draw(player.Weapon.LaserSprite);
+        //            }
+        //        }
+        //    }
+        //}
         private void RenderPlayers()
         {
-            for (int i = 0; i < GameState.Players.Count; i++)
+            var iter = GameState.PlayerRep.GetIterator();
+            while(iter.HasNext())
             {
-                var player = GameState.Players[i];
-                if (!player.IsDead)
+                Player player = (Player)iter.Next();
+                if(!player.IsDead)
                 {
                     Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
                     player.PlayerBar.Position = playerBarPos;
@@ -214,13 +243,29 @@ namespace Client
         }
 
 
+        //private void UpdateBullets(Time deltaTime)
+        //{
+        //    foreach (var player in GameState.Players)
+        //    {
+        //        foreach (var wep in player.HoldingWeapon)
+        //        {
+        //            if (wep != null)
+        //            {
+        //                wep.UpdateProjectiles(deltaTime.AsSeconds());
+        //                wep.CheckCollisions(player);
+        //            }
+        //        }
+        //    }
+        //}
         private void UpdateBullets(Time deltaTime)
         {
-            foreach (var player in GameState.Players)
+            var iter = GameState.PlayerRep.GetIterator();
+            while(iter.HasNext())
             {
+                Player player = (Player)iter.Next();
                 foreach (var wep in player.HoldingWeapon)
                 {
-                    if (wep != null)
+                    if(wep != null)
                     {
                         wep.UpdateProjectiles(deltaTime.AsSeconds());
                         wep.CheckCollisions(player);
@@ -229,19 +274,31 @@ namespace Client
             }
         }
 
+        //private void UpdatePickupables(Player player)
+        //{
+        //    for (int i = 0; i < GameState.Pickupables.Count; i++)
+        //    {
+        //        Pickupable pickup = GameState.Pickupables[i];
+        //        if (CollisionTester.BoundingBoxTest(player, pickup))
+        //        {
+        //            pickup.Pickup(player);
+        //            GameState.Pickupables.RemoveAt(i);
+        //        }
+        //    }
+        //}
         private void UpdatePickupables(Player player)
         {
-            for (int i = 0; i < GameState.Pickupables.Count; i++)
+            var iter = GameState.PickupableRep.GetIterator();
+            while(iter.HasNext())
             {
-                Pickupable pickup = GameState.Pickupables[i];
-                if (CollisionTester.BoundingBoxTest(player, pickup))
+                Pickupable pickup = (Pickupable)iter.Next();
+                if(CollisionTester.BoundingBoxTest(player, pickup))
                 {
                     pickup.Pickup(player);
-                    GameState.Pickupables.RemoveAt(i);
+                    iter.Remove();
                 }
             }
         }
-
         public void UpdateLoop(Time deltaTime, Vector2f mPos)
         {
             UpdateBullets(deltaTime);
@@ -335,14 +392,21 @@ namespace Client
         }
 
 
+        //private void DrawNonCollidables()
+        //{
+        //    foreach (var item in GameState.NonCollidables)
+        //    {
+        //        GameWindow.Draw(item);
+        //    }
+        //}
         private void DrawNonCollidables()
         {
-            foreach (var item in GameState.NonCollidables)
+            var iter = GameState.NonCollidableRep.GetIterator();
+            while(iter.HasNext())
             {
-                GameWindow.Draw(item);
+                GameWindow.Draw((Sprite)iter.Next());
             }
         }
-
 
         private void DrawProjectiles(Player player)
         {
@@ -357,14 +421,21 @@ namespace Client
         }
 
 
+        //private void DrawPickupables()
+        //{
+        //    for (int i = 0; i < GameState.Pickupables.Count; i++)
+        //    {
+        //        GameWindow.Draw(GameState.Pickupables[i]);
+        //    }
+        //}
         private void DrawPickupables()
         {
-            for (int i = 0; i < GameState.Pickupables.Count; i++)
+            var iter = GameState.PickupableRep.GetIterator();
+            while(iter.HasNext())
             {
-                GameWindow.Draw(GameState.Pickupables[i]);
+                GameWindow.Draw((Pickupable)iter.Next());
             }
         }
-
 
         public void DrawLoop()
         {
@@ -607,7 +678,8 @@ namespace Client
                         GameState.Collidables.Add(indestructable);
                     }
                     else
-                        GameState.NonCollidables.Add(indestructable);
+                        GameState.NonCollidableRep.GetIterator().Add(indestructable);
+                        //GameState.NonCollidables.Add(indestructable);
                 }
             }
         }
@@ -682,7 +754,8 @@ namespace Client
             bool isSpawned = ForceSpawnObject(syringe);
             if (isSpawned)
             {
-                GameState.Pickupables.Add(syringe);
+                GameState.PickupableRep.GetIterator().Add(syringe);
+                //GameState.Pickupables.Add(syringe);
             }
 
 
@@ -696,7 +769,8 @@ namespace Client
             bool isSpawned = ForceSpawnObject(medkit);
             if (isSpawned)
             {
-                GameState.Pickupables.Add(medkit);
+                GameState.PickupableRep.GetIterator().Add(medkit);
+                //GameState.Pickupables.Add(medkit);
             }
         }
 
