@@ -61,6 +61,10 @@ namespace Client.Config
         [ResourceAttr("Assets/syringeReload.png")] ReloadSyringe,
         [ResourceAttr("Assets/syringeHealing.png")] HealingSyringe,
         [ResourceAttr("Assets/syringeDeflection.png")] DeflectionSyringe,
+        // Traps
+        [ResourceAttr("Assets/FreezingTrap.png")] FreezeTrap,
+        [ResourceAttr("Assets/DamageTrap.png")] DamageTrap,
+        [ResourceAttr("Assets/RemoveAmmoTrap.png")] RemoveAmmoTrap,
         // Tilemaps
         [ResourceAttr("Assets/tilemap.png")] TileMap,
         // Particles

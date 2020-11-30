@@ -505,7 +505,7 @@ namespace Client
             {
                 //SpawnDestructible();
                 //SpawnIndestructible();
-                SpawnTurrets();
+                SpawnTraps();
             }
             // testing builder
             if (Keyboard.IsKeyPressed(Keyboard.Key.H))
@@ -633,11 +633,29 @@ namespace Client
             return objectSpawned;
         }
 
-        private void SpawnTurrets()
+        private void SpawnTraps()
         {
-            TrapSpawner turretone = new SpikeTrapBuilder();
-            turretone.BuildTrap();
-            GameState.Collidables.Add(turretone);
+            TrapSpawner trap;
+            int num = GameState.Random.Next(4);
+            switch (num)
+            {
+                case 0:
+                    trap = new DamageTrapBuilder();
+                    break;
+                case 1:
+                    trap = new FreezeTrapBuilder();
+                    break;
+                default:
+                    trap = new RemoveAmmoTrapBuilder();
+                    break;
+            }
+
+            bool isSpawned = ForceSpawnObject(trap);
+            if (isSpawned)
+            {
+                trap.BuildTrap();
+                GameState.Pickupables.Add(trap);
+            }
         }
 
         private void SpawnRandomSyringe()

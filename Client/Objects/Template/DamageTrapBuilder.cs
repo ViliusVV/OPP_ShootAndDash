@@ -11,22 +11,22 @@ using System.Threading.Tasks;
 
 namespace Client.Objects.Template
 {
-    class RemoveAmmoTrapBuilder : TrapSpawner
+    class DamageTrapBuilder : TrapSpawner
     {
-        public RemoveAmmoTrapBuilder()
+        public DamageTrapBuilder()
         {
-            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.RemoveAmmoTrap);
+            this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.DamageTrap);
         }
 
         public override Sprite ApplySkin()
         {
-            return new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.RemoveAmmoTrap));
+            return new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.DamageTrap));
         }
 
         public override void ApplyDamage(Player player)
         {
-            OurLogger.Log("Stepped on Remove Ammo trap");
-            player.AddHealth(-5f);
+            OurLogger.Log("Stepped on damage trap");
+            player.AddHealth(-30f);
         }
 
         public override void ApplyBehavior(Player player)
@@ -36,7 +36,6 @@ namespace Client.Objects.Template
                 player.SpeedMultiplier = 0.8f;
                 Task.Delay(1000).ContinueWith(o => player.SpeedMultiplier = 1);
             }
-            player.Weapon.Ammo = 0;
         }
     }
 }
