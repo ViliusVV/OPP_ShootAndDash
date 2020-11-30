@@ -1,4 +1,6 @@
-﻿using Client.Objects.Pickupables.Strategy;
+﻿using Client.Config;
+using Client.Flyweight;
+using Client.Objects.Pickupables.Strategy;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,31 +11,38 @@ namespace Client.Objects.Pickupables
     {
         public PowerUp GetPowerup(string powerupType)
         {
+
             if (powerupType == null)
                 return null;
 
             if (powerupType.Equals("DeflectionSyringe"))
             {
-                return new DeflectionSyringe();
+                PowerupFlyweight flyweight = PowerupFlyweightFactory.GetFlyweight(TextureIdentifier.DeflectionSyringe, new DeflectionStrategy());
+                return new DeflectionSyringe(flyweight);
             }
             else if (powerupType.Equals("HealingSyringe"))
             {
-                return new HealingSyringe();
+                PowerupFlyweight flyweight = PowerupFlyweightFactory.GetFlyweight(TextureIdentifier.HealingSyringe, new HealingStrategy());
+                return new HealingSyringe(flyweight);
             }
             else if (powerupType.Equals("Medkit"))
             {
-                var tmpMedkit = new Medkit();
+                PowerupFlyweight flyweight = PowerupFlyweightFactory.GetFlyweight(TextureIdentifier.Medkit, new HealingStrategy());
+                var tmpMedkit = new Medkit(flyweight);
+
                 tmpMedkit.PowerUpStrategy = new HealingStrategy(100f);
 
                 return tmpMedkit;
             }
             else if (powerupType.Equals("MovementSyringe"))
             {
-                return new MovementSyringe();
+                PowerupFlyweight flyweight = PowerupFlyweightFactory.GetFlyweight(TextureIdentifier.MovementSyringe, new MovmentSpeedStrategy());
+                return new MovementSyringe(flyweight);
             }
             else if (powerupType.Equals("ReloadSyringe"))
             {
-                return new ReloadSyringe();
+                PowerupFlyweight flyweight = PowerupFlyweightFactory.GetFlyweight(TextureIdentifier.ReloadSyringe, new ReloadSpeedStrategy());
+                return new ReloadSyringe(flyweight);
             }
             return null;
         }
