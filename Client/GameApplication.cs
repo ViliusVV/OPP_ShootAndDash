@@ -726,7 +726,7 @@ namespace Client
             if (isSpawned)
             {
                 trap.BuildTrap();
-                GameState.Pickupables.Add(trap);
+                GameState.PickupableRep.GetIterator().Add(trap);
             }
         }
 
