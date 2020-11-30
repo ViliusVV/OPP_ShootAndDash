@@ -217,6 +217,20 @@ namespace Client.Objects
                 }
             }
 
+            bool OptimisedCollisionBullet(Sprite sprite, Sprite bullet) 
+            {
+                Vector2f colidablePos = new Vector2f(sprite.Position.X + 32, sprite.Position.Y + 32);
+
+                double squaredDist = VectorUtils.GetSquaredDistance(colidablePos, bullet.Position);
+
+                if(squaredDist < 4096)
+                {
+                    return CollisionTester.BoundingBoxTest(sprite, bullet);
+                }
+
+                return false;
+            }
+
             // Edge case: remove duplicate collisions
             indexesToRemove = indexesToRemove.Distinct().ToList();
 
