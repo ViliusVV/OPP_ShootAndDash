@@ -34,7 +34,7 @@ namespace Client.Objects.Template
             if (player.SpeedMultiplier > 0.9f)
             {
                 player.SpeedMultiplier = 0.8f;
-                Task.Delay(1000).ContinueWith(o => player.SpeedMultiplier = 1);
+                Task.Delay(100).ContinueWith(o => player.SpeedMultiplier = 1);
             }
             player.Weapon.Ammo = 0;
         }

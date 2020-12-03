@@ -101,7 +101,7 @@ namespace Client
             GameState.TileMap = builder.GetResult();
 
             // Generate additional objects (destructibles, indestructibles, pickupables)
-            SpawningManager(20, 15, 60);
+            SpawningManager(20, 15, 60, 20);
             
             // View
             MainView = GameWindow.DefaultView;
@@ -619,7 +619,7 @@ namespace Client
         // ============================== SPAWNING ================================
         // ========================================================================
 
-        private void SpawningManager(int destrCount, int indestrCount, int syringeCount)
+        private void SpawningManager(int destrCount, int indestrCount, int syringeCount, int trapCount)
         {
             for (int i = 0; i < destrCount; i++)
             {
@@ -632,6 +632,10 @@ namespace Client
             for (int i = 0; i < syringeCount; i++)
             {
                 SpawnRandomSyringe();
+            }
+            for (int i = 0; i < trapCount; i++)
+            {
+                SpawnTraps();
             }
         }
 

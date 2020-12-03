@@ -20,45 +20,46 @@ namespace Client.Objects.Template
         public override void Pickup(Player player)
         {
             this.PickedUp = true;
-            PlayerKnockback(player);
+            PlayerKnockback(player, 20f);
 
             ApplyDamage(player);
             ApplyBehavior(player);
         }
 
-        void PlayerKnockback(Player player)
+        void PlayerKnockback(Player player, float power)
         {
             if (player.Speed.X > 0 && player.Speed.Y == 0) // Left 
             {
-                player.Speed = new SFML.System.Vector2f(player.Speed.X - 20f, 0f);
+                player.Speed = new SFML.System.Vector2f(player.Speed.X - power, 0f);
+                //player.Position = new SFML.System.Vector2f(player.Position.X - power, player.Position.Y);
             }
             else if (player.Speed.X < 0 && player.Speed.Y == 0) // Right 
             {
-                player.Speed = new SFML.System.Vector2f(player.Speed.X + 20f, 0f);
+                player.Speed = new SFML.System.Vector2f(player.Speed.X + power, 0f);
             }
             else if (player.Speed.X == 0 && player.Speed.Y > 0) // Top
             {
-                player.Speed = new SFML.System.Vector2f(0f, player.Speed.Y - 20f);
+                player.Speed = new SFML.System.Vector2f(0f, player.Speed.Y - power);
             }
             else if (player.Speed.X == 0 && player.Speed.Y < 0) // Bottom
             {
-                player.Speed = new SFML.System.Vector2f(0f, player.Speed.Y + 20f);
+                player.Speed = new SFML.System.Vector2f(0f, player.Speed.Y + power);
             }
             else if (player.Speed.X > 0 && player.Speed.Y > 0) // Top Left
             {
-                player.Speed = new SFML.System.Vector2f(player.Speed.X - 20f, player.Speed.Y - 20f);
+                player.Speed = new SFML.System.Vector2f(player.Speed.X - power, player.Speed.Y - power);
             }
             else if (player.Speed.X < 0 && player.Speed.Y > 0) // Top Right
             {
-                player.Speed = new SFML.System.Vector2f(player.Speed.X + 20f, player.Speed.Y - 20f);
+                player.Speed = new SFML.System.Vector2f(player.Speed.X + power, player.Speed.Y - power);
             }
             else if (player.Speed.X > 0 && player.Speed.Y < 0) // Bottom Left
             {
-                player.Speed = new SFML.System.Vector2f(player.Speed.X - 20f, player.Speed.Y + 20f);
+                player.Speed = new SFML.System.Vector2f(player.Speed.X - power, player.Speed.Y + power);
             }
             else if (player.Speed.X < 0 && player.Speed.Y < 0) // Bottom Right
             {
-                player.Speed = new SFML.System.Vector2f(player.Speed.X + 20f, player.Speed.Y + 20f);
+                player.Speed = new SFML.System.Vector2f(player.Speed.X + power, player.Speed.Y + power);
             }
         }
     }
