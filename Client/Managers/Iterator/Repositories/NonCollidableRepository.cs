@@ -8,11 +8,11 @@ namespace Client.Managers.Iterator.Repositories
     public class NonCollidableRepository : Container
     {
         public static List<Sprite> NonCollidables;
-        public Iterator GetIterator()
+        public IIterator GetIterator()
         {
             return new NonCollidableIterator();
         }
-        private class NonCollidableIterator : Iterator
+        private class NonCollidableIterator : IIterator
         {
             int index;
             public NonCollidableIterator()

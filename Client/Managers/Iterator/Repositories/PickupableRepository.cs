@@ -8,12 +8,12 @@ namespace Client.Managers.Iterator.Repositories
     public class PickupableRepository : Container
     {
         public static List<Pickupable> Pickupables;
-        public Iterator GetIterator()
+        public IIterator GetIterator()
         {
             return new PickupableIterator();
         }
 
-        private class PickupableIterator : Iterator
+        private class PickupableIterator : IIterator
         {
             int index;
             public PickupableIterator()

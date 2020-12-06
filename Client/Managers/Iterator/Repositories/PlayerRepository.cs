@@ -1,4 +1,5 @@
 ﻿using Client.Models;
+using SFML.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,19 +9,29 @@ namespace Client.Managers.Iterator.Repositories
     public class PlayerRepository : Container
     {
         public static List<Player> Players;
-        public Iterator GetIterator()
+        public IIterator GetIterator()
         {
             return new PlayerIterator();
         }
-        private class PlayerIterator : Iterator
+        public IIterator GetIterator(double distance, Sprite player)
         {
+            return new PlayerIterator(distance, player);
+        }
+        private class PlayerIterator : IIterator
+        {
+            List<Player> players;
             int index;
             public PlayerIterator()
             {
                 index = 0;
+                players = Players;
             }
-
-            public void Add(Object obj)
+            public PlayerIterator(double dist, Sprite target)
+            {
+                index = 0;
+                players = Players.FindAll(x => IsPlayerInRange(x, target, dist));
+            }
+            public void Add(object obj)
             {
                 if (Players == null)
                     Players = new List<Player>();
@@ -34,14 +45,14 @@ namespace Client.Managers.Iterator.Repositories
 
             public bool HasNext()
             {
-                if (index < Players.Count)
+                if (index < players.Count)
                     return true;
                 return false;
             }
 
             public object Next()
             {
-                return Players[index++];
+                return players[index++];
             }
 
             public void Remove()
@@ -49,12 +60,18 @@ namespace Client.Managers.Iterator.Repositories
                 if (Players[index - 1] != null)
                 {
                     Players.RemoveAt(--index);
+                    players.RemoveAt(index);
                 }
             }
 
             public void RemoveAt(int index)
             {
                 Players.RemoveAt(index);
+            }
+            public bool IsPlayerInRange(Sprite player1, Sprite player2, double range)
+            {
+                var dist = MathF.Sqrt(Common.Utilities.VectorUtils.GetSquaredDistance(player1.Position, player2.Position));
+                return dist < range;
             }
         }
     }

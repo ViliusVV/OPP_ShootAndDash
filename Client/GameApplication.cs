@@ -62,7 +62,6 @@ namespace Client
 
 
         Player MainPlayer { get; set; }
-
         Clock FrameClock { get; set; } = new Clock();
         Clock RespawnTimer { get; set; } = new Clock();
 
@@ -112,6 +111,9 @@ namespace Client
             // weapon prototype
             weaponProtoype = new Pistol();
 
+
+
+
             // Player init
             CreateMainPlayer();
 
@@ -125,6 +127,10 @@ namespace Client
             {
                 GameState.Players.Add(MainPlayer);
                 GameState.PlayerRep.GetIterator().Add(MainPlayer);
+                GameState.PlayerRep.GetIterator().Add(SpawnFakePlayer(4000, 2000));
+                GameState.PlayerRep.GetIterator().Add(SpawnFakePlayer(4000, 2200));
+                GameState.PlayerRep.GetIterator().Add(SpawnFakePlayer(4000, 2400));
+
             }
 
             PlayerEventManager.Subscribe(PlayerEventType.KilledPlayer, GameplayUI.KillNotifier);
@@ -213,13 +219,42 @@ namespace Client
         //        }
         //    }
         //}
+        //private void RenderPlayers()
+        //{
+        //    var iter = GameState.PlayerRep.GetIterator();
+        //    while(iter.HasNext())
+        //    {
+        //        Player player = (Player)iter.Next();
+        //        if(!player.IsDead)
+        //        {
+        //            Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
+        //            player.PlayerBar.Position = playerBarPos;
+        //            player.UpdateSpeed();
+        //            player.TranslateFromSpeed();
+        //            player.Update();
+
+        //            UpdatePickupables(player);
+
+        //            GameWindow.Draw(player);
+        //            GameWindow.Draw(player.PlayerBar);
+
+        //            if (player.Weapon != null)
+        //            {
+        //                GameWindow.Draw(player.Weapon);
+        //                DrawProjectiles(player);
+        //                if (player.Weapon.LaserSight != null) GameWindow.Draw(player.Weapon.LaserSprite);
+        //            }
+        //        }
+        //    }
+        //}
         private void RenderPlayers()
         {
-            var iter = GameState.PlayerRep.GetIterator();
-            while(iter.HasNext())
+            var iter = GameState.PlayerRep.GetIterator(500, MainPlayer);
+
+            while (iter.HasNext())
             {
                 Player player = (Player)iter.Next();
-                if(!player.IsDead)
+                if (!player.IsDead)
                 {
                     Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
                     player.PlayerBar.Position = playerBarPos;
@@ -778,6 +813,18 @@ namespace Client
             }
         }
 
+        private Player SpawnFakePlayer(float x, float y)
+        {
+            Player FakePlayer = new Player();
+            FakePlayer.Position = new Vector2f(x, y);
+
+            //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
+            FakePlayer.HoldingWeapon[0] = (Weapon)weaponProtoype.Clone(); //for testing purposes
+            FakePlayer.Weapon = FakePlayer.HoldingWeapon[0];
+            FakePlayer.SetWeapon(FakePlayer.HoldingWeapon[0]);
+            FakePlayer.PreviousWeapon = "";
+            return FakePlayer;
+        }
 
 
         // ========================================================================
