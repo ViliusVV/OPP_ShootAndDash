@@ -465,7 +465,7 @@ namespace Client
         //}
         private void DrawPickupables()
         {
-            var iter = GameState.PickupableRep.GetIterator();
+            var iter = GameState.PickupableRep.GetIterator(1000, MainPlayer);
             while(iter.HasNext())
             {
                 GameWindow.Draw((Pickupable)iter.Next());

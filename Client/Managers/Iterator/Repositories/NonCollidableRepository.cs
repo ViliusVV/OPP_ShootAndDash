@@ -20,7 +20,7 @@ namespace Client.Managers.Iterator.Repositories
                 index = 0;
             }
 
-            public void Add(Object obj)
+            public void Add(object obj)
             {
                 if (NonCollidables == null)
                     NonCollidables = new List<Sprite>();

@@ -60,7 +60,6 @@ namespace Client.Managers.Iterator.Repositories
                 if (Players[index - 1] != null)
                 {
                     Players.RemoveAt(--index);
-                    players.RemoveAt(index);
                 }
             }
 
