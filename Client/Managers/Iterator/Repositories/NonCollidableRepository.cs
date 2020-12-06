@@ -12,14 +12,24 @@ namespace Client.Managers.Iterator.Repositories
         {
             return new NonCollidableIterator();
         }
+        public IIterator GetIterator(double distance, Sprite target)
+        {
+            return new NonCollidableIterator(distance, target);
+        }
         private class NonCollidableIterator : IIterator
         {
+            List<Sprite> nonCollidables;
             int index;
             public NonCollidableIterator()
             {
                 index = 0;
+                nonCollidables = NonCollidables;
             }
-
+            public NonCollidableIterator(double dist, Sprite target)
+            {
+                index = 0;
+                nonCollidables = NonCollidables.FindAll(x => IsInRange(x, target, dist));
+            }
             public void Add(object obj)
             {
                 if (NonCollidables == null)
@@ -34,14 +44,14 @@ namespace Client.Managers.Iterator.Repositories
 
             public bool HasNext()
             {
-                if (index < NonCollidables.Count)
+                if (index < nonCollidables.Count)
                     return true;
                 return false;
             }
 
             public object Next()
             {
-                return NonCollidables[index++];
+                return nonCollidables[index++];
             }
 
             public void Remove()
@@ -55,6 +65,11 @@ namespace Client.Managers.Iterator.Repositories
             public void RemoveAt(int index)
             {
                 NonCollidables.RemoveAt(index);
+            }
+            public bool IsInRange(Sprite player1, Sprite player2, double range)
+            {
+                var dist = MathF.Sqrt(Common.Utilities.VectorUtils.GetSquaredDistance(player1.Position, player2.Position));
+                return dist < range;
             }
         }
     }
