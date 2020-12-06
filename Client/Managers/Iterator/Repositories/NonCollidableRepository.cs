@@ -66,9 +66,9 @@ namespace Client.Managers.Iterator.Repositories
             {
                 NonCollidables.RemoveAt(index);
             }
-            public bool IsInRange(Sprite player1, Sprite player2, double range)
+            public bool IsInRange(Sprite target1, Sprite target2, double range)
             {
-                var dist = MathF.Sqrt(Common.Utilities.VectorUtils.GetSquaredDistance(player1.Position, player2.Position));
+                var dist = MathF.Sqrt(Common.Utilities.VectorUtils.GetSquaredDistance(target1.Position, target2.Position));
                 return dist < range;
             }
         }
