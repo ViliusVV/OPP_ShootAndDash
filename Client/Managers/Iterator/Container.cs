@@ -6,6 +6,6 @@ namespace Client.Managers.Iterator
 {
     public interface Container
     {
-        public Iterator GetIterator();
+        public IIterator GetIterator();
     }
 }
