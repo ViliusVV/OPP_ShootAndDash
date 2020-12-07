@@ -26,6 +26,7 @@ using System.Diagnostics;
 using Common.Enums;
 using Client.Observer;
 using Client.Objects.Template;
+using Client.Objects.Memento;
 
 namespace Client
 {
@@ -102,7 +103,8 @@ namespace Client
 
             // Generate additional objects (destructibles, indestructibles, pickupables)
             SpawningManager(20, 15, 60, 20);
-            
+            SpawnPortal();
+
             // View
             MainView = GameWindow.DefaultView;
             ZoomedView = new View(MainView);
@@ -160,7 +162,7 @@ namespace Client
 
                 UpdateLoop(deltaTime, mPos);
 
-                
+
                 lock (SFMLLock)
                 {
                     HandleDeath();
@@ -688,7 +690,6 @@ namespace Client
             }
         }
 
-
         private bool ForceSpawnObject(Sprite objectSprite)
         {
             bool objectSpawned = false;
@@ -707,6 +708,25 @@ namespace Client
                 }
             }
             return objectSpawned;
+        }
+
+        private void SpawnPortal()
+        {
+            PortalProspect portal = new PortalProspect();
+            portal.Pos = new Vector2f(200f, 200f);
+
+            Caretaker caretaker = new Caretaker();
+            caretaker.Memento = portal.CreateMemento();
+
+            portal.Pos = new Vector2f(400f, 400f);
+            
+            //if (Keyboard.IsKeyPressed(Keyboard.Key.I))
+            //{
+            //    portal.SetMemento(caretaker.Memento);
+            //    OurLogger.Log("Memento mori");
+            //}
+
+            GameState.PickupableRep.GetIterator().Add(portal);
         }
 
         private void SpawnTraps()

@@ -68,7 +68,8 @@ namespace Client.Config
         // Tilemaps
         [ResourceAttr("Assets/tilemap.png")] TileMap,
         // Particles
-        [ResourceAttr("Assets/Explosion.png")] Explosion
+        [ResourceAttr("Assets/Explosion.png")] Explosion,
+        [ResourceAttr("Assets/Portal.png")] Portal
     }
 
     public enum FontIdentifier
