@@ -3,10 +3,12 @@ using Client.Models;
 using Client.Objects;
 using Client.Objects.Destructables;
 using Client.Objects.Indestructables;
+using Client.Objects.Memento;
 using Client.Utilities;
 using Common;
 using Common.DTO;
 using SFML.Graphics;
+using SFML.System;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -28,6 +30,7 @@ namespace Client.Managers
         //public List<Sprite> NonCollidables { get; set; }
         public NonCollidableRepository NonCollidableRep { get; set; }
 
+        public bool PortalObjectCreated { get; set; }
 
         public ConnectionManager ConnectionManager { get; set; }
 
@@ -42,6 +45,7 @@ namespace Client.Managers
             //this.NonCollidables = new List<Sprite>();
             this.NonCollidableRep = new NonCollidableRepository();
             this.Random = new Random();
+            PortalObjectCreated = false;
         }
 
         public static GameState GetInstance()

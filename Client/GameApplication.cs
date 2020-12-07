@@ -26,6 +26,7 @@ using System.Diagnostics;
 using Common.Enums;
 using Client.Observer;
 using Client.Objects.Template;
+using Client.Objects.Memento;
 using Common.Utilities.Loggers;
 using System.IO;
 
@@ -60,8 +61,8 @@ namespace Client
 
         GameState GameState { get; set; } = GameState.GetInstance();
         PlayerEventManager PlayerEventManager { get; } = PlayerEventManager.GetInstance();
-       
 
+        public bool isMementoSet = false;
 
         Player MainPlayer { get; set; }
         Clock FrameClock { get; set; } = new Clock();
@@ -69,6 +70,7 @@ namespace Client
 
         AimCursor AimCursor = new AimCursor();
         GamePlayUI GameplayUI = new GamePlayUI();
+        ButtonsClass container = new ButtonsClass();
 
         Weapon weaponProtoype;
 
@@ -117,7 +119,19 @@ namespace Client
 
             // Generate additional objects (destructibles, indestructibles, pickupables)
             SpawningManager(20, 15, 60, 20);
-            
+
+            // Portal creation
+            PortalProspect portal = new PortalProspect();
+            Caretaker m1 = new Caretaker();
+            Caretaker m2 = new Caretaker();
+
+            portal.Pos = new Vector2f(200f, 200f);
+            m1.Memento = portal.CreateMemento();
+            portal.Pos = new Vector2f(400f, 400f);
+            m2.Memento = portal.CreateMemento();
+
+            GameState.Collidables.Add(portal);
+
             // View
             MainView = GameWindow.DefaultView;
             ZoomedView = new View(MainView);
@@ -153,6 +167,7 @@ namespace Client
             PlayerEventManager.Subscribe(PlayerEventType.KilledPlayer, GameplayUI.Scoreboard);
            
             var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
+
             while (GameWindow.IsOpen)
             {
                 GameWindow.Clear();
@@ -171,18 +186,14 @@ namespace Client
                     SendPos(GameState.ConnectionManager.Connection);
                 }
 
-               
-                  
-
                 var middlePoint = VectorUtils.GetMiddlePoint(MainPlayer.Position, mPos);
 
                 MainPlayer.Heading = VectorUtils.GetAngleBetweenVectors(MainPlayer.Position, mPos);
                 MainPlayer.LookingAtPoint = mPos;
 
-
+                SpawnPortal(portal, m1, m2);
                 UpdateLoop(deltaTime, mPos);
 
-                
                 lock (SFMLLock)
                 {
                     HandleDeath();
@@ -191,7 +202,8 @@ namespace Client
                     GameWindow.Draw(GameplayUI.Scoreboard);
                     GameWindow.Draw(GameplayUI.RespawnMesage);
                     GameWindow.Draw(GameplayUI.KillNotifier);
-
+                    if(container.Show)
+                    GameWindow.Draw(container.composite);
                     ZoomedView.Center = middlePoint;
 
                     ZoomedView.Zoom(zoomView);
@@ -633,7 +645,7 @@ namespace Client
             {
                 //SpawnDestructible();
                 //SpawnIndestructible();
-                SpawnTraps();
+                //SpawnTraps();
             }
             // testing builder
             if (Keyboard.IsKeyPressed(Keyboard.Key.H))
@@ -669,8 +681,20 @@ namespace Client
             {
                 Toggle();
             }
+            // Menu
+            if (Keyboard.IsKeyPressed(Keyboard.Key.P))
+			{
+                container.ChangeVisibility();
+			}
+            if (Keyboard.IsKeyPressed(Keyboard.Key.W))
+			{
+                container.composite.SelectPrevious();
+			}
+            if (Keyboard.IsKeyPressed(Keyboard.Key.S))
+			{
+                container.composite.SelectNext();
+			}
         }
-
 
         // ========================================================================
         // ============================== SPAWNING ================================
@@ -745,7 +769,6 @@ namespace Client
             }
         }
 
-
         private bool ForceSpawnObject(Sprite objectSprite)
         {
             bool objectSpawned = false;
@@ -766,6 +789,25 @@ namespace Client
             return objectSpawned;
         }
 
+        private void SpawnPortal(PortalProspect portal, Caretaker m1, Caretaker m2)
+        {
+            //PortalPickupCheck portalManage = new PortalPickupCheck();
+            if (!isMementoSet && Keyboard.IsKeyPressed(Keyboard.Key.Num1))
+            {
+                portal.RestoreMemento(m2.Memento);
+                MainPlayer.Position = new Vector2f(1000f, 1000f);
+                isMementoSet = true;
+                OurLogger.Log("200; 200");
+            }
+            else if (isMementoSet && (CollisionTester.BoundingBoxTest(MainPlayer, portal) || Keyboard.IsKeyPressed(Keyboard.Key.Num2)))
+            {
+                portal.RestoreMemento(m1.Memento);
+                MainPlayer.Position = new Vector2f(1000f, 1000f);
+                OurLogger.Log("400; 400");
+                isMementoSet = false;
+            }
+        }
+
         private void SpawnTraps()
         {
             TrapSpawner trap;
@@ -773,7 +815,7 @@ namespace Client
             switch (num)
             {
                 case 0:
-                    trap = new DamageTrapBuilder();
+                    trap = new DamageTrapBuilder(); 
                     break;
                 case 1:
                     trap = new FreezeTrapBuilder();

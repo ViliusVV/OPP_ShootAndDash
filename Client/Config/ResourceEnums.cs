@@ -22,6 +22,9 @@ namespace Client.Config
         [ResourceAttr("Assets/Char4Spritesheet.png")] ProfoundAsianChar,
         // UI
         [ResourceAttr("Assets/cursor.png")] AimCursor,
+        [ResourceAttr("Assets/ButtonDefault.png")] ButtonDefault,
+        [ResourceAttr("Assets/ButtonSelected.png")] ButtonSelected,
+        [ResourceAttr("Assets/ButtonClicked.png")] ButtonClicked,
         //[ResourceAttr("Assets/ScoreboardBox.png")] ScoreboardBox,
         // Projectiles
         [ResourceAttr("Assets/bullet.png")] Bullet,
@@ -68,7 +71,8 @@ namespace Client.Config
         // Tilemaps
         [ResourceAttr("Assets/tilemap.png")] TileMap,
         // Particles
-        [ResourceAttr("Assets/Explosion.png")] Explosion
+        [ResourceAttr("Assets/Explosion.png")] Explosion,
+        [ResourceAttr("Assets/Portal.png")] Portal
     }
 
     public enum FontIdentifier
