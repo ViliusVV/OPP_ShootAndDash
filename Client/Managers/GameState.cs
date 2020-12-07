@@ -30,7 +30,7 @@ namespace Client.Managers
         //public List<Sprite> NonCollidables { get; set; }
         public NonCollidableRepository NonCollidableRep { get; set; }
 
-        public bool PortalPickedUp { get; set; }
+        public bool PortalObjectCreated { get; set; }
 
         public ConnectionManager ConnectionManager { get; set; }
 
@@ -45,7 +45,7 @@ namespace Client.Managers
             //this.NonCollidables = new List<Sprite>();
             this.NonCollidableRep = new NonCollidableRepository();
             this.Random = new Random();
-            PortalPickedUp = false;
+            PortalObjectCreated = false;
         }
 
         public static GameState GetInstance()
