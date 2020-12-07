@@ -24,7 +24,8 @@ namespace Client.Utilities
 
         protected void InsertResource(TIdentifier id, TResource resource)
         {
-            OurLogger.Log("Loaded resource: " + GameResourceHelper.GetResoucePath<Enum>(id as Enum));
+            //OurLogger.Log("Loaded resource: " + GameResourceHelper.GetResoucePath<Enum>(id as Enum));
+            //GameApplication.defaultLogger.LogMessage(10, "Loaded resource: " + GameResourceHelper.GetResoucePath<Enum>(id as Enum));
             if(!resourceMap.ContainsKey(id))
             {
                 resourceMap.Add(id, resource);

@@ -14,7 +14,7 @@ namespace Common.Utilities.Loggers
         {
             next = nextLogger;
         }
-        public void LogMessage(int level, string message, [CallerFilePath] string file = "", [CallerMemberName] string member = "", [CallerLineNumber] int line = 0)
+        public virtual void LogMessage(int level, string message, [CallerFilePath] string file = "", [CallerMemberName] string member = "", [CallerLineNumber] int line = 0)
         {
             if(logableMessageLevel <= level)
             {

@@ -19,7 +19,9 @@ namespace Client.Objects.Pickupables.Strategy
 
         public void DoPowerUpLogic(Player player)
         {
-            OurLogger.Log("Executing healing powerup strategy");
+            //OurLogger.Log("Executing healing powerup strategy");
+            GameApplication.defaultLogger.LogMessage(5, "Executing healing powerup strategy");
+
             player.AddHealth(HealAmount);
         }
     }

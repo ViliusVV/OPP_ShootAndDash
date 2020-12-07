@@ -20,8 +20,8 @@ namespace Client.Objects.Pickupables.Strategy
 
         public void DoPowerUpLogic(Player player)
         {
-            OurLogger.Log("Executing deflection powerup strategy");
-
+            //OurLogger.Log("Executing deflection powerup strategy");
+            GameApplication.defaultLogger.LogMessage(5, "Executing deflection powerup strategy");
             player.IsInvincible = true;
 
             Task.Delay((int)Duration).ContinueWith(o => player.IsInvincible = false);
