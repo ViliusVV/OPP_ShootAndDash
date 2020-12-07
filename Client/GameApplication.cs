@@ -27,6 +27,8 @@ using Common.Enums;
 using Client.Observer;
 using Client.Objects.Template;
 using Client.Objects.Memento;
+using Common.Utilities.Loggers;
+using System.IO;
 
 namespace Client
 {
@@ -68,17 +70,24 @@ namespace Client
 
         AimCursor AimCursor = new AimCursor();
         GamePlayUI GameplayUI = new GamePlayUI();
+        ButtonsClass container = new ButtonsClass();
 
         Weapon weaponProtoype;
 
-        public GameApplication() { }
+
+        public static AbstractLogger criticalLogger = new CriticalLogger(50);
+        public static AbstractLogger importantLogger = new ImportantLogger(20);
+        public static AbstractLogger fileLogger = new FileLogger(30, "logs.txt");
+        public static AbstractLogger defaultLogger = new DefaultLogger(0);
+
+        public GameApplication() {
+        }
 
         public static GameApplication GetInstance()
         {
+
             return _instance;
         }
-
-
 
         // ========================================================================
         // =========================== MAIN ENTRY POINT ===========================
@@ -86,6 +95,14 @@ namespace Client
 
         public void Run()
         {
+            // set up loggers using chain of responsibility pattern
+            Console.ForegroundColor = ConsoleColor.White;
+            defaultLogger.SetNext(importantLogger);
+            importantLogger.SetNext(fileLogger);
+            fileLogger.SetNext(criticalLogger);
+            criticalLogger.SetNext(null);
+            defaultLogger.LogMessage(60, "Loggers setup!");
+
             // Create render window
             GameWindow = CreateRenderWindow(Styles.Close);
             Vector2f winSize = GameWindow.GetView().Size;
@@ -150,6 +167,7 @@ namespace Client
             PlayerEventManager.Subscribe(PlayerEventType.KilledPlayer, GameplayUI.Scoreboard);
            
             var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
+
             while (GameWindow.IsOpen)
             {
                 GameWindow.Clear();
@@ -176,7 +194,6 @@ namespace Client
                 SpawnPortal(portal, m1, m2);
                 UpdateLoop(deltaTime, mPos);
 
-
                 lock (SFMLLock)
                 {
                     HandleDeath();
@@ -185,7 +202,8 @@ namespace Client
                     GameWindow.Draw(GameplayUI.Scoreboard);
                     GameWindow.Draw(GameplayUI.RespawnMesage);
                     GameWindow.Draw(GameplayUI.KillNotifier);
-
+                    if(container.Show)
+                    GameWindow.Draw(container.composite);
                     ZoomedView.Center = middlePoint;
 
                     ZoomedView.Zoom(zoomView);
@@ -511,8 +529,8 @@ namespace Client
                 {
                     player.Weapon.Shoot(shootData.Target, shootData.Orgin, shootData.Rotation, player, false);
                 }
-
-                OurLogger.Log(shootData.ToString());
+                defaultLogger.LogMessage(10, shootData.ToString());
+                //OurLogger.Log(shootData.ToString());
 
             });
             
@@ -521,14 +539,17 @@ namespace Client
                 Player killer = GameState.Players.Find(p => p.Name.Equals(killerServ.Name));
                 Player victim = GameState.Players.Find(p => p.Name.Equals(victimServ.Name));
 
-                OurLogger.Log($"{victimServ.Name} got shot. Before {victim.Health} after {victimServ.Health} ");
+                //OurLogger.Log($"{victimServ.Name} got shot. Before {victim.Health} after {victimServ.Health} ");
+                defaultLogger.LogMessage(15, $"{victimServ.Name} got shot. Before {victim.Health} after {victimServ.Health} ");
 
                 victim.Health = victimServ.Health;
 
                 if (victim.IsDead)
                 {
-                    OurLogger.Log($"{killerServ.Name} killed ---> {victimServ.Name}");
-                    killer.Kills = killerServ.Kills;
+                    //OurLogger.Log($"{killerServ.Name} killed ---> {victimServ.Name}");
+                    defaultLogger.LogMessage(30, $"{killerServ.Name} killed ---> {victimServ.Name}");
+
+                   killer.Kills = killerServ.Kills;
                     victim.Deaths = victimServ.Deaths;
 
                     var evtData = new PlayerEventData()
@@ -540,7 +561,8 @@ namespace Client
                 }
                 else
                 {
-                    OurLogger.Log($"{victimServ.Name} got shot. Befor ");
+                    defaultLogger.LogMessage(15, $"{victimServ.Name} got shot. Befor ");
+                    //OurLogger.Log($"{victimServ.Name} got shot. Befor ");
                 }
             });
         }
@@ -583,11 +605,13 @@ namespace Client
             };
 
             window.GainedFocus += (sender, e) => {
-                OurLogger.Log("Window gained focus");
+                //OurLogger.Log("Window gained focus");
+                defaultLogger.LogMessage(10, "Window gained focus");
                 this.HasFocus = true;
             };
             window.LostFocus += (sender, e) => {
-                OurLogger.Log("Window lost focus");
+                defaultLogger.LogMessage(10, "Window lost focus");
+                //OurLogger.Log("Window lost focus");
                 this.HasFocus = false;
             };
         }
@@ -657,8 +681,20 @@ namespace Client
             {
                 Toggle();
             }
+            // Menu
+            if (Keyboard.IsKeyPressed(Keyboard.Key.P))
+			{
+                container.ChangeVisibility();
+			}
+            if (Keyboard.IsKeyPressed(Keyboard.Key.W))
+			{
+                container.composite.SelectPrevious();
+			}
+            if (Keyboard.IsKeyPressed(Keyboard.Key.S))
+			{
+                container.composite.SelectNext();
+			}
         }
-
 
         // ========================================================================
         // ============================== SPAWNING ================================
@@ -861,7 +897,9 @@ namespace Client
 
         private void CreateSprites()
         {
-            OurLogger.Log("Loading sprites...");
+            //OurLogger.Log("Loading sprites...");
+            defaultLogger.LogMessage(30, "Loading sprites...");
+
             IntRect rect = new IntRect(0, 0, 1280, 720);
             AimCursor.SetTexture(new Texture(ResourceFacade.Textures.Get(TextureIdentifier.AimCursor)));
         }

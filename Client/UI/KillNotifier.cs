@@ -30,6 +30,8 @@ namespace Client.UI
             lock (GameApplication.GetInstance().SFMLLock)
             {
                 OurLogger.Log("Kill notifier notified");
+                GameApplication.defaultLogger.LogMessage(11, "Kill notifier notified");
+
                 message.DisplayedString = $"Player {eventData.Shooter.Name} killed {eventData.Victim.Name}";
 
                 var viewPort = GameApplication.GetInstance().GameWindow.GetViewport(GameApplication.GetInstance().MainView);

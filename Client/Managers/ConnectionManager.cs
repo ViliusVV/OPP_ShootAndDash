@@ -35,19 +35,26 @@ namespace Client.Utilities
                 if (dt > 0.5)
                 {
                     clock.Restart();
-                    OurLogger.Log("Connecting...");
+                    //OurLogger.Log("Connecting...");
+                    GameApplication.defaultLogger.LogMessage(20, "Connecting...");
                 }
             }
             if (Connection.State != HubConnectionState.Connected)
             {
-                OurLogger.Log("Connection failed!");
+                //OurLogger.Log("Connection failed!");
+                GameApplication.defaultLogger.LogMessage(50, "Connection failed!");
+
                 Environment.Exit(1);
             }
             else
             {
-                OurLogger.Log("Connection succesfull!");
+                //OurLogger.Log("Connection succesfull!");
+                GameApplication.defaultLogger.LogMessage(20, "Connection successful!");
+
             }
-            OurLogger.Log(Connection.State.ToString());
+            //OurLogger.Log(Connection.State.ToString());
+            GameApplication.defaultLogger.LogMessage(10, Connection.State.ToString());
+
         }
     }
 }

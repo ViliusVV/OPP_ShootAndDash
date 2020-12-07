@@ -23,13 +23,14 @@ namespace Client.Flyweight
             
             if(_powerupFlyweights.ContainsKey(key))
             {
-                OurLogger.Log($"Reusing flyweight {key}");
-
+                //OurLogger.Log($"Reusing flyweight {key}");
+                GameApplication.defaultLogger.LogMessage(10, $"Reusing flyweight {key}");
                 return _powerupFlyweights[key];
             }
             else
             {
-                OurLogger.Log($"Creating new flyweight {key}");
+                //OurLogger.Log($"Creating new flyweight {key}");
+                GameApplication.defaultLogger.LogMessage(10, $"Creating flyweight {key}");
 
                 PowerupFlyweight powerupFlyweight = new PowerupFlyweight(ResourceHolderFacade.GetInstance().Textures.Get(textureIdentifier), strategy);
 

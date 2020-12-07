@@ -47,7 +47,9 @@ namespace Client.UI
         {
             lock (GameApplication.GetInstance().SFMLLock)
             {
-                OurLogger.Log($"Got event {eventData}");
+                //OurLogger.Log($"Got event {eventData}");
+                GameApplication.defaultLogger.LogMessage(20, $"Got event {eventData}");
+
                 if (!scores.ContainsKey(eventData.Shooter))
                 {
                     scores.Add(eventData.Shooter, new CustomText(2 * 7));

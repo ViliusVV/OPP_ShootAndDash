@@ -121,7 +121,9 @@ namespace Client.Utilities
             Vector2u vect = new Vector2u(64, 64);
             if (!load(vect, level, 64, 48))
             {
-                OurLogger.Log("error on map load");
+                //OurLogger.Log("error on map load");
+                GameApplication.defaultLogger.LogMessage(50, "error on map load");
+
             };
         }
         public void CreateMap(int length, int width)
@@ -138,7 +140,9 @@ namespace Client.Utilities
             Vector2u vect = new Vector2u(64, 64);
             if (!load(vect, level, (uint)length, (uint)width))
             {
-                OurLogger.Log("error on map load");
+                //OurLogger.Log("error on map load");
+                GameApplication.defaultLogger.LogMessage(50, "error on map load");
+
             };
         }
     }

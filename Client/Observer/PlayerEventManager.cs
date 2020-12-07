@@ -32,13 +32,16 @@ namespace Client.Observer
 
         public void Subscribe(PlayerEventType type, IPlayerEventListener listener)
         {
-            OurLogger.Log($"{listener} subscribed to event type {type}");
+            //OurLogger.Log($"{listener} subscribed to event type {type}");
+            GameApplication.defaultLogger.LogMessage(20, $"{listener} subscribed to event type {type}");
+
             _listeners[type].Add(listener);
         }
 
         public void Unsubscribe(PlayerEventType type, IPlayerEventListener listener)
         {
-            OurLogger.Log($"{listener} unsubscribed from event type {type}");
+            //OurLogger.Log($"{listener} unsubscribed from event type {type}");
+            GameApplication.defaultLogger.LogMessage(20, $"{listener} unsubscribed to event type {type}");
             _listeners[type].Remove(listener);
         }
 

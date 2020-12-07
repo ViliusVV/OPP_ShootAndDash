@@ -23,7 +23,8 @@ namespace Client.Objects.Pickupables.Strategy
         {
             if(player.Weapon != null)
             {
-                OurLogger.Log("Executing reload speed powerup strategy");
+                //OurLogger.Log("Executing reload speed powerup strategy");
+                GameApplication.defaultLogger.LogMessage(5, "Executing reload speed powerup strategy");
 
                 float oldRelaodTime = player.Weapon.ReloadDuration;
                 player.Weapon.ReloadDuration = oldRelaodTime / ReloadReduction;

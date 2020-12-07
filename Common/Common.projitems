@@ -16,6 +16,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)ModelInterfaces\IProjectile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\WeaponType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModelInterfaces\IPlayer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\Loggers\AbstractLogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\Loggers\CriticalLogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\Loggers\DefaultLogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\Loggers\FileLogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\Loggers\ImportantLogger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\OurLogger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\Utils.cs" />
     <Compile Include="..\Common\DTO\Vector2fS.cs" />
