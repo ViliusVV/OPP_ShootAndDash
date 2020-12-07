@@ -130,7 +130,7 @@ namespace Client
             // Player init
             CreateMainPlayer();
 
-            GameState.ConnectionManager = new ConnectionManager("http://192.168.0.106:51230/sd-server");
+            GameState.ConnectionManager = new ConnectionManager("http://underpoweredserver.tplinkdns.com:51230/");
 
 
 
@@ -621,7 +621,7 @@ namespace Client
             {
                 //SpawnDestructible();
                 //SpawnIndestructible();
-                //SpawnTraps();
+                SpawnTraps();
             }
             // testing builder
             if (Keyboard.IsKeyPressed(Keyboard.Key.H))
@@ -756,7 +756,7 @@ namespace Client
         private void SpawnPortal(PortalProspect portal, Caretaker m1, Caretaker m2)
         {
             //PortalPickupCheck portalManage = new PortalPickupCheck();
-            if (!isMementoSet && Keyboard.IsKeyPressed(Keyboard.Key.Num1))
+            if (!isMementoSet && (CollisionTester.BoundingBoxTest(MainPlayer, portal) || Keyboard.IsKeyPressed(Keyboard.Key.Num1)))
             {
                 portal.RestoreMemento(m2.Memento);
                 MainPlayer.Position = new Vector2f(1000f, 1000f);
