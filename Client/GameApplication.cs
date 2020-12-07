@@ -26,6 +26,8 @@ using System.Diagnostics;
 using Common.Enums;
 using Client.Observer;
 using Client.Objects.Template;
+using Common.Utilities.Loggers;
+using System.IO;
 
 namespace Client
 {
@@ -70,6 +72,10 @@ namespace Client
 
         Weapon weaponProtoype;
 
+
+        AbstractLogger criticalLogger = new ConsoleLogger(50);
+        AbstractLogger fileLogger = new FileLogger(30, "logs.txt");
+        AbstractLogger defaultLogger = new DefaultLogger(0);
         public GameApplication() { }
 
         public static GameApplication GetInstance()
@@ -111,7 +117,12 @@ namespace Client
             // weapon prototype
             weaponProtoype = new Pistol();
 
-
+            // set up loggers using chain of responsibility pattern
+            defaultLogger.SetNext(fileLogger);
+            fileLogger.SetNext(criticalLogger);
+            //File.Create("logs.txt");
+            criticalLogger.SetNext(null);
+            defaultLogger.LogMessage(60, "Loggers setup!");
 
 
             // Player init
