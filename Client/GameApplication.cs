@@ -130,7 +130,7 @@ namespace Client
             portal.Pos = new Vector2f(400f, 400f);
             m2.Memento = portal.CreateMemento();
 
-            GameState.Collidables.Add(portal);
+            GameState.NonCollidableRep.GetIterator().Add(portal);
 
             // View
             MainView = GameWindow.DefaultView;
@@ -792,6 +792,10 @@ namespace Client
         private void SpawnPortal(PortalProspect portal, Caretaker m1, Caretaker m2)
         {
             //PortalPickupCheck portalManage = new PortalPickupCheck();
+            defaultLogger.LogMessage(3, CollisionTester.BoundingBoxTest(MainPlayer, portal).ToString());
+            defaultLogger.LogMessage(4, MainPlayer.Position.ToString());
+            defaultLogger.LogMessage(4, portal.Position.ToString());
+
             if (!isMementoSet && (CollisionTester.BoundingBoxTest(MainPlayer, portal) || Keyboard.IsKeyPressed(Keyboard.Key.Num1)))
             {
                 portal.RestoreMemento(m2.Memento);
