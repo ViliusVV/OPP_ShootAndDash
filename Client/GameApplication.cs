@@ -68,6 +68,7 @@ namespace Client
 
         AimCursor AimCursor = new AimCursor();
         GamePlayUI GameplayUI = new GamePlayUI();
+        ButtonsClass container = new ButtonsClass();
 
         Weapon weaponProtoype;
 
@@ -150,6 +151,7 @@ namespace Client
             PlayerEventManager.Subscribe(PlayerEventType.KilledPlayer, GameplayUI.Scoreboard);
            
             var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
+
             while (GameWindow.IsOpen)
             {
                 GameWindow.Clear();
@@ -176,7 +178,6 @@ namespace Client
                 SpawnPortal(portal, m1, m2);
                 UpdateLoop(deltaTime, mPos);
 
-
                 lock (SFMLLock)
                 {
                     HandleDeath();
@@ -185,7 +186,8 @@ namespace Client
                     GameWindow.Draw(GameplayUI.Scoreboard);
                     GameWindow.Draw(GameplayUI.RespawnMesage);
                     GameWindow.Draw(GameplayUI.KillNotifier);
-
+                    if(container.Show)
+                    GameWindow.Draw(container.composite);
                     ZoomedView.Center = middlePoint;
 
                     ZoomedView.Zoom(zoomView);
@@ -657,8 +659,20 @@ namespace Client
             {
                 Toggle();
             }
+            // Menu
+            if (Keyboard.IsKeyPressed(Keyboard.Key.P))
+			{
+                container.ChangeVisibility();
+			}
+            if (Keyboard.IsKeyPressed(Keyboard.Key.W))
+			{
+                container.composite.SelectPrevious();
+			}
+            if (Keyboard.IsKeyPressed(Keyboard.Key.S))
+			{
+                container.composite.SelectNext();
+			}
         }
-
 
         // ========================================================================
         // ============================== SPAWNING ================================
