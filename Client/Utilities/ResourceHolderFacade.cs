@@ -29,7 +29,7 @@ namespace Client.Utilities
         // Load all game textures
         void LoadTextures()
         {
-            OurLogger.Log("Loading textures...");
+            //OurLogger.Log("Loading textures...");
 
             // Iterate over all textures and load
             var allTextures = Enum.GetValues(typeof(TextureIdentifier));
@@ -46,7 +46,7 @@ namespace Client.Utilities
         // Load all music and sound efects
         void LoadSounds()
         {
-            OurLogger.Log("Loading sounds...");
+            //OurLogger.Log("Loading sounds...");
 
             var allSounds = Enum.GetValues(typeof(SoundIdentifier));
             foreach (SoundIdentifier sound in allSounds)
@@ -59,7 +59,7 @@ namespace Client.Utilities
         // Load all custom fonts
         void LoadFonts()
         {
-            OurLogger.Log("Loading fonts...");
+            //OurLogger.Log("Loading fonts...");
 
             var allFonts = Enum.GetValues(typeof(FontIdentifier));
             foreach (FontIdentifier font in allFonts)

@@ -266,7 +266,9 @@ namespace Client.Objects
             
             if (this.Ammo >= this.MagazineSize && elapsed >= this.ReloadDuration)
             {
-                OurLogger.Log("Gun finished reloading!");
+               // OurLogger.Log("Gun finished reloading!");
+                GameApplication.defaultLogger.LogMessage(4, "Gun finished reloading");
+
                 this.Reloading = false;
             }
         }

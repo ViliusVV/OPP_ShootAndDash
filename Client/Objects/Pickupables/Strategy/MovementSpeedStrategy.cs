@@ -20,7 +20,8 @@ namespace Client.Objects.Pickupables.Strategy
         }
         public void DoPowerUpLogic(Player player)
         {
-            OurLogger.Log("Executing movement speed powerup strategy");
+            //OurLogger.Log("Executing movement speed powerup strategy");
+            GameApplication.defaultLogger.LogMessage(5, "Executing movement speed powerup strategy");
 
             player.SpeedMultiplier = SpeedMultiplier;
 

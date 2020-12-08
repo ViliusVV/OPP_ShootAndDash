@@ -25,7 +25,9 @@ namespace Client.Objects.Template
 
         public override void ApplyDamage(Player player)
         {
-            OurLogger.Log("Stepped on damage trap");
+            //OurLogger.Log("Stepped on damage trap");
+            GameApplication.defaultLogger.LogMessage(6, "Stepped on damage trap");
+
             player.AddHealth(-30f);
         }
 

@@ -25,7 +25,9 @@ namespace Client.Objects.Template
 
         public override void ApplyDamage(Player player)
         {
-            OurLogger.Log("Stepped on Freeze trap");
+            //OurLogger.Log("Stepped on Freeze trap");
+            GameApplication.defaultLogger.LogMessage(6, "Stepped on freeze trap");
+
             player.AddHealth(-5f);
         }
 

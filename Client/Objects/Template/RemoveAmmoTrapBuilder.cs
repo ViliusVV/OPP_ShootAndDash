@@ -25,7 +25,9 @@ namespace Client.Objects.Template
 
         public override void ApplyDamage(Player player)
         {
-            OurLogger.Log("Stepped on Remove Ammo trap");
+            //OurLogger.Log("Stepped on Remove Ammo trap");
+            GameApplication.defaultLogger.LogMessage(6, "Stepped on remove ammo trap");
+
             player.AddHealth(-5f);
         }
 

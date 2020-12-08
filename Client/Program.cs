@@ -17,13 +17,14 @@ namespace Client
     {
         static void Main()
         {
+            Console.ForegroundColor = ConsoleColor.White;
             GameApplication game = GameApplication.GetInstance();
 
-            OurLogger.Log("Starting game...");
+            GameApplication.defaultLogger.LogMessage(10, "Starting game...");
 
             game.Run();
 
-            OurLogger.Log("Game closed!");
+            GameApplication.defaultLogger.LogMessage(10, "Game closed!");
         }
     }
 }
