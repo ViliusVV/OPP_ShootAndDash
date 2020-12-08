@@ -117,20 +117,22 @@ namespace Client
             director.Construct();
             GameState.TileMap = builder.GetResult();
 
-            // Generate additional objects (destructibles, indestructibles, pickupables)
-            SpawningManager(20, 15, 60, 20);
-
             // Portal creation
             PortalProspect portal = new PortalProspect();
             Caretaker m1 = new Caretaker();
             Caretaker m2 = new Caretaker();
 
-            portal.Pos = new Vector2f(200f, 200f);
+            portal.Pos = new Vector2f(3*64f, 45*64f);
+            portal.Tex = TextureHolder.GetInstance().Get(TextureIdentifier.Portal);
             m1.Memento = portal.CreateMemento();
-            portal.Pos = new Vector2f(400f, 400f);
+            portal.Pos = new Vector2f(60*64f, 3*64f);
+            portal.Tex = TextureHolder.GetInstance().Get(TextureIdentifier.PortalRed);
             m2.Memento = portal.CreateMemento();
 
             GameState.NonCollidableRep.GetIterator().Add(portal);
+
+            // Generate additional objects (destructibles, indestructibles, pickupables)
+            SpawningManager(20, 15, 60, 20);
 
             // View
             MainView = GameWindow.DefaultView;
@@ -791,24 +793,23 @@ namespace Client
 
         private void SpawnPortal(PortalProspect portal, Caretaker m1, Caretaker m2)
         {
-            //PortalPickupCheck portalManage = new PortalPickupCheck();
             defaultLogger.LogMessage(3, CollisionTester.BoundingBoxTest(MainPlayer, portal).ToString());
             defaultLogger.LogMessage(4, MainPlayer.Position.ToString());
             defaultLogger.LogMessage(4, portal.Position.ToString());
 
-            if (!isMementoSet && (CollisionTester.BoundingBoxTest(MainPlayer, portal) || Keyboard.IsKeyPressed(Keyboard.Key.Num1)))
+            if (isMementoSet && (CollisionTester.BoundingBoxTest(MainPlayer, portal) || Keyboard.IsKeyPressed(Keyboard.Key.Num1)))
             {
                 portal.RestoreMemento(m2.Memento);
-                MainPlayer.Position = new Vector2f(1000f, 1000f);
-                isMementoSet = true;
+                MainPlayer.Position = new Vector2f(16*64f, 16 * 64f);
+                isMementoSet = false;
                 OurLogger.Log("200; 200");
             }
-            else if (isMementoSet && (CollisionTester.BoundingBoxTest(MainPlayer, portal) || Keyboard.IsKeyPressed(Keyboard.Key.Num2)))
+            else if (!isMementoSet && (CollisionTester.BoundingBoxTest(MainPlayer, portal) || Keyboard.IsKeyPressed(Keyboard.Key.Num2)))
             {
                 portal.RestoreMemento(m1.Memento);
-                MainPlayer.Position = new Vector2f(1000f, 1000f);
+                MainPlayer.Position = new Vector2f(16 * 64f, 16 * 64f);
                 OurLogger.Log("400; 400");
-                isMementoSet = false;
+                isMementoSet = true;
             }
         }
 
