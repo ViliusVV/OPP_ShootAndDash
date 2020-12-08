@@ -131,7 +131,7 @@ namespace Client
             // Player init
             CreateMainPlayer();
 
-            GameState.ConnectionManager = new ConnectionManager("http://192.168.0.106:51230/sd-server");
+            GameState.ConnectionManager = new ConnectionManager("http://underpoweredserver.tplinkdns.com:51230/");
 
 
 
@@ -270,6 +270,7 @@ namespace Client
                 {
                     Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
                     player.PlayerBar.Position = playerBarPos;
+                    if(!container.Show)
                     player.UpdateSpeed();
                     player.TranslateFromSpeed();
                     player.Update();
@@ -599,65 +600,68 @@ namespace Client
         {
             // Polling key presses is better than events if we
             // need to detect multiple key presses at same time
-            if (Keyboard.IsKeyPressed(Keyboard.Key.X))
+            if (container.Show == false)
             {
-                SpawnRandomSyringe();
-            }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Z))
-            {
-                MainPlayer.AddHealth(-1);
-            }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.R))
-            {
-                MainPlayer.Weapon.Reload();
-            }
+                if (Keyboard.IsKeyPressed(Keyboard.Key.X))
+                {
+                    SpawnRandomSyringe();
+                }
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Z))
+                {
+                    MainPlayer.AddHealth(-1);
+                }
+                if (Keyboard.IsKeyPressed(Keyboard.Key.R))
+                {
+                    MainPlayer.Weapon.Reload();
+                }
 
-            if (Mouse.IsButtonPressed(Mouse.Button.Left))
-            {
-                var target = AimCursor.Position - MainPlayer.Position;
-                MainPlayer.Weapon.Shoot(target, MainPlayer);
-            }
+                if (Mouse.IsButtonPressed(Mouse.Button.Left))
+                {
+                    var target = AimCursor.Position - MainPlayer.Position;
+                    MainPlayer.Weapon.Shoot(target, MainPlayer);
+                }
 
-            // Testing abstract factory
-            if (Keyboard.IsKeyPressed(Keyboard.Key.O))
-            {
-                //SpawnDestructible();
-                //SpawnIndestructible();
-                //SpawnTraps();
-            }
-            // testing builder
-            if (Keyboard.IsKeyPressed(Keyboard.Key.H))
-            {
+                // Testing abstract factory
+                if (Keyboard.IsKeyPressed(Keyboard.Key.O))
+                {
+                    //SpawnDestructible();
+                    //SpawnIndestructible();
+                    //SpawnTraps();
+                }
+                // testing builder
+                if (Keyboard.IsKeyPressed(Keyboard.Key.H))
+                {
 
-                director.ConstructBase();
-                GameState.TileMap = builder.GetResult();
-            }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Q))
-            {
-                MainPlayer.Toggle();
-            }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.G))
-            {
-                MainPlayer.DropWeapon();
-            }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Num1))
-            {
-                if (MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[0].Name)
-                    MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
-            }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Num2))
-            {
-                if (MainPlayer.HoldingWeapon[1] != null && MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[1].Name)
-                    MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[1]);
-            }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Num3))
-            {
-                if (MainPlayer.HoldingWeapon[2] != null && MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[2].Name)
-                    MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[2]);
-            }
-            if (Keyboard.IsKeyPressed(Keyboard.Key.M))
-            {
-                Toggle();
+                    director.ConstructBase();
+                    GameState.TileMap = builder.GetResult();
+                }
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Q))
+                {
+                    MainPlayer.Toggle();
+                }
+                if (Keyboard.IsKeyPressed(Keyboard.Key.G))
+                {
+                    MainPlayer.DropWeapon();
+                }
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Num1))
+                {
+                    if (MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[0].Name)
+                        MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
+                }
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Num2))
+                {
+                    if (MainPlayer.HoldingWeapon[1] != null && MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[1].Name)
+                        MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[1]);
+                }
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Num3))
+                {
+                    if (MainPlayer.HoldingWeapon[2] != null && MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[2].Name)
+                        MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[2]);
+                }
+                if (Keyboard.IsKeyPressed(Keyboard.Key.M))
+                {
+                    Toggle();
+                }
             }
             // Menu
             if (Keyboard.IsKeyPressed(Keyboard.Key.P))
@@ -671,6 +675,11 @@ namespace Client
             if (Keyboard.IsKeyPressed(Keyboard.Key.S))
 			{
                 container.composite.SelectNext();
+			}
+            if (Keyboard.IsKeyPressed(Keyboard.Key.Space))
+			{
+                container.chooseComposite();
+                container.returnComposite();
 			}
         }
 

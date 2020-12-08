@@ -4,6 +4,7 @@ using SFML.System;
 using System.Collections.Generic;
 using System;
 using System.Text;
+using Common.Utilities;
 
 namespace Client.UI
 {
@@ -11,6 +12,7 @@ namespace Client.UI
 	{
 		public List<Component> children;
 		public int selectedChild;
+		public bool CurrentChosen = false;
 		public Clock ChangeTimer { get; set; } = new Clock();
 
 		public CompositeUI()
@@ -82,6 +84,7 @@ namespace Client.UI
 
 				children[index].Select();
 				selectedChild = index;
+				OurLogger.Log("Selecting child in composite: " + selectedChild.ToString());
 			}
 		}
 
@@ -131,7 +134,10 @@ namespace Client.UI
 
 			foreach(var child in children)
 			{
-				target.Draw(child, states);
+				if (this.CurrentChosen == true)
+				{
+					target.Draw(child, states);
+				}
 			}
 		}
 
