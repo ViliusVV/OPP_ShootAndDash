@@ -797,14 +797,14 @@ namespace Client
             defaultLogger.LogMessage(4, MainPlayer.Position.ToString());
             defaultLogger.LogMessage(4, portal.Position.ToString());
 
-            if (isMementoSet && (CollisionTester.BoundingBoxTest(MainPlayer, portal) || Keyboard.IsKeyPressed(Keyboard.Key.Num1)))
+            if (isMementoSet && (CollisionTester.BoundingBoxTest(MainPlayer, portal) || Keyboard.IsKeyPressed(Keyboard.Key.Num9)))
             {
                 portal.RestoreMemento(m2.Memento);
-                MainPlayer.Position = new Vector2f(16*64f, 16 * 64f);
+                MainPlayer.Position = new Vector2f(16 * 64f, 16 * 64f);
                 isMementoSet = false;
                 OurLogger.Log("200; 200");
             }
-            else if (!isMementoSet && (CollisionTester.BoundingBoxTest(MainPlayer, portal) || Keyboard.IsKeyPressed(Keyboard.Key.Num2)))
+            else if (!isMementoSet && (CollisionTester.BoundingBoxTest(MainPlayer, portal) || Keyboard.IsKeyPressed(Keyboard.Key.Num0)))
             {
                 portal.RestoreMemento(m1.Memento);
                 MainPlayer.Position = new Vector2f(16 * 64f, 16 * 64f);
