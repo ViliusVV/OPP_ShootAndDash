@@ -26,7 +26,6 @@ namespace Client.UI
             pressedTexture = TextureHolder.GetInstance().Get(TextureIdentifier.ButtonClicked);
             sprite = new Sprite();
             text = new Text(string.Empty, ResourceHolderFacade.GetInstance().Fonts.Get(FontIdentifier.PixelatedSmall), 16);
-
             sprite.Texture = normalTexture;
             var bounds = sprite.GetLocalBounds();
             text.Position = new Vector2f(bounds.Width / 2, bounds.Height / 2);
@@ -48,6 +47,16 @@ namespace Client.UI
         {
             isToggle = flag;
         }
+
+        public string CheckText()
+		{
+            return text.DisplayedString;
+		}
+
+        public bool CheckToggle()
+		{
+            return isToggle;
+		}
 
         public override bool IsSelectable()
         {

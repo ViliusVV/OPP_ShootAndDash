@@ -4,19 +4,27 @@ using SFML.System;
 using System.Collections.Generic;
 using System;
 using System.Text;
+using Common.Utilities;
 
 namespace Client.UI
 {
 	class CompositeUI : Component
 	{
 		public List<Component> children;
+		public List<Component> temp;
 		public int selectedChild;
+		public int tempSelected;
+		public bool CurrentChosen = false;
+		public bool DepthCheck = false;
 		public Clock ChangeTimer { get; set; } = new Clock();
 
 		public CompositeUI()
 		{
 			children = new List<Component>();
+			temp = new List<Component>();
+			temp = children;
 			selectedChild = -1;
+			tempSelected = 0;
 		}
 
 		public void Add(Component component)
@@ -73,15 +81,33 @@ namespace Client.UI
 
 		public void Select(int index)
 		{
-			if (children[index].IsSelectable())
+			if (DepthCheck == false)
 			{
-				if (HasSelection())
+				if (children[index].IsSelectable())
 				{
-					children[selectedChild].Deselect();
-				}
+					if (HasSelection())
+					{
+						children[selectedChild].Deselect();
+					}
 
-				children[index].Select();
-				selectedChild = index;
+					children[index].Select();
+					selectedChild = index;
+					//OurLogger.Log("Selecting child in composite: " + selectedChild.ToString());
+				}
+			}
+			else
+			{
+				if (temp[index].IsSelectable())
+				{
+					if (HasSelection())
+					{
+						temp[tempSelected].Deselect();
+					}
+
+					temp[index].Select();
+					tempSelected = index;
+					//OurLogger.Log("Selecting child in composite: " + tempSelected.ToString());
+				}
 			}
 		}
 
@@ -94,11 +120,23 @@ namespace Client.UI
 
 				// Search next component that is selectable, wrap around if necessary
 				int next = selectedChild;
-				do
+				if (DepthCheck == false)
 				{
-					next = (next + 1) % children.Count;
+					do
+					{
+						next = (next + 1) % children.Count;
+					}
+					while (!children[next].IsSelectable());
 				}
-				while (!children[next].IsSelectable());
+				else
+				{
+					next = tempSelected;
+					do
+					{
+						next = (next + 1) % temp.Count;
+					}
+					while (!temp[next].IsSelectable());
+				}
 
 				// Select that component
 				Select(next);
@@ -114,11 +152,23 @@ namespace Client.UI
 
 				// Search previous component that is selectable, wrap around if necessary
 				int prev = selectedChild;
-				do
+				if (DepthCheck == false)
 				{
-					prev = (prev + children.Count - 1) % children.Count;
+					do
+					{
+						prev = (prev + children.Count - 1) % children.Count;
+					}
+					while (!children[prev].IsSelectable());
 				}
-				while (!children[prev].IsSelectable());
+				else
+				{
+					prev = tempSelected;
+					do
+					{
+						prev = (prev + temp.Count - 1) % temp.Count;
+					}
+					while (!temp[prev].IsSelectable());
+				}
 
 				// Select that component
 				Select(prev);
@@ -131,7 +181,10 @@ namespace Client.UI
 
 			foreach(var child in children)
 			{
-				target.Draw(child, states);
+				if (this.CurrentChosen == true)
+				{
+					target.Draw(child, states);
+				}
 			}
 		}
 
