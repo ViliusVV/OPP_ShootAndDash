@@ -11,16 +11,13 @@ namespace Client.UI
 	class ButtonsClass
 	{
 		public CompositeUI composite;
-		public CompositeUI controlComposite;
 		public bool Show = false;
 		
 		public Clock ChangeTimer { get; set; } = new Clock();
-
 		public ButtonsClass()
 		{
 			//main menu
 			composite = new CompositeUI();
-			controlComposite = new CompositeUI();
 
 			var playButton = new Button();
 			playButton.Position = new Vector2f(200, 200);
@@ -42,34 +39,41 @@ namespace Client.UI
 			CompositeUI leaf = new CompositeUI();
 
 			var rightControlButton = new Button();
-			rightControlButton.Position = new Vector2f(300, 250);
+			rightControlButton.Position = new Vector2f(320, 250);
 			rightControlButton.SetText("WASD");
 
 			var arrowControlButton = new Button();
-			arrowControlButton.Position = new Vector2f(400, 250);
+			arrowControlButton.Position = new Vector2f(420, 250);
 			arrowControlButton.SetText("Arrows");
 
+			var volumeLowerButton = new Button();
+			volumeLowerButton.Position = new Vector2f(300, 300);
+			volumeLowerButton.SetText("<");
+
+			var volumeHigherButton = new Button();
+			volumeHigherButton.Position = new Vector2f(440, 300);
+			volumeHigherButton.SetText(">");
+
+			var volumeButton = new Button();
+			volumeButton.Position = new Vector2f(370, 300);
+			volumeButton.SetText("69");
+
 			var backButton = new Button();
-			backButton.Position = new Vector2f(350, 300);
+			backButton.Position = new Vector2f(370, 350);
 			backButton.SetText("Back");
 
 			leaf.Add(rightControlButton);
 			leaf.Add(arrowControlButton);
+			leaf.Add(volumeLowerButton);
+			leaf.Add(volumeButton);
+			leaf.Add(volumeHigherButton);
 			leaf.Add(backButton);
 
 			composite.Add(leaf);
-
-			controlComposite.Add(playButton);
-			controlComposite.Add(settingsButton);
-			controlComposite.Add(leaf);
-			controlComposite.Add(exitButton);
-
+			
 			//---------------------
-			//leaf.CurrentChosen = true;
 			composite.Add(exitButton);
 			composite.CurrentChosen = true;
-			//CompositeUI unlimited = (CompositeUI)composite.children[2];
-			//composite.children = unlimited.children;
 
 		}
 
@@ -91,28 +95,48 @@ namespace Client.UI
 
 		public void chooseComposite()
 		{
-			if (composite.HasSelection())
+
+			if (composite.DepthCheck == false)
 			{
-				composite.children[composite.selectedChild].Activate();
-				Button depression = (Button)composite.children[composite.selectedChild];
-				if (depression.CheckToggle())
+				if (this.ChangeTimer.ElapsedTime.AsMilliseconds() > 200)
 				{
-					CompositeUI newComposite = (CompositeUI)composite.children[composite.selectedChild + 1];
-					//controlComposite = composite;
-					composite.children = newComposite.children;
+					this.ChangeTimer.Restart();
+					if (composite.HasSelection())
+					{
+						composite.children[composite.selectedChild].Activate();
+						Button depression = (Button)composite.children[composite.selectedChild];
+						if (depression.CheckToggle())
+						{
+							composite.DepthCheck = true;
+							CompositeUI tempList = (CompositeUI)composite.children[composite.selectedChild + 1];
+							tempList.CurrentChosen = true;
+							composite.temp = tempList.children;
+							composite.tempSelected = 0;
+						}
+					}
 				}
 			}
 		}
 
 		public void returnComposite()
 		{
-			Button temp = (Button)composite.children[composite.selectedChild];
-			
-			if(temp.CheckText() == "Back")
+			//OurLogger.Log(composite.selectedChild.ToString());
+			if (composite.DepthCheck == true)
 			{
-				OurLogger.Log(temp.CheckText());
-				composite = controlComposite;
-				composite.CurrentChosen = true;
+				if (this.ChangeTimer.ElapsedTime.AsMilliseconds() > 200)
+				{
+					this.ChangeTimer.Restart();
+					Button temp = (Button)composite.temp[composite.tempSelected];
+
+					if (temp.CheckText() == "Back")
+					{
+						//OurLogger.Log(temp.CheckText());
+						composite.DepthCheck = false;
+						CompositeUI tempList = (CompositeUI)composite.children[composite.selectedChild + 1];
+						tempList.CurrentChosen = false;
+						composite.temp = null;
+					}
+				}
 			}
 		}
 		

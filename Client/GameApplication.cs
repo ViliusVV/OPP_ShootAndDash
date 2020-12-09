@@ -802,9 +802,9 @@ namespace Client
 
         private void SpawnPortal(PortalProspect portal, Caretaker m1, Caretaker m2)
         {
-            defaultLogger.LogMessage(3, CollisionTester.BoundingBoxTest(MainPlayer, portal).ToString());
-            defaultLogger.LogMessage(4, MainPlayer.Position.ToString());
-            defaultLogger.LogMessage(4, portal.Position.ToString());
+            //defaultLogger.LogMessage(3, CollisionTester.BoundingBoxTest(MainPlayer, portal).ToString());
+            //defaultLogger.LogMessage(4, MainPlayer.Position.ToString());
+            //defaultLogger.LogMessage(4, portal.Position.ToString());
 
             if (isMementoSet && (CollisionTester.BoundingBoxTest(MainPlayer, portal) || Keyboard.IsKeyPressed(Keyboard.Key.Num1)))
             {
