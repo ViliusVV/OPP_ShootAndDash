@@ -938,10 +938,16 @@ namespace Client
 
         public void ConntectToServer()
         {
-            GameState.ConnectionManager.ConnectToHub();
-
-            BindEvents();
-            CreatePlayer();
+            if(GameState.ConnectionManager.ConnectToHub())
+            {
+                BindEvents();
+                CreatePlayer();
+            }
+            else
+            {
+                MainPlayer.Weapon.Ammo = 0;
+                MainPlayer.Weapon.Reload();
+            }
         }
 
 

@@ -1,13 +1,20 @@
-﻿using Common.DTO;
-using Common.Utilities;
-using Microsoft.AspNetCore.SignalR.Client;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 using SFML.System;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Client.Utilities
+namespace Client.Managers.Proxy
 {
+    public interface IConnectionManager
+    {
+        public bool Connected { get => Connection.State == HubConnectionState.Connected; }
+        public HubConnection Connection { get; set; }
+        public Clock ActivityClock { get; set; }
+        public bool ConnectToHub();
+
+
+    }
     public class ConnectionManager
     {
         public string ServerUrl { get; set; }
@@ -24,7 +31,7 @@ namespace Client.Utilities
                .Build();
         }
 
-        public bool ConnectToHub()
+        public void ConnectToHub()
         {
             Clock clock = new Clock();
             Connection.StartAsync();
@@ -43,8 +50,8 @@ namespace Client.Utilities
             {
                 //OurLogger.Log("Connection failed!");
                 GameApplication.defaultLogger.LogMessage(50, "Connection failed!");
-                return false;
-                //Environment.Exit(1);
+
+                Environment.Exit(1);
             }
             else
             {
@@ -54,7 +61,7 @@ namespace Client.Utilities
             }
             //OurLogger.Log(Connection.State.ToString());
             GameApplication.defaultLogger.LogMessage(10, Connection.State.ToString());
-            return true;
+
         }
     }
 }
