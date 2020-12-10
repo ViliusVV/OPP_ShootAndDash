@@ -149,7 +149,8 @@ namespace Client
             // Player init
             CreateMainPlayer();
 
-            GameState.ConnectionManager = new ConnectionManager("http://underpoweredserver.tplinkdns.com:51230/");
+            ConnectionManager connectionManager = new ConnectionManager("http://underpoweredserver.tplinkdns.com:51230/");
+            GameState.ConnectionManagerProxy = new Managers.Proxy.ConnectionManagerProxy(connectionManager);
 
 
 
@@ -181,11 +182,11 @@ namespace Client
                 }
 
                 Time deltaTime = FrameClock.Restart();
-                if (GameState.ConnectionManager.ActivityClock.ElapsedTime.AsSeconds() > (1f / multiplayerSendRate) 
-                    && GameState.ConnectionManager.Connected)
+                if (GameState.ConnectionManagerProxy.ActivityClock.ElapsedTime.AsSeconds() > (1f / multiplayerSendRate) 
+                    && GameState.ConnectionManagerProxy.IsConnected())
                 {
-                    GameState.ConnectionManager.ActivityClock.Restart();
-                    SendPos(GameState.ConnectionManager.Connection);
+                    GameState.ConnectionManagerProxy.ActivityClock.Restart();
+                    SendPos(GameState.ConnectionManagerProxy.Connection);
                 }
 
                 var middlePoint = VectorUtils.GetMiddlePoint(MainPlayer.Position, mPos);
@@ -441,8 +442,8 @@ namespace Client
 
         public void CreatePlayer()
         {
-
-            GameState.ConnectionManager.Connection.SendAsync("LoginPlayerServerEvent", MainPlayer.ToDTO()).Wait();
+            GameState.ConnectionManagerProxy.Connection.SendAsync("LoginPlayerServerEvent", MainPlayer.ToDTO()).Wait();
+            //GameState.ConnectionManager.Connection.SendAsync("LoginPlayerServerEvent", MainPlayer.ToDTO()).Wait();
         }
 
         // ========================================================================
@@ -519,16 +520,18 @@ namespace Client
 
         public void BindEvents()
         {
-
-            GameState.ConnectionManager.Connection.On<ServerGameState>("UpdateGameStateClient", (stateDto) =>
+            GameState.ConnectionManagerProxy.Connection.On<ServerGameState>("UpdateGameStateClient", (stateDto) =>
             {
                 UpdatePlayers(stateDto);
             });
-
-            GameState.ConnectionManager.Connection.On<ShootEventData>("ShootEventClient", (shootData) =>
+            //GameState.ConnectionManager.Connection.On<ServerGameState>("UpdateGameStateClient", (stateDto) =>
+            //{
+            //    UpdatePlayers(stateDto);
+            //});
+            GameState.ConnectionManagerProxy.Connection.On<ShootEventData>("ShootEventClient", (shootData) =>
             {
                 Player player = GameState.Players.Find(p => p.Name.Equals(shootData.Shooter.Name));
-                if(player != null)
+                if (player != null)
                 {
                     player.Weapon.Shoot(shootData.Target, shootData.Orgin, shootData.Rotation, player, false);
                 }
@@ -536,8 +539,18 @@ namespace Client
                 //OurLogger.Log(shootData.ToString());
 
             });
-            
-            GameState.ConnectionManager.Connection.On<ServerPlayer, ServerPlayer>("UpdateScoresClient", (killerServ, victimServ) =>
+            //GameState.ConnectionManager.Connection.On<ShootEventData>("ShootEventClient", (shootData) =>
+            //{
+            //    Player player = GameState.Players.Find(p => p.Name.Equals(shootData.Shooter.Name));
+            //    if(player != null)
+            //    {
+            //        player.Weapon.Shoot(shootData.Target, shootData.Orgin, shootData.Rotation, player, false);
+            //    }
+            //    defaultLogger.LogMessage(10, shootData.ToString());
+            //    //OurLogger.Log(shootData.ToString());
+
+            //});
+            GameState.ConnectionManagerProxy.Connection.On<ServerPlayer, ServerPlayer>("UpdateScoresClient", (killerServ, victimServ) =>
             {
                 Player killer = GameState.Players.Find(p => p.Name.Equals(killerServ.Name));
                 Player victim = GameState.Players.Find(p => p.Name.Equals(victimServ.Name));
@@ -552,7 +565,7 @@ namespace Client
                     //OurLogger.Log($"{killerServ.Name} killed ---> {victimServ.Name}");
                     defaultLogger.LogMessage(30, $"{killerServ.Name} killed ---> {victimServ.Name}");
 
-                   killer.Kills = killerServ.Kills;
+                    killer.Kills = killerServ.Kills;
                     victim.Deaths = victimServ.Deaths;
 
                     var evtData = new PlayerEventData()
@@ -568,13 +581,45 @@ namespace Client
                     //OurLogger.Log($"{victimServ.Name} got shot. Befor ");
                 }
             });
+            //GameState.ConnectionManager.Connection.On<ServerPlayer, ServerPlayer>("UpdateScoresClient", (killerServ, victimServ) =>
+            //{
+            //    Player killer = GameState.Players.Find(p => p.Name.Equals(killerServ.Name));
+            //    Player victim = GameState.Players.Find(p => p.Name.Equals(victimServ.Name));
+
+            //    //OurLogger.Log($"{victimServ.Name} got shot. Before {victim.Health} after {victimServ.Health} ");
+            //    defaultLogger.LogMessage(15, $"{victimServ.Name} got shot. Before {victim.Health} after {victimServ.Health} ");
+
+            //    victim.Health = victimServ.Health;
+
+            //    if (victim.IsDead)
+            //    {
+            //        //OurLogger.Log($"{killerServ.Name} killed ---> {victimServ.Name}");
+            //        defaultLogger.LogMessage(30, $"{killerServ.Name} killed ---> {victimServ.Name}");
+
+            //       killer.Kills = killerServ.Kills;
+            //        victim.Deaths = victimServ.Deaths;
+
+            //        var evtData = new PlayerEventData()
+            //        {
+            //            Shooter = killer,
+            //            Victim = victim
+            //        };
+            //        PlayerEventManager.Notify(PlayerEventType.KilledPlayer, evtData);
+            //    }
+            //    else
+            //    {
+            //        defaultLogger.LogMessage(15, $"{victimServ.Name} got shot. Befor ");
+            //        //OurLogger.Log($"{victimServ.Name} got shot. Befor ");
+            //    }
+            //});
         }
 
 
         public void BindWindowEvents(RenderWindow window)
         {
             window.Closed += (obj, e) => {
-                GameState.ConnectionManager.Connection.StopAsync().Wait();
+                //GameState.ConnectionManager.Connection.StopAsync().Wait();
+                GameState.ConnectionManagerProxy.Connection.StopAsync().Wait();
                 window.Close();
             };
 
@@ -938,7 +983,12 @@ namespace Client
 
         public void ConntectToServer()
         {
-            if(GameState.ConnectionManager.ConnectToHub())
+            //if(GameState.ConnectionManager.ConnectToHub())
+            //{
+            //    BindEvents();
+            //    CreatePlayer();
+            //}
+            if(GameState.ConnectionManagerProxy.ConnectToHub())
             {
                 BindEvents();
                 CreatePlayer();

@@ -1,4 +1,5 @@
 ﻿using Client.Managers.Iterator.Repositories;
+using Client.Managers.Proxy;
 using Client.Models;
 using Client.Objects;
 using Client.Objects.Destructables;
@@ -32,8 +33,8 @@ namespace Client.Managers
 
         public bool PortalObjectCreated { get; set; }
 
-        public ConnectionManager ConnectionManager { get; set; }
-
+        //public ConnectionManager ConnectionManager { get; set; }
+        public ConnectionManagerProxy ConnectionManagerProxy { get; set; }
 
         public GameState()
         {

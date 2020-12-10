@@ -155,7 +155,8 @@ namespace Client.Objects
                 if (sendToServer)
                 {
                     var shootEventData = new ShootEventData(player.ToDTO(), target, this.Position, this.Rotation);
-                    GameState.GetInstance().ConnectionManager.Connection.SendAsync("ShootEventServer", shootEventData);
+                    //GameState.GetInstance().ConnectionManager.Connection.SendAsync("ShootEventServer", shootEventData);
+                    GameState.GetInstance().ConnectionManagerProxy.Connection.SendAsync("ShootEventServer", shootEventData);
                 }
             }
         }
@@ -182,7 +183,8 @@ namespace Client.Objects
 
                         if (shooter.IsMainPlayer) {
                             players[j].AddHealth(-this.Damage);
-                            GameState.GetInstance().ConnectionManager.Connection.SendAsync("UpdateScoresServer", shooter.ToDTO(), players[j].ToDTO());
+                            //GameState.GetInstance().ConnectionManager.Connection.SendAsync("UpdateScoresServer", shooter.ToDTO(), players[j].ToDTO());
+                            GameState.GetInstance().ConnectionManagerProxy.Connection.SendAsync("UpdateScoresServer", shooter.ToDTO(), players[j].ToDTO());
                         }
 
                     }
