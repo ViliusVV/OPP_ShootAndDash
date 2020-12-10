@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System;
 using System.Text;
 using Common.Utilities;
+using Client.UI.Visitor;
 
 namespace Client.UI
 {
@@ -184,6 +185,20 @@ namespace Client.UI
 				if (this.CurrentChosen == true)
 				{
 					target.Draw(child, states);
+				}
+			}
+		}
+
+		public void Accept(IVisitor visitor)
+		{
+			if (this.ChangeTimer.ElapsedTime.AsMilliseconds() > 200)
+			{
+				this.ChangeTimer.Restart();
+				Button textCheck = (Button)children[selectedChild];
+				if (textCheck.CheckText() == "Settings")
+				{
+					OurLogger.Log("Testing visit");
+					visitor.Visit(temp[tempSelected]);
 				}
 			}
 		}

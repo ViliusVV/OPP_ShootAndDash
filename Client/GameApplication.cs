@@ -27,6 +27,7 @@ using Common.Enums;
 using Client.Observer;
 using Client.Objects.Template;
 using Client.Objects.Memento;
+using Client.UI.Visitor;
 using Common.Utilities.Loggers;
 using System.IO;
 
@@ -68,7 +69,7 @@ namespace Client
         Clock FrameClock { get; set; } = new Clock();
         Clock RespawnTimer { get; set; } = new Clock();
 
-        AimCursor AimCursor = new AimCursor();
+        public AimCursor AimCursor = new AimCursor();
         GamePlayUI GameplayUI = new GamePlayUI();
         ButtonsClass container = new ButtonsClass();
 
@@ -703,6 +704,7 @@ namespace Client
             if (Keyboard.IsKeyPressed(Keyboard.Key.Space))
 			{
                 container.chooseComposite();
+                container.composite.Accept(new CursorVisitor());
                 container.returnComposite();
 			}
         }

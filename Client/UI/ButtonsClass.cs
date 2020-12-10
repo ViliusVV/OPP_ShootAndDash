@@ -101,6 +101,7 @@ namespace Client.UI
 				if (this.ChangeTimer.ElapsedTime.AsMilliseconds() > 200)
 				{
 					this.ChangeTimer.Restart();
+					this.composite.ChangeTimer.Restart();
 					if (composite.HasSelection())
 					{
 						composite.children[composite.selectedChild].Activate();
