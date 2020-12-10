@@ -31,6 +31,11 @@ namespace Client.UI
             this.CursorSprite = sprite;
         }
 
+        public void ChangeSize(float size)
+		{
+            this.CursorSprite.Scale = new Vector2f(size, size);
+		}
+
         public void SetTexture(Texture texture)
         {
             this.SetSprite(new Sprite(texture));
