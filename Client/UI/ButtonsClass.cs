@@ -36,6 +36,7 @@ namespace Client.UI
 			composite.Add(settingsButton);
 
 			//settings menu
+			CompositeUI leaf2 = new CompositeUI();
 			CompositeUI leaf = new CompositeUI();
 
 			var rightControlButton = new Button();
@@ -62,13 +63,34 @@ namespace Client.UI
 			backButton.Position = new Vector2f(370, 350);
 			backButton.SetText("Back");
 
+			var smallCursorButton = new Button();
+			smallCursorButton.Position = new Vector2f(300, 200);
+			smallCursorButton.SetText("Small");
+
+			var mediumCursorButton = new Button();
+			mediumCursorButton.Position = new Vector2f(370, 200);
+			mediumCursorButton.SetText("Medium");
+
+			var bigCursorButton = new Button();
+			bigCursorButton.Position = new Vector2f(440, 200);
+			bigCursorButton.SetText("Big");
+
+			var cursorButton = new Button();
+			cursorButton.Position = new Vector2f(370, 150);
+			cursorButton.SetText("Cursor");
+
 			leaf.Add(rightControlButton);
 			leaf.Add(arrowControlButton);
 			leaf.Add(volumeLowerButton);
-			leaf.Add(volumeButton);
+			leaf2.Add(volumeButton);
+			leaf2.Add(cursorButton);
 			leaf.Add(volumeHigherButton);
 			leaf.Add(backButton);
-
+			leaf.Add(smallCursorButton);
+			leaf.Add(mediumCursorButton);
+			leaf.Add(bigCursorButton);
+			leaf2.CurrentChosen = true;
+			leaf.Add(leaf2);
 			composite.Add(leaf);
 			
 			//---------------------

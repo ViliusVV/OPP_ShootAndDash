@@ -40,7 +40,7 @@ namespace Client.UI
         {
             this.text.DisplayedString = text;
             var bounds = this.text.GetLocalBounds();
-            this.text.Origin = new Vector2f(bounds.Width / 2, bounds.Height / 2);
+            this.text.Origin = new Vector2f(bounds.Width / 2, bounds.Height-30 / 2);
         }
 
         public void SetToggle(bool flag)

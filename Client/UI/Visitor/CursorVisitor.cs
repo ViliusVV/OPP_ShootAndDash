@@ -8,6 +8,7 @@ namespace Client.UI.Visitor
 	{
 		public void Visit(Component element)
 		{
+			Button temp = (Button)element;
 			GameApplication.GetInstance().AimCursor.ChangeSize(3);
 		}
 	}

@@ -18,6 +18,19 @@ namespace Client.Utilities
             Volume = i;
         }
 
+        public void ChangeVolume(float i)
+		{
+            Volume = Volume + i;
+            if (Volume > 100)
+            {
+                Volume = 100;
+            }
+            if (Volume < 100)
+            {
+                Volume = 0;
+            }
+        }
+
         public float GetVolume()
         {
             return Volume;
