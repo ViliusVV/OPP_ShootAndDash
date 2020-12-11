@@ -6,6 +6,7 @@ using System;
 using System.Text;
 using Common.Utilities;
 using Client.UI.Visitor;
+using Client.Utilities;
 
 namespace Client.UI
 {
@@ -197,8 +198,14 @@ namespace Client.UI
 				Button textCheck = (Button)children[selectedChild];
 				if (textCheck.CheckText() == "Settings")
 				{
-					OurLogger.Log("Testing visit");
+					//OurLogger.Log("Testing visit");
 					visitor.Visit(temp[tempSelected]);
+				}
+				if (5 <= tempSelected && tempSelected <= 6)
+				{
+					CompositeUI tempComposite = (CompositeUI)temp[8];
+					Button volumeText = (Button)tempComposite.children[0];
+					volumeText.SetText(SoundVolume.GetInstance().GetVolume().ToString());
 				}
 			}
 		}

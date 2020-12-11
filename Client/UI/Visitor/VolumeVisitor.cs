@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Client.Utilities;
+using Common.Utilities;
 
 namespace Client.UI.Visitor
 {
@@ -13,10 +14,12 @@ namespace Client.UI.Visitor
 			if (temp.CheckText() == "<")
 			{
 				SoundVolume.GetInstance().ChangeVolume(-5);
+				OurLogger.Log("Lowering volume");
 			}
 			else if(temp.CheckText() == ">") 
 			{
 				SoundVolume.GetInstance().ChangeVolume(5);
+				OurLogger.Log("Increasing volume");
 			}
 		}
 	}

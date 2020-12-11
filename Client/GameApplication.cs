@@ -629,7 +629,7 @@ namespace Client
             // but can only trigger only one key at a time
             window.KeyPressed += (sender, e) => {
                 Window windowEvt = (Window)sender;
-                if (e.Code == Keyboard.Key.Escape)
+                if (e.Code == Keyboard.Key.Escape || GameState.CloseWindow)
                 {
                     windowEvt.Close();
                 }
@@ -748,8 +748,20 @@ namespace Client
 			}
             if (Keyboard.IsKeyPressed(Keyboard.Key.Space))
 			{
+                container.selectButton();
                 container.chooseComposite();
-                container.composite.Accept(new CursorVisitor());
+                if (container.composite.tempSelected <= 2)
+                {
+                    container.composite.Accept(new CursorVisitor());
+                }
+                else if (container.composite.tempSelected <= 4)
+				{
+                    container.composite.Accept(new ControlsVisitor());
+				}
+                else if (container.composite.tempSelected <= 6)
+				{
+                    container.composite.Accept(new VolumeVisitor());
+				}
                 container.returnComposite();
 			}
         }

@@ -5,6 +5,7 @@ using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 using Common.Utilities;
+using Client.Managers;
 
 namespace Client.UI
 {
@@ -21,7 +22,7 @@ namespace Client.UI
 
 			var playButton = new Button();
 			playButton.Position = new Vector2f(200, 200);
-			playButton.SetText("Play");
+			playButton.SetText("Resume");
 
 			var settingsButton = new Button();
 			settingsButton.Position = new Vector2f(200, 250);
@@ -48,23 +49,23 @@ namespace Client.UI
 			arrowControlButton.SetText("Arrows");
 
 			var volumeLowerButton = new Button();
-			volumeLowerButton.Position = new Vector2f(300, 300);
+			volumeLowerButton.Position = new Vector2f(290, 300);
 			volumeLowerButton.SetText("<");
 
 			var volumeHigherButton = new Button();
-			volumeHigherButton.Position = new Vector2f(440, 300);
+			volumeHigherButton.Position = new Vector2f(450, 300);
 			volumeHigherButton.SetText(">");
 
 			var volumeButton = new Button();
 			volumeButton.Position = new Vector2f(370, 300);
-			volumeButton.SetText("69");
+			volumeButton.SetText("50");
 
 			var backButton = new Button();
 			backButton.Position = new Vector2f(370, 350);
 			backButton.SetText("Back");
 
 			var smallCursorButton = new Button();
-			smallCursorButton.Position = new Vector2f(300, 200);
+			smallCursorButton.Position = new Vector2f(290, 200);
 			smallCursorButton.SetText("Small");
 
 			var mediumCursorButton = new Button();
@@ -72,13 +73,16 @@ namespace Client.UI
 			mediumCursorButton.SetText("Medium");
 
 			var bigCursorButton = new Button();
-			bigCursorButton.Position = new Vector2f(440, 200);
+			bigCursorButton.Position = new Vector2f(450, 200);
 			bigCursorButton.SetText("Big");
 
 			var cursorButton = new Button();
 			cursorButton.Position = new Vector2f(370, 150);
-			cursorButton.SetText("Cursor");
+			cursorButton.SetText("Settings");
 
+			leaf.Add(smallCursorButton);
+			leaf.Add(mediumCursorButton);
+			leaf.Add(bigCursorButton);
 			leaf.Add(rightControlButton);
 			leaf.Add(arrowControlButton);
 			leaf.Add(volumeLowerButton);
@@ -86,14 +90,11 @@ namespace Client.UI
 			leaf2.Add(cursorButton);
 			leaf.Add(volumeHigherButton);
 			leaf.Add(backButton);
-			leaf.Add(smallCursorButton);
-			leaf.Add(mediumCursorButton);
-			leaf.Add(bigCursorButton);
 			leaf2.CurrentChosen = true;
 			leaf.Add(leaf2);
 			composite.Add(leaf);
 			
-			//---------------------
+			//-------------------------------
 			composite.Add(exitButton);
 			composite.CurrentChosen = true;
 
@@ -114,7 +115,21 @@ namespace Client.UI
 				}
 			}
 		}
-
+		public void selectButton()
+		{
+				if(composite.HasSelection())
+				{
+					Button tempButton = (Button)composite.children[composite.selectedChild];
+					if(tempButton.CheckText() == "Resume")
+					{
+						ChangeVisibility();
+					}
+					else if(tempButton.CheckText() == "Exit")
+					{
+						GameState.GetInstance().CloseWindow = true;
+					}
+				}
+		}
 		public void chooseComposite()
 		{
 
@@ -127,8 +142,8 @@ namespace Client.UI
 					if (composite.HasSelection())
 					{
 						composite.children[composite.selectedChild].Activate();
-						Button depression = (Button)composite.children[composite.selectedChild];
-						if (depression.CheckToggle())
+						Button tempButton = (Button)composite.children[composite.selectedChild];
+						if (tempButton.CheckToggle())
 						{
 							composite.DepthCheck = true;
 							CompositeUI tempList = (CompositeUI)composite.children[composite.selectedChild + 1];

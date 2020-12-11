@@ -32,7 +32,11 @@ namespace Client.Managers
         public NonCollidableRepository NonCollidableRep { get; set; }
 
         public bool PortalObjectCreated { get; set; }
+        //Composite controls
+        public bool ControlsCheck { get; set; }
 
+        public bool CloseWindow { get; set; } 
+        //-----------------------
         //public ConnectionManager ConnectionManager { get; set; }
         public ConnectionManagerProxy ConnectionManagerProxy { get; set; }
 
@@ -47,6 +51,8 @@ namespace Client.Managers
             this.NonCollidableRep = new NonCollidableRepository();
             this.Random = new Random();
             PortalObjectCreated = false;
+            ControlsCheck = true;
+            CloseWindow = false;
         }
 
         public static GameState GetInstance()

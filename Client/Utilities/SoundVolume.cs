@@ -25,7 +25,7 @@ namespace Client.Utilities
             {
                 Volume = 100;
             }
-            if (Volume < 100)
+            if (Volume < 0)
             {
                 Volume = 0;
             }

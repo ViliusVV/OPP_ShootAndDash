@@ -213,10 +213,24 @@ namespace Client.Models
         {
             if (IsMainPlayer && GameApplication.GetInstance().HasFocus)
             {
-                bool left = Keyboard.IsKeyPressed(Keyboard.Key.A);
-                bool right = Keyboard.IsKeyPressed(Keyboard.Key.D);
-                bool up = Keyboard.IsKeyPressed(Keyboard.Key.W);
-                bool down = Keyboard.IsKeyPressed(Keyboard.Key.S);
+                bool left = false;
+                bool right = false;
+                bool up = false;
+                bool down = false;
+                if (GameState.GetInstance().ControlsCheck)
+                {
+                    left = Keyboard.IsKeyPressed(Keyboard.Key.A);
+                    right = Keyboard.IsKeyPressed(Keyboard.Key.D);
+                    up = Keyboard.IsKeyPressed(Keyboard.Key.W);
+                    down = Keyboard.IsKeyPressed(Keyboard.Key.S);
+                }
+                else
+				{
+                    left = Keyboard.IsKeyPressed(Keyboard.Key.Left);
+                    right = Keyboard.IsKeyPressed(Keyboard.Key.Right);
+                    up = Keyboard.IsKeyPressed(Keyboard.Key.Up);
+                    down = Keyboard.IsKeyPressed(Keyboard.Key.Down);
+                }
                 const float increment = 0.4f;
                 const float maxSpd = 4;
                 float xIncrement = 0;
