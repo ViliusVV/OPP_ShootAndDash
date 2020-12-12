@@ -11,7 +11,6 @@ namespace Client.UI
 {
 	class Button : Component
 	{
-        private Action callback;
         private Texture normalTexture;
         private Texture selectedTexture;
         private Texture pressedTexture;
@@ -29,11 +28,6 @@ namespace Client.UI
             sprite.Texture = normalTexture;
             var bounds = sprite.GetLocalBounds();
             text.Position = new Vector2f(bounds.Width / 2, bounds.Height / 2);
-        }
-
-        public void SetCallback(Action callback)
-        {
-            this.callback = callback;
         }
 
         public void SetText(string text)
@@ -85,11 +79,6 @@ namespace Client.UI
             if (isToggle)
             {
                 sprite.Texture = pressedTexture;
-            }
-
-            if (callback != null)
-            {
-                callback();
             }
 
             // If we are not a toggle then deactivate the button since we are just momentarily activated.
