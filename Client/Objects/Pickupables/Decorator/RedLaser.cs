@@ -5,12 +5,13 @@ using Client.Config;
 using SFML.Graphics;
 using Client.Utilities;
 using SFML.System;
+using Client.Objects.Pickupables.Mediator;
 
 namespace Client.Objects.Pickupables.Decorator
 {
 	public class RedLaser : LaserDecorator
 	{
-        public RedLaser(Weapon newweapon) : base()
+        public RedLaser(Weapon newweapon, IMediator mediator) : base(mediator)
         {
             newweapon.LaserSight = new string("Red");
             newweapon.LaserSprite = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.RedLaser));
@@ -32,7 +33,7 @@ namespace Client.Objects.Pickupables.Decorator
             }
             else if (text == "Sniper")
             {
-                newweapon.Name = "SniperG";
+                newweapon.Name = "SniperR";
                 newweapon.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.RedSniperLaser);
                 newweapon.LaserSprite.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 10f);
             }

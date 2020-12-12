@@ -5,12 +5,13 @@ using Client.Config;
 using SFML.Graphics;
 using Client.Utilities;
 using SFML.System;
+using Client.Objects.Pickupables.Mediator;
 
 namespace Client.Objects.Pickupables.Decorator
 {
     public class Shotgun : WeaponDecorator
     {
-        public Shotgun() : base()
+        public Shotgun(IMediator mediator) : base(mediator)
         {
             this.Name = "Shotgun";
             this.MagazineSize = 5;

@@ -30,6 +30,7 @@ using Client.Objects.Memento;
 using Client.UI.Visitor;
 using Common.Utilities.Loggers;
 using System.IO;
+using Client.Objects.Pickupables.Mediator;
 
 namespace Client
 {
@@ -75,6 +76,7 @@ namespace Client
 
         Weapon weaponProtoype;
 
+        public ConcreteMediator m { get; set; }
 
         public static AbstractLogger criticalLogger = new CriticalLogger(50);
         public static AbstractLogger importantLogger = new ImportantLogger(20);
@@ -140,20 +142,20 @@ namespace Client
             ZoomedView = new View(MainView);
             GameWindow.SetView(ZoomedView);
 
+            // Mediator
+            m = new ConcreteMediator();
 
             // weapon prototype
-            weaponProtoype = new Pistol();
-
-
+            weaponProtoype = new Pistol(m);
 
 
             // Player init
             CreateMainPlayer();
 
+            m.GetPlayerText(MainPlayer.PlayerBar);
+
             ConnectionManager connectionManager = new ConnectionManager("http://underpoweredserver.tplinkdns.com:51230/");
             GameState.ConnectionManagerProxy = new Managers.Proxy.ConnectionManagerProxy(connectionManager);
-
-
 
             bool isPlayerSpawned = ForceSpawnObject(MainPlayer);
 
@@ -171,6 +173,8 @@ namespace Client
             PlayerEventManager.Subscribe(PlayerEventType.KilledPlayer, GameplayUI.Scoreboard);
            
             var mPos = GameWindow.MapPixelToCoords(Mouse.GetPosition(GameWindow));
+
+
 
             while (GameWindow.IsOpen)
             {
@@ -385,7 +389,7 @@ namespace Client
                 {
                     ForceSpawnObject(MainPlayer);
                     MainPlayer.HoldingWeapon = new Weapon[3];
-                    MainPlayer.HoldingWeapon[0] = new Pistol(); //for testing purposes
+                    MainPlayer.HoldingWeapon[0] = new Pistol(m); //for testing purposes
                     MainPlayer.Weapon = MainPlayer.HoldingWeapon[0];
                     MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
                     MainPlayer.PreviousWeapon = "";
@@ -984,7 +988,7 @@ namespace Client
             MainPlayer.Position = new Vector2f(GameWindow.Size.X / 2f, GameWindow.Size.Y / 2f);
 
             //new Weapon("AK-47", 50, 20, 2000, 50, 5000, 50);
-            MainPlayer.HoldingWeapon[0] = (Weapon)weaponProtoype.Clone(); //for testing purposes
+            MainPlayer.HoldingWeapon[0] = (Weapon)weaponProtoype.Clone();
             MainPlayer.Weapon = MainPlayer.HoldingWeapon[0];
             MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
             MainPlayer.PreviousWeapon = "";

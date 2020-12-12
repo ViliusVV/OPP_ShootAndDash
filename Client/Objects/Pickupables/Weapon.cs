@@ -6,6 +6,7 @@ using Client.Objects.Abstract_Facotry.Destructibles.Bridge;
 using Client.Objects.Destructables;
 using Client.Objects.Pickupables;
 using Client.Objects.Pickupables.Decorator;
+using Client.Objects.Pickupables.Mediator;
 using Client.Objects.Prototype;
 using Client.UI;
 using Client.Utilities;
@@ -43,9 +44,10 @@ namespace Client.Objects
         public Clock ReloadCooldown { get; set; } = new Clock();
         public Sprite ProjectileSprite { get; set; }
         public Sprite LaserSprite { get; set; }
-        
 
-        public Weapon()
+        public IMediator mediator { get; set; }
+
+        public Weapon(IMediator mediator)
         {
             //this.Name = name;
             //this.MagazineSize = magazineSize;
@@ -60,6 +62,7 @@ namespace Client.Objects
             //this.ProjectileSprite = new Sprite(TextureHolder.GetInstance().Get(TextureIdentifier.Bullet));
             //this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GunAk47);
             //this.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
+            this.mediator = mediator;
         }
 
         public void DrawProjectiles(RenderWindow gameWindow)
@@ -94,6 +97,8 @@ namespace Client.Objects
         public override void Pickup(Player player)
         {
             bool check = false;
+            mediator.Send("pickedup", this);
+            player.PlayerBar.TimeOutTimer.Restart();
             for (int i = 0; i < 3; i++)
             {
                 if (player.HoldingWeapon[i] != null && player.HoldingWeapon[i].Name == this.Name)
@@ -309,17 +314,17 @@ namespace Client.Objects
             return copy;
         }
 
-        public static Weapon CreateWeapon(WeaponType wepType)
+        public Weapon CreateWeapon(WeaponType wepType)
         {
             return wepType switch
             {
-                WeaponType.AssaultRifle => new AssaultRifle(),
-                WeaponType.Pistol => new Pistol(),
-                WeaponType.FlameThrower => new Flamethrower(),
-                WeaponType.Minigun => new Minigun(),
-                WeaponType.SniperRifle => new SniperRifle(),
-                WeaponType.Shootgun => new Shotgun(),
-                /* Default */ _ => new Pistol(),
+                WeaponType.AssaultRifle => new AssaultRifle(mediator),
+                WeaponType.Pistol => new Pistol(mediator),
+                WeaponType.FlameThrower => new Flamethrower(mediator),
+                WeaponType.Minigun => new Minigun(mediator),
+                WeaponType.SniperRifle => new SniperRifle(mediator),
+                WeaponType.Shootgun => new Shotgun(mediator),
+                /* Default */ _ => new Pistol(mediator),
             };
         }
 

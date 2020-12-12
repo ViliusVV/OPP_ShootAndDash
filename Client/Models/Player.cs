@@ -121,6 +121,8 @@ namespace Client.Models
                     {
                         if (HoldingWeapon[i] != null && HoldingWeapon[i].Name == this.Weapon.Name)
                         {
+                            this.Weapon.mediator.Send("dropped", this.Weapon);
+                            PlayerBar.TimeOutTimer.Restart();
                             HoldingWeapon[i] = null;
                         }
                     }

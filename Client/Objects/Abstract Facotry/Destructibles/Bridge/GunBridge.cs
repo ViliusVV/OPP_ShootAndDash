@@ -15,36 +15,36 @@ namespace Client.Objects.Abstract_Facotry.Destructibles.Bridge
             switch (num)
             {
                 case 0:
-                    spawn = new Minigun();
+                    spawn = new Minigun(GameApplication.GetInstance().m);
                     break;
                 case 1:
-                    spawn = new SniperRifle();
+                    spawn = new SniperRifle(GameApplication.GetInstance().m);
                     break;
                 case 2:
-                    spawn = new Flamethrower();
+                    spawn = new Flamethrower(GameApplication.GetInstance().m);
                     break;
                 case 3:
-                    spawn = new Shotgun();
+                    spawn = new Shotgun(GameApplication.GetInstance().m);
                     break;
                 // Weapons with laser
                 case 4:
-                    spawn = new SniperRifle();
-                    new RedLaser(spawn);
+                    spawn = new SniperRifle(GameApplication.GetInstance().m);
+                    new RedLaser(spawn, GameApplication.GetInstance().m);
                     break;
                 case 5:
-                    spawn = new AssaultRifle();
-                    new RedLaser(spawn);
+                    spawn = new AssaultRifle(GameApplication.GetInstance().m);
+                    new RedLaser(spawn, GameApplication.GetInstance().m);
                     break;
                 case 6:
-                    spawn = new SniperRifle();
-                    new GreenLaser(spawn);
+                    spawn = new SniperRifle(GameApplication.GetInstance().m);
+                    new GreenLaser(spawn, GameApplication.GetInstance().m);
                     break;
                 case 7:
-                    spawn = new AssaultRifle();
-                    new GreenLaser(spawn);
+                    spawn = new AssaultRifle(GameApplication.GetInstance().m);
+                    new GreenLaser(spawn, GameApplication.GetInstance().m);
                     break;
                 default:
-                    spawn = new AssaultRifle();
+                    spawn = new AssaultRifle(GameApplication.GetInstance().m);
                     break;
             }
             return spawn;

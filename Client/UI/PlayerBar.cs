@@ -16,6 +16,10 @@ namespace Client.UI
         public Sprite PlayerHealtMaskSprite { get; set; }
         public Sprite PlayerAmmoMaskSprite { get; set; }
 
+        public Text WeaponText { get; set; }
+        public Clock TimeOutTimer = new Clock();
+        private readonly int messageTimeout = 2;
+
         public Vector2f Position 
         {
             get => PlayerBarSprite.Position;
@@ -23,6 +27,7 @@ namespace Client.UI
                 PlayerBarSprite.Position = value;
                 PlayerHealtMaskSprite.Position = value;
                 PlayerAmmoMaskSprite.Position = value;
+                WeaponText.Position = value;
             } 
         }
 
@@ -34,6 +39,7 @@ namespace Client.UI
             PlayerHealtMaskSprite = new Sprite(textures.Get(TextureIdentifier.PlayerBarMask));
             PlayerAmmoMaskSprite = new Sprite(textures.Get(TextureIdentifier.PlayerBarAmmoMask));
 
+            WeaponText = new Text(string.Empty, ResourceHolderFacade.GetInstance().Fonts.Get(Config.FontIdentifier.PixelatedSmall), 16);
             ConfigBar();
         }
 
@@ -42,6 +48,8 @@ namespace Client.UI
             PlayerBarSprite.Origin = SpriteUtils.GetSpriteCenter(PlayerBarSprite);
             PlayerHealtMaskSprite.Origin = SpriteUtils.GetSpriteCenter(PlayerHealtMaskSprite);
             PlayerAmmoMaskSprite.Origin = SpriteUtils.GetSpriteCenter(PlayerAmmoMaskSprite);
+
+            WeaponText.Origin = new Vector2f(WeaponText.GetLocalBounds().Width + 75, WeaponText.GetLocalBounds().Height + 20);
 
             Vector2f barScaleVec = new Vector2f(BarScale, BarScale);
             PlayerBarSprite.Scale = barScaleVec;
@@ -58,6 +66,7 @@ namespace Client.UI
 
             PlayerAmmoMaskSprite.Scale = new Vector2f(ammoPercent / 100f * BarScale, BarScale);
             PlayerAmmoMaskSprite.Position = new Vector2f(PlayerAmmoMaskSprite.Position.X - (100 - ammoPercent) * coef / 100f, PlayerAmmoMaskSprite.Position.Y);
+
         }
 
 
@@ -66,6 +75,12 @@ namespace Client.UI
             target.Draw(PlayerHealtMaskSprite);
             target.Draw(PlayerAmmoMaskSprite);
             target.Draw(PlayerBarSprite);
+            try
+            {
+                if (TimeOutTimer.ElapsedTime.AsSeconds() < messageTimeout)
+                    target.Draw(WeaponText);
+            }
+            catch { }
         }
     }
 }
