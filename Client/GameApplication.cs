@@ -79,9 +79,9 @@ namespace Client
 
         public ConcreteMediator mediator = new ConcreteMediator();
 
-        public static AbstractLogger criticalLogger = new CriticalLogger(50);
-        public static AbstractLogger importantLogger = new ImportantLogger(20);
-        public static AbstractLogger fileLogger = new FileLogger(30, "logs.txt");
+        AbstractLogger criticalLogger = new CriticalLogger(50);
+        AbstractLogger importantLogger = new ImportantLogger(20);
+        AbstractLogger fileLogger = new FileLogger(30, "logs.txt");
         public static AbstractLogger defaultLogger = new DefaultLogger(0);
 
         public GameApplication() {
