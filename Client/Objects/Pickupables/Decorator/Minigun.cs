@@ -29,4 +29,3 @@ namespace Client.Objects.Pickupables.Decorator
         }
     }
 }
-//new Minigun("Minigun", 50, 30, 2000, 50, 5000, 50);

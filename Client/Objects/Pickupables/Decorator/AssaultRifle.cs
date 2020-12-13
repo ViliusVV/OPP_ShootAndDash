@@ -27,10 +27,5 @@ namespace Client.Objects.Pickupables.Decorator
             this.Texture = TextureHolder.GetInstance().Get(TextureIdentifier.GunAk47);
             this.Origin = new Vector2f(SpriteUtils.GetSpriteCenter(this).X, 3f);
         }
-
-        void Check()
-        {
-            mediator.Send("pickedup", this);
-        }
     }
 }

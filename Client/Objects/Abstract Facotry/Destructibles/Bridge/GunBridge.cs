@@ -15,36 +15,36 @@ namespace Client.Objects.Abstract_Facotry.Destructibles.Bridge
             switch (num)
             {
                 case 0:
-                    spawn = new Minigun(GameApplication.GetInstance().m);
+                    spawn = new Minigun(GameApplication.GetInstance().mediator);
                     break;
                 case 1:
-                    spawn = new SniperRifle(GameApplication.GetInstance().m);
+                    spawn = new SniperRifle(GameApplication.GetInstance().mediator);
                     break;
                 case 2:
-                    spawn = new Flamethrower(GameApplication.GetInstance().m);
+                    spawn = new Flamethrower(GameApplication.GetInstance().mediator);
                     break;
                 case 3:
-                    spawn = new Shotgun(GameApplication.GetInstance().m);
+                    spawn = new Shotgun(GameApplication.GetInstance().mediator);
                     break;
                 // Weapons with laser
                 case 4:
-                    spawn = new SniperRifle(GameApplication.GetInstance().m);
-                    new RedLaser(spawn, GameApplication.GetInstance().m);
+                    spawn = new SniperRifle(GameApplication.GetInstance().mediator);
+                    new RedLaser(spawn, GameApplication.GetInstance().mediator);
                     break;
                 case 5:
-                    spawn = new AssaultRifle(GameApplication.GetInstance().m);
-                    new RedLaser(spawn, GameApplication.GetInstance().m);
+                    spawn = new AssaultRifle(GameApplication.GetInstance().mediator);
+                    new RedLaser(spawn, GameApplication.GetInstance().mediator);
                     break;
                 case 6:
-                    spawn = new SniperRifle(GameApplication.GetInstance().m);
-                    new GreenLaser(spawn, GameApplication.GetInstance().m);
+                    spawn = new SniperRifle(GameApplication.GetInstance().mediator);
+                    new GreenLaser(spawn, GameApplication.GetInstance().mediator);
                     break;
                 case 7:
-                    spawn = new AssaultRifle(GameApplication.GetInstance().m);
-                    new GreenLaser(spawn, GameApplication.GetInstance().m);
+                    spawn = new AssaultRifle(GameApplication.GetInstance().mediator);
+                    new GreenLaser(spawn, GameApplication.GetInstance().mediator);
                     break;
                 default:
-                    spawn = new AssaultRifle(GameApplication.GetInstance().m);
+                    spawn = new AssaultRifle(GameApplication.GetInstance().mediator);
                     break;
             }
             return spawn;

@@ -76,7 +76,7 @@ namespace Client
 
         Weapon weaponProtoype;
 
-        public ConcreteMediator m { get; set; }
+        public ConcreteMediator mediator = new ConcreteMediator();
 
         public static AbstractLogger criticalLogger = new CriticalLogger(50);
         public static AbstractLogger importantLogger = new ImportantLogger(20);
@@ -142,17 +142,15 @@ namespace Client
             ZoomedView = new View(MainView);
             GameWindow.SetView(ZoomedView);
 
-            // Mediator
-            m = new ConcreteMediator();
 
             // weapon prototype
-            weaponProtoype = new Pistol(m);
+            weaponProtoype = new Pistol(mediator);
 
 
             // Player init
             CreateMainPlayer();
 
-            m.GetPlayerText(MainPlayer.PlayerBar);
+            mediator.GetPlayerText(MainPlayer.PlayerBar);
 
             ConnectionManager connectionManager = new ConnectionManager("http://underpoweredserver.tplinkdns.com:51230/");
             GameState.ConnectionManagerProxy = new Managers.Proxy.ConnectionManagerProxy(connectionManager);
@@ -389,7 +387,7 @@ namespace Client
                 {
                     ForceSpawnObject(MainPlayer);
                     MainPlayer.HoldingWeapon = new Weapon[3];
-                    MainPlayer.HoldingWeapon[0] = new Pistol(m); //for testing purposes
+                    MainPlayer.HoldingWeapon[0] = new Pistol(mediator); //for testing purposes
                     MainPlayer.Weapon = MainPlayer.HoldingWeapon[0];
                     MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
                     MainPlayer.PreviousWeapon = "";
