@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Common.Enums;
 using Client.Adapters;
+using Client.Objects.Pickupables.Decorator;
 
 namespace Client.Models
 {
@@ -379,6 +380,7 @@ namespace Client.Models
 
             if(this.Weapon == null)
             {
+                this.Weapon = new Pistol(GameApplication.GetInstance().mediator);
                 this.Weapon = Weapon.CreateWeapon(playerDto.ServerWeapon.WeaponType);
                 this.HoldingWeapon[0] = this.Weapon;
             }

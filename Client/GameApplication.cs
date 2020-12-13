@@ -152,7 +152,7 @@ namespace Client
 
             mediator.GetPlayerText(MainPlayer.PlayerBar);
 
-            ConnectionManager connectionManager = new ConnectionManager("http://underpoweredserver.tplinkdns.com:51230/");
+            ConnectionManager connectionManager = new ConnectionManager("http://underpoweredserver.tplinkdns.com:51230/sd-server");
             GameState.ConnectionManagerProxy = new Managers.Proxy.ConnectionManagerProxy(connectionManager);
 
             bool isPlayerSpawned = ForceSpawnObject(MainPlayer);
