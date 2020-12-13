@@ -12,10 +12,19 @@ namespace ServerXUnitTests
     {
         public Mock<GameManager> GameManager { get; private set; }
 
-        public ServerTests(Mock<GameManager> gameManager)
+        //public ServerTests(Mock<GameManager> gameManager)
+        //{
+
+        //    var mockConnection = new Mock<HubConnection>();
+        //}
+        public ServerTests()
         {
 
-            var mockConnection = new Mock<HubConnection>();
+        }
+        [Fact]
+        public void TestGameManager()
+        {
+            Assert.True(true);
         }
         //[Fact]
         //public void HubsAreMockableViaDynamic()
