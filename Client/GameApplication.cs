@@ -285,7 +285,16 @@ namespace Client
         private void RenderPlayers()
         {
             var iter = GameState.PlayerRep.GetIterator(500, MainPlayer);
-
+            while (iter.HasNext())
+            {
+                Player player = (Player)iter.Next();
+                if (!player.IsDead)
+                {
+                    GameWindow.Draw(player);
+                    GameWindow.Draw(player.PlayerBar);
+                }
+            }
+            iter = GameState.PlayerRep.GetIterator();
             while (iter.HasNext())
             {
                 Player player = (Player)iter.Next();
@@ -300,8 +309,8 @@ namespace Client
 
                     UpdatePickupables(player);
 
-                    GameWindow.Draw(player);
-                    GameWindow.Draw(player.PlayerBar);
+                    //GameWindow.Draw(player);
+                    //GameWindow.Draw(player.PlayerBar);
 
                     if (player.Weapon != null)
                     {
