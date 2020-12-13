@@ -66,7 +66,7 @@ namespace Client
 
         public bool isMementoSet = false;
 
-        Player MainPlayer { get; set; }
+        public Player MainPlayer { get; set; }
         Clock FrameClock { get; set; } = new Clock();
         Clock RespawnTimer { get; set; } = new Clock();
 
@@ -210,7 +210,8 @@ namespace Client
                     GameWindow.Draw(GameplayUI.Scoreboard);
                     GameWindow.Draw(GameplayUI.RespawnMesage);
                     GameWindow.Draw(GameplayUI.KillNotifier);
-                    if(container.Show)
+                    GameWindow.Draw(GameplayUI.InGameLog);
+                    if (container.Show)
                     GameWindow.Draw(container.composite);
                     ZoomedView.Center = middlePoint;
 
@@ -645,6 +646,40 @@ namespace Client
                 {
                     ConntectToServer();
                 }
+                if (e.Code == Keyboard.Key.Tilde)
+                {
+                    GameplayUI.InGameLog.ShowLog = !GameplayUI.InGameLog.ShowLog;
+                    MainPlayer.StopControlls = GameplayUI.InGameLog.ShowLog;
+
+                }
+
+                if (e.Code == Keyboard.Key.Enter)
+                {
+                    if (GameplayUI.InGameLog.ShowLog)
+                    {
+                        GameplayUI.InGameLog.ConfirmLine();
+                    }
+                }
+
+                if(e.Code == Keyboard.Key.Backspace)
+                {
+                    if (GameplayUI.InGameLog.ShowLog)
+                    {
+                        GameplayUI.InGameLog.ClearLine();
+                    }
+                }
+
+            };
+
+            window.TextEntered += (sender, e) =>
+            {
+                if (GameplayUI.InGameLog.ShowLog)
+                {
+                    Window windowEvt = (Window)sender;
+                    TextEventArgs args = (TextEventArgs)e;
+                    args.Unicode = args.Unicode.Trim('\b');
+                    GameplayUI.InGameLog.AddText(e.Unicode);
+                }
             };
 
             window.MouseWheelScrolled += (sender, e) => {
@@ -674,100 +709,97 @@ namespace Client
         {
             // Polling key presses is better than events if we
             // need to detect multiple key presses at same time
-            if (container.Show == false)
+            if (!GameplayUI.InGameLog.ShowLog)
             {
-                if (Keyboard.IsKeyPressed(Keyboard.Key.X))
+                if (container.Show == false)
                 {
-                    SpawnRandomSyringe();
+                    if (Keyboard.IsKeyPressed(Keyboard.Key.X))
+                    {
+                        SpawnRandomSyringe();
+                    }
+                    if (Keyboard.IsKeyPressed(Keyboard.Key.Z))
+                    {
+                        MainPlayer.AddHealth(-1);
+                    }
+                    if (Keyboard.IsKeyPressed(Keyboard.Key.R))
+                    {
+                        MainPlayer.Weapon.Reload();
+                    }
+
+                    if (Mouse.IsButtonPressed(Mouse.Button.Left))
+                    {
+                        var target = AimCursor.Position - MainPlayer.Position;
+                        MainPlayer.Weapon.Shoot(target, MainPlayer);
+                    }
+
+                    // Testing abstract factory
+                    if (Keyboard.IsKeyPressed(Keyboard.Key.O))
+                    {
+                        //SpawnDestructible();
+                        //SpawnIndestructible();
+                        SpawnTraps();
+                    }
+                    // testing builder
+                    if (Keyboard.IsKeyPressed(Keyboard.Key.H))
+                    {
+
+                        director.ConstructBase();
+                        GameState.TileMap = builder.GetResult();
+                    }
+                    if (Keyboard.IsKeyPressed(Keyboard.Key.Q))
+                    {
+                        MainPlayer.Toggle();
+                    }
+                    if (Keyboard.IsKeyPressed(Keyboard.Key.G))
+                    {
+                        MainPlayer.DropWeapon();
+                    }
+                    if (Keyboard.IsKeyPressed(Keyboard.Key.Num1))
+                    {
+                        if (MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[0].Name)
+                            MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
+                    }
+                    if (Keyboard.IsKeyPressed(Keyboard.Key.Num2))
+                    {
+                        if (MainPlayer.HoldingWeapon[1] != null && MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[1].Name)
+                            MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[1]);
+                    }
+                    if (Keyboard.IsKeyPressed(Keyboard.Key.Num3))
+                    {
+                        if (MainPlayer.HoldingWeapon[2] != null && MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[2].Name)
+                            MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[2]);
+                    }
+                    if (Keyboard.IsKeyPressed(Keyboard.Key.M))
+                    {
+                        Toggle();
+                    }
                 }
-                if (Keyboard.IsKeyPressed(Keyboard.Key.Z))
+                // Menu
+                if (Keyboard.IsKeyPressed(Keyboard.Key.P))
                 {
-                    MainPlayer.AddHealth(-1);
-                }
-                if (Keyboard.IsKeyPressed(Keyboard.Key.R))
-                {
-                    MainPlayer.Weapon.Reload();
+                    container.ChangeVisibility();
                 }
 
-                if (Mouse.IsButtonPressed(Mouse.Button.Left))
-                {
-                    var target = AimCursor.Position - MainPlayer.Position;
-                    MainPlayer.Weapon.Shoot(target, MainPlayer);
-                }
 
-            // Testing abstract factory
-            if (Keyboard.IsKeyPressed(Keyboard.Key.O))
-            {
-                //SpawnDestructible();
-                //SpawnIndestructible();
-                SpawnTraps();
+                if (Keyboard.IsKeyPressed(Keyboard.Key.Space))
+                {
+                    container.selectButton();
+                    container.chooseComposite();
+                    if (container.composite.tempSelected <= 2)
+                    {
+                        container.composite.Accept(new CursorVisitor());
+                    }
+                    else if (container.composite.tempSelected <= 4)
+                    {
+                        container.composite.Accept(new ControlsVisitor());
+                    }
+                    else if (container.composite.tempSelected <= 6)
+                    {
+                        container.composite.Accept(new VolumeVisitor());
+                    }
+                    container.returnComposite();
+                }
             }
-            // testing builder
-            if (Keyboard.IsKeyPressed(Keyboard.Key.H))
-            {
-
-                    director.ConstructBase();
-                    GameState.TileMap = builder.GetResult();
-                }
-                if (Keyboard.IsKeyPressed(Keyboard.Key.Q))
-                {
-                    MainPlayer.Toggle();
-                }
-                if (Keyboard.IsKeyPressed(Keyboard.Key.G))
-                {
-                    MainPlayer.DropWeapon();
-                }
-                if (Keyboard.IsKeyPressed(Keyboard.Key.Num1))
-                {
-                    if (MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[0].Name)
-                        MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
-                }
-                if (Keyboard.IsKeyPressed(Keyboard.Key.Num2))
-                {
-                    if (MainPlayer.HoldingWeapon[1] != null && MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[1].Name)
-                        MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[1]);
-                }
-                if (Keyboard.IsKeyPressed(Keyboard.Key.Num3))
-                {
-                    if (MainPlayer.HoldingWeapon[2] != null && MainPlayer.Weapon.Name != MainPlayer.HoldingWeapon[2].Name)
-                        MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[2]);
-                }
-                if (Keyboard.IsKeyPressed(Keyboard.Key.M))
-                {
-                    Toggle();
-                }
-            }
-            // Menu
-            if (Keyboard.IsKeyPressed(Keyboard.Key.P))
-			{
-                container.ChangeVisibility();
-			}
-            if (Keyboard.IsKeyPressed(Keyboard.Key.W))
-			{
-                container.composite.SelectPrevious();
-			}
-            if (Keyboard.IsKeyPressed(Keyboard.Key.S))
-			{
-                container.composite.SelectNext();
-			}
-            if (Keyboard.IsKeyPressed(Keyboard.Key.Space))
-			{
-                container.selectButton();
-                container.chooseComposite();
-                if (container.composite.tempSelected <= 2)
-                {
-                    container.composite.Accept(new CursorVisitor());
-                }
-                else if (container.composite.tempSelected <= 4)
-				{
-                    container.composite.Accept(new ControlsVisitor());
-				}
-                else if (container.composite.tempSelected <= 6)
-				{
-                    container.composite.Accept(new VolumeVisitor());
-				}
-                container.returnComposite();
-			}
         }
 
         // ========================================================================

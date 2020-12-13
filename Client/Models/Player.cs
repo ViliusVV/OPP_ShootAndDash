@@ -56,6 +56,8 @@ namespace Client.Models
 
         public PlayerBar PlayerBar { get; set; }
 
+        public bool StopControlls { get; set; } = false;
+
 
         public Player()
         {
@@ -219,19 +221,22 @@ namespace Client.Models
                 bool right = false;
                 bool up = false;
                 bool down = false;
-                if (GameState.GetInstance().ControlsCheck)
+                if (!this.StopControlls)
                 {
-                    left = Keyboard.IsKeyPressed(Keyboard.Key.A);
-                    right = Keyboard.IsKeyPressed(Keyboard.Key.D);
-                    up = Keyboard.IsKeyPressed(Keyboard.Key.W);
-                    down = Keyboard.IsKeyPressed(Keyboard.Key.S);
-                }
-                else
-				{
-                    left = Keyboard.IsKeyPressed(Keyboard.Key.Left);
-                    right = Keyboard.IsKeyPressed(Keyboard.Key.Right);
-                    up = Keyboard.IsKeyPressed(Keyboard.Key.Up);
-                    down = Keyboard.IsKeyPressed(Keyboard.Key.Down);
+                    if (GameState.GetInstance().ControlsCheck)
+                    {
+                        left = Keyboard.IsKeyPressed(Keyboard.Key.A);
+                        right = Keyboard.IsKeyPressed(Keyboard.Key.D);
+                        up = Keyboard.IsKeyPressed(Keyboard.Key.W);
+                        down = Keyboard.IsKeyPressed(Keyboard.Key.S);
+                    }
+                    else
+                    {
+                        left = Keyboard.IsKeyPressed(Keyboard.Key.Left);
+                        right = Keyboard.IsKeyPressed(Keyboard.Key.Right);
+                        up = Keyboard.IsKeyPressed(Keyboard.Key.Up);
+                        down = Keyboard.IsKeyPressed(Keyboard.Key.Down);
+                    }
                 }
                 const float increment = 0.4f;
                 const float maxSpd = 4;
