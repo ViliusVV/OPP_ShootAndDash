@@ -1,6 +1,7 @@
 ﻿using Client.Collisions;
 using Client.Config;
 using Client.Managers;
+using Client.Managers.Iterator.Repositories;
 using Client.Models;
 using Client.Objects.Abstract_Facotry.Destructibles.Bridge;
 using Client.Objects.Destructables;
@@ -173,7 +174,7 @@ namespace Client.Objects
             List<int> indexesToRemove = new List<int>();
 
             var collidables = GameState.GetInstance().Collidables;
-            var players = GameState.GetInstance().Players;
+            var players = PlayerRepository.Players;
 
 
             for (int i = 0; i < Projectiles.Count; i++)

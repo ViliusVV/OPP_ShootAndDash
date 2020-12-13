@@ -31,6 +31,7 @@ using Client.UI.Visitor;
 using Common.Utilities.Loggers;
 using System.IO;
 using Client.Objects.Pickupables.Mediator;
+using Client.Managers.Iterator.Repositories;
 
 namespace Client
 {
@@ -159,7 +160,6 @@ namespace Client
 
             if (isPlayerSpawned)
             {
-                GameState.Players.Add(MainPlayer);
                 GameState.PlayerRep.GetIterator().Add(MainPlayer);
                 GameState.PlayerRep.GetIterator().Add(SpawnFakePlayer(4000, 2000));
                 GameState.PlayerRep.GetIterator().Add(SpawnFakePlayer(4000, 2200));
@@ -292,8 +292,15 @@ namespace Client
                 {
                     GameWindow.Draw(player);
                     GameWindow.Draw(player.PlayerBar);
+
+                    if (player.Weapon != null)
+                    {
+                        GameWindow.Draw(player.Weapon);
+                    }
                 }
             }
+
+
             iter = GameState.PlayerRep.GetIterator();
             while (iter.HasNext())
             {
@@ -309,12 +316,8 @@ namespace Client
 
                     UpdatePickupables(player);
 
-                    //GameWindow.Draw(player);
-                    //GameWindow.Draw(player.PlayerBar);
-
                     if (player.Weapon != null)
                     {
-                        GameWindow.Draw(player.Weapon);
                         DrawProjectiles(player);
                         if (player.Weapon.LaserSight != null) GameWindow.Draw(player.Weapon.LaserSprite);
                     }
@@ -431,7 +434,7 @@ namespace Client
         {
             foreach (var dto in stateDTO.Players)
             {
-                Player player = GameState.Players.Find(p => p.Name.Equals(dto.Name));
+                Player player = PlayerRepository.Players.Find(p => p.Name.Equals(dto.Name));
                 if (player != null && !MainPlayer.Equals(player))
                 {
                     player.RefreshData(dto);
@@ -440,7 +443,7 @@ namespace Client
                 if (player == null)
                 {
                     Player tmpPlayer = new Player(dto);
-                    GameState.Players.Add(tmpPlayer);
+                    PlayerRepository.Players.Add(tmpPlayer);
                 }
             }
         }
@@ -543,7 +546,7 @@ namespace Client
             //});
             GameState.ConnectionManagerProxy.Connection.On<ShootEventData>("ShootEventClient", (shootData) =>
             {
-                Player player = GameState.Players.Find(p => p.Name.Equals(shootData.Shooter.Name));
+                Player player = PlayerRepository.Players.Find(p => p.Name.Equals(shootData.Shooter.Name));
                 if (player != null)
                 {
                     player.Weapon.Shoot(shootData.Target, shootData.Orgin, shootData.Rotation, player, false);
@@ -565,8 +568,8 @@ namespace Client
             //});
             GameState.ConnectionManagerProxy.Connection.On<ServerPlayer, ServerPlayer>("UpdateScoresClient", (killerServ, victimServ) =>
             {
-                Player killer = GameState.Players.Find(p => p.Name.Equals(killerServ.Name));
-                Player victim = GameState.Players.Find(p => p.Name.Equals(victimServ.Name));
+                Player killer = PlayerRepository.Players.Find(p => p.Name.Equals(killerServ.Name));
+                Player victim = PlayerRepository.Players.Find(p => p.Name.Equals(victimServ.Name));
 
                 //OurLogger.Log($"{victimServ.Name} got shot. Before {victim.Health} after {victimServ.Health} ");
                 defaultLogger.LogMessage(15, $"{victimServ.Name} got shot. Before {victim.Health} after {victimServ.Health} ");

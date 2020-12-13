@@ -22,7 +22,6 @@ namespace Client.Managers
 
         public Random Random { get; private set; }
 
-        public List<Player> Players { get; set; }
         //public List<Pickupable> Pickupables { get; set; }
         public virtual List<Sprite> Collidables { get; set; }
         public PickupableRepository PickupableRep { get; set; }
@@ -42,7 +41,6 @@ namespace Client.Managers
 
         public GameState()
         {
-            this.Players = new List<Player>();
             this.PlayerRep = new PlayerRepository();
             //this.Pickupables = new List<Pickupable>();
             this.PickupableRep = new PickupableRepository();
@@ -74,7 +72,7 @@ namespace Client.Managers
         public void ToDTO()
         {
             ServerGameState dto = new ServerGameState();
-            foreach(Player player in Players)
+            foreach(Player player in PlayerRepository.Players)
             {
                 dto.Players.Add(player.ToDTO());
             }
@@ -84,7 +82,7 @@ namespace Client.Managers
         {
             foreach(ServerPlayer playerDto in dto.Players)
             {
-                Player player = Players.Find(p => p.Name.Equals(playerDto.Name));
+                Player player = PlayerRepository.Players.Find(p => p.Name.Equals(playerDto.Name));
 
                 if (player != null && !player.IsMainPlayer)
                 {
