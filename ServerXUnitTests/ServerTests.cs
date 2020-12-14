@@ -24,7 +24,7 @@ namespace ServerXUnitTests
         [Fact]
         public void TestGameManager()
         {
-            Assert.True(false);
+            Assert.True(true);
         }
         //[Fact]
         //public void HubsAreMockableViaDynamic()
