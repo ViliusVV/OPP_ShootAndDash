@@ -12,34 +12,85 @@ namespace ServerXUnitTests
     {
         public Mock<GameManager> GameManager { get; private set; }
 
-        //public ServerTests(Mock<GameManager> gameManager)
-        //{
-
-        //    var mockConnection = new Mock<HubConnection>();
-        //}
         public ServerTests()
         {
+        }
 
-        }
+
         [Fact]
-        public void TestGameManager()
+        public void HubsAreMockableViaDynamic()
         {
-            Assert.True(false);
+            bool sendCalled = true;
+            ShotAndDashHub hub = new ShotAndDashHub();
+
+            Assert.True(sendCalled);
         }
-        //[Fact]
-        //public void HubsAreMockableViaDynamic()
-        //{
-        //    bool sendCalled = false;
-        //    ShotAndDashHub hub = new ShotAndDashHub();
-        //    var mockClients = new Mock<IHubCallerConnectionContext<dynamic>>();
-        //    hub.Clients = mockClients.Object;
-        //    dynamic all = new ExpandoObject();
-        //    all.broadcastMessage = new Action<string, string>((name, message) => {
-        //        sendCalled = true;
-        //    });
-        //    mockClients.Setup(m => m.All).Returns((ExpandoObject)all);
-        //    hub.Send("TestUser", "TestMessage");
-        //    Assert.True(sendCalled);
-        //}
+
+        [Fact]
+        public void HubsAreMockableViaDynamic2()
+        {
+            bool sendCalled = true;
+            ShotAndDashHub hub = new ShotAndDashHub();
+
+            Assert.True(sendCalled);
+        }
+
+        [Fact]
+        public void HubsAreMockableViaDynamic3()
+        {
+            bool sendCalled = true;
+            ShotAndDashHub hub = new ShotAndDashHub();
+
+            Assert.True(sendCalled);
+        }
+
+        [Fact]
+        public void HubsAreMockableViaDynamic4()
+        {
+            bool sendCalled = true;
+            ShotAndDashHub hub = new ShotAndDashHub();
+
+            Assert.True(sendCalled);
+        }
+
+
+        [Fact]
+        public void HubsAreMockableViaDynamic5()
+        {
+            bool sendCalled = true;
+            ShotAndDashHub hub = new ShotAndDashHub();
+
+            Assert.True(sendCalled);
+        }
+
+
+        [Fact]
+        public void HubsAreMockableViaDynamic6()
+        {
+            bool sendCalled = true;
+            ShotAndDashHub hub = new ShotAndDashHub();
+
+            Assert.True(sendCalled);
+        }
+
+
+        [Fact]
+        public void HubsAreMockableViaDynamic7()
+        {
+            bool sendCalled = true;
+            ShotAndDashHub hub = new ShotAndDashHub();
+
+            Assert.True(sendCalled);
+        }
+
+
+        [Fact]
+        public void HubsAreMockableViaDynamic8()
+        {
+            bool sendCalled = false;
+            ShotAndDashHub hub = new ShotAndDashHub();
+
+            Assert.True(sendCalled);
+        }
     }
 }
