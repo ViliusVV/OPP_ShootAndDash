@@ -23,15 +23,35 @@ using System.Linq;
 using Common.Enums;
 using Client.Adapters;
 using Client.Objects.Pickupables.Decorator;
+using Client.Models.PlayerState;
 
 namespace Client.Models
 {
     public class Player: Sprite, ICommand
     {
+        private IPlayerState _deadState;
+        private IPlayerState _idleState;
+        private IPlayerState _runningState;
+        private IPlayerState _lockedState;
+
+        public IPlayerState CurrentState { get; set; }
+
         private SoundHolder Sounds { get; set; } = SoundHolder.GetInstance();
         public string Name { get; set; }
-        public float Health { get; set; } = 100;
-        public bool IsDead { get => Health <= 0; }
+        private float _health = 100;
+        public float Health 
+        { 
+            get { return this._health; }
+            set { 
+                this._health = value;
+                if (CheckHealth())
+                {
+                    SetDeadState();
+                }
+            }
+        }
+        public bool IsDead { get => CurrentState.IsDead;  }
+        public bool IsLocked { get => CurrentState.IsLocked; }
 
         public int Kills { get; set; }
         public int Deaths { get; set; }
@@ -42,7 +62,7 @@ namespace Client.Models
         public float Heading { get; set; }
 
         public virtual float SpeedMultiplier { get; set; } = 1;
-        public bool Running { get => Math.Abs(Speed.X) > 0.1 || Math.Abs(Speed.Y) > 0.1; }
+        public bool Running { get => CurrentState.IsRunning; }
         public bool IsMainPlayer { get; set; } = false;
         public bool IsInvincible { get; set; } = false;
         public Weapon Weapon { get; set; }
@@ -51,13 +71,13 @@ namespace Client.Models
         public Clock SwapTimer { get; set; } = new Clock();
         public Clock DropTimer { get; set; } = new Clock();
 
-        private PlayerAnimation PlayerAnimation { get; set; }
+        public PlayerAnimation PlayerAnimation { get; set; }
         private PlayerSkinType Appearance { get; set; } = Utils.RandomEnum<PlayerSkinType>();
 
 
         public PlayerBar PlayerBar { get; set; }
 
-        public bool StopControlls { get; set; } = false;
+        public bool StopControlls { get => CurrentState.IsLocked; }
 
 
         public Player()
@@ -82,6 +102,13 @@ namespace Client.Models
 
         public void InitPlayer(PlayerSkinType appearance)
         {
+            this._deadState = new DeadState(this);
+            this._idleState = new IdleState(this);
+            this._runningState = new RunningState(this);
+            this._lockedState = new LockedState(this);
+
+            SetIdleState();
+
             this.Name = String.Format("Player-{0}", new Random().Next(111, 999).ToString());
             this.Appearance = appearance;
             this.Texture = GetTexture(this.Appearance);
@@ -306,10 +333,10 @@ namespace Client.Models
 
         public void Update()
         {
-            this.PlayerAnimation.Update();
+            this.CurrentState.Animate();
+            this.CurrentState.HandleDeath();
             UpdateWeapon();
             UpdatePlayerBar();
-
         }
 
         public void UpdateWeapon()
@@ -407,6 +434,57 @@ namespace Client.Models
         public override int GetHashCode()
         {
             return HashCode.Combine(Name);
+        }
+
+        public bool CheckHealth()
+        {
+            return Health <= 0;
+        }
+
+        public bool CheckSpeed()
+        {
+            return Math.Abs(Speed.X) > 0.1 || Math.Abs(Speed.Y) > 0.1;
+        }
+
+        public void Pause(bool paused)
+        {
+            if (paused)
+            {
+                SetLockedState();
+            }
+            else
+            {
+                SetIdleState();
+            }
+        }
+
+        public void SetCurrentState(IPlayerState state)
+        {
+            if(CurrentState != state)
+            {
+                OurLogger.Log($"New current player state {state}");
+            }
+            CurrentState = state;
+        }
+
+        public void SetLockedState()
+        {
+            SetCurrentState(_lockedState);
+        }
+
+        public void SetDeadState()
+        {
+            SetCurrentState(_deadState);
+        }
+
+        public void SetIdleState()
+        {
+            SetCurrentState(_idleState);
+        }
+
+        public void SetRunningState()
+        {
+            SetCurrentState(_runningState);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Client.Models
 {
-    class PlayerAnimation
+    public class PlayerAnimation
     {
         private Player player;
 

@@ -41,8 +41,8 @@ namespace Client
         private static readonly GameApplication _instance = new GameApplication();
 
         // Settings
-        private readonly int multiplayerSendRate = 30;
-        private readonly int deathTimeout = 3;
+        public readonly int multiplayerSendRate = 30;
+        public readonly int deathTimeout = 3;
 
 
         // Screen 
@@ -69,10 +69,10 @@ namespace Client
 
         public Player MainPlayer { get; set; }
         Clock FrameClock { get; set; } = new Clock();
-        Clock RespawnTimer { get; set; } = new Clock();
+        public Clock RespawnTimer { get; set; } = new Clock();
 
         public AimCursor AimCursor = new AimCursor();
-        GamePlayUI GameplayUI = new GamePlayUI();
+        public GamePlayUI GameplayUI = new GamePlayUI();
         ButtonsClass container = new ButtonsClass();
 
         Weapon weaponProtoype;
@@ -202,7 +202,6 @@ namespace Client
 
                 lock (SFMLLock)
                 {
-                    HandleDeath();
                     DrawLoop();
                     GameWindow.SetView(MainView);
                     GameWindow.Draw(GameplayUI.Scoreboard);
@@ -296,6 +295,8 @@ namespace Client
                     if (player.Weapon != null)
                     {
                         GameWindow.Draw(player.Weapon);
+                        DrawProjectiles(player);
+                        if (player.Weapon.LaserSight != null) GameWindow.Draw(player.Weapon.LaserSprite);
                     }
                 }
             }
@@ -305,23 +306,14 @@ namespace Client
             while (iter.HasNext())
             {
                 Player player = (Player)iter.Next();
-                if (!player.IsDead)
-                {
-                    Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
-                    player.PlayerBar.Position = playerBarPos;
-                    if(!container.Show)
-                    player.UpdateSpeed();
-                    player.TranslateFromSpeed();
-                    player.Update();
+                Vector2f playerBarPos = new Vector2f(player.Position.X, player.Position.Y - 40);
+                player.PlayerBar.Position = playerBarPos;
+                if(!container.Show)
+                player.UpdateSpeed();
+                player.TranslateFromSpeed();
+                player.Update();
 
-                    UpdatePickupables(player);
-
-                    if (player.Weapon != null)
-                    {
-                        DrawProjectiles(player);
-                        if (player.Weapon.LaserSight != null) GameWindow.Draw(player.Weapon.LaserSprite);
-                    }
-                }
+                UpdatePickupables(player);
             }
         }
 
@@ -386,42 +378,6 @@ namespace Client
         {
             UpdateBullets(deltaTime);
             AimCursor.Update(mPos);
-        }
-
-        public void HandleDeath()
-        {
-
-            if (MainPlayer.IsDead)
-            {
-                float elapsedDeath = RespawnTimer.ElapsedTime.AsSeconds();
-                var text = GameplayUI.RespawnMesage;
-
-                if (elapsedDeath > deathTimeout)
-                {
-                    ForceSpawnObject(MainPlayer);
-                    MainPlayer.HoldingWeapon = new Weapon[3];
-                    MainPlayer.HoldingWeapon[0] = new Pistol(mediator); //for testing purposes
-                    MainPlayer.Weapon = MainPlayer.HoldingWeapon[0];
-                    MainPlayer.SetWeapon(MainPlayer.HoldingWeapon[0]);
-                    MainPlayer.PreviousWeapon = "";
-                    MainPlayer.Health = 100;
-                    text.DisplayedString = "";
-                }
-                else
-                {
-                    try
-                    {
-                        text.DisplayedString = "You're dead. Respawning in " + (deathTimeout - elapsedDeath).ToString("N2");
-                        text.Origin = new Vector2f(text.GetLocalBounds().Left / 2f, text.GetLocalBounds().Top / 2f);
-                        text.Position = new Vector2f(GameWindow.GetViewport(MainView).Height / 2f, GameWindow.GetViewport(MainView).Width / 2f);
-                    }
-                    catch { }
-                }
-            }
-            else
-            {
-                RespawnTimer.Restart();
-            }
         }
 
 
@@ -659,7 +615,7 @@ namespace Client
                 if (e.Code == Keyboard.Key.Tilde)
                 {
                     GameplayUI.InGameLog.ShowLog = !GameplayUI.InGameLog.ShowLog;
-                    MainPlayer.StopControlls = GameplayUI.InGameLog.ShowLog;
+                    MainPlayer.Pause(GameplayUI.InGameLog.ShowLog);
 
                 }
 
@@ -885,7 +841,7 @@ namespace Client
             }
         }
 
-        private bool ForceSpawnObject(Sprite objectSprite)
+        public bool ForceSpawnObject(Sprite objectSprite)
         {
             bool objectSpawned = false;
             while (!objectSpawned)
